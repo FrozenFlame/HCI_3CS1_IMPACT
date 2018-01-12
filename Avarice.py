@@ -1,9 +1,9 @@
 import pygame
-from game import Engine
+import Engine
 
 def main():
-    program = Engine.Engine()
-    program.main_loop()
+    avarice = Engine.Engine()
+    avarice.main_loop()
     pygame.quit()
     quit()
 

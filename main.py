@@ -1,6 +1,6 @@
 import sys
 import pygame
-from game.scripts.Globals import *
+from scripts.Globals import *
 
 pygame.init()
 
