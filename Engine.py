@@ -53,14 +53,14 @@ class Dragbox(object):
                 travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
                 self.distance -= travelled
                 if self.distance <= 0:  # destination reached
-                    self.posX = self.defaultPos[0] * dTime
-                    self.posY = self.defaultPos[1] * dTime
+                    self.posX = self.defaultPos[0] #* dTime
+                    self.posY = self.defaultPos[1] #* dTime
                     self.resting = True
                     self.destination = None
                     # print("lol")
                 else:
-                    self.posX += self.vector[0]
-                    self.posY += self.vector[1]
+                    self.posX += self.vector[0] *dTime
+                    self.posY += self.vector[1] *dTime
                     # print("lol2")
             # animating but not held card
             elif self.isHeld == False and self.resting == False:
@@ -68,18 +68,20 @@ class Dragbox(object):
                 travelled = math.hypot(self.vector[0]*dTime, self.vector[1]*dTime)
                 self.distance -= travelled
                 if self.distance <= 0:  # destination reached
-                    self.posX = self.defaultPos[0] * dTime
-                    self.posY = self.defaultPos[1] * dTime
+                    self.posX = self.defaultPos[0] #* dTime
+                    self.posY = self.defaultPos[1] #* dTime
                     self.resting = True
                     self.destination = None
                 else:
-                    self.posX += self.vector[0]
-                    self.posY += self.vector[1]
+                    self.posX += self.vector[0] *dTime
+                    self.posY += self.vector[1] *dTime
     # setting of destination, or the relative vector to location
     def set_destination(self, x, y):
-        print("set desti msg: {0}, {1}".format(x,y))
+        print("set desti: {0}, {1}".format(x,y))
         print("Mouse pos {0}".format(pygame.mouse.get_pos()))
         print("Distance {0}".format(self.distance))
+        print("Vector: {0}".format(self.vector))
+        print()
         xDistance = x - self.posX
         yDistance = y - self.posY
         self.distance = math.hypot(xDistance, yDistance)  # distance from default position
