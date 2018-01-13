@@ -48,12 +48,15 @@ class Dragbox(object):
         #         self.posY += self.vector[1]
         if self.destination:
             if self.isHeld == True:
+                self.posX = mouseX - self.width*0.75
+                self.posY = mouseY - self.height*0.75
+                '''
                 self.set_destination(mouseX, mouseY)
                 # print ("TRUE")
                 travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
                 self.distance -= travelled
                 if self.distance <= 0:  # destination reached
-                    self.posX = self.defaultPos[0] #* dTime
+                    self.posX = self.defaultPos[0] #* dTime     I think this was somehow the issue, moved it down to 'else'
                     self.posY = self.defaultPos[1] #* dTime
                     self.resting = True
                     self.destination = None
@@ -62,6 +65,7 @@ class Dragbox(object):
                     self.posX += self.vector[0] *dTime
                     self.posY += self.vector[1] *dTime
                     # print("lol2")
+                    '''
             # animating but not held card
             elif self.isHeld == False and self.resting == False:
                 self.set_destination(self.defaultPos[0], self.defaultPos[1])
