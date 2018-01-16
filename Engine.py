@@ -14,6 +14,7 @@ class Dragbox(object):
         self.resting = True #unused for now
         self.defaultPos = (640,250)
         self.img = pygame.image.load("assets\\cards\\democard.png")
+        self.img = self.img.convert_alpha()
         self.speed = 10
 
         #animated positing junk
@@ -89,6 +90,15 @@ class Dragbox(object):
                 collide = True
         return collide
 
+#this too, THESE NEED TO GO TO THEIR OWN CLASSES AT SOME POINT LADS
+class dummyboard(object):
+    def __init__(self):
+        self.posX = 0.0
+        self.posY = 0.0
+        self.img = pygame.image.load("assets\\board\\DemoGameboard.png").convert_alpha()
+    def draw(self, screen):
+            screen.blit(self.img, (self.posX, self.posY))
+            self.blitted = True
 class Engine(object):
     def __init__(self):
         pygame.init()
@@ -117,7 +127,7 @@ class Engine(object):
         self.deckImgHolder1 = Dragbox()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Dragbox()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Dragbox()
-
+        self.board = dummyboard()
 
 
     # handles events which happen in the program
@@ -184,7 +194,8 @@ class Engine(object):
 
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self):
-        self.screen.fill((100,100,100))
+        self.board.draw(self.screen)
+        # self.screen.fill((100,100,100))
         self.card.draw(self.screen)
 
         for h in self.handList:
@@ -194,7 +205,9 @@ class Engine(object):
         self.deckImgHolder2.draw(self.screen)
         self.deckImgHolder3.draw(self.screen)
 
-        pass
+        # FPS
+        pygame.display.set_caption("Avarice - A Greed-Based Card Game - FPS: {0:.2f}".format(self.clock.get_fps()))
+
 
     def main_loop(self):
 
