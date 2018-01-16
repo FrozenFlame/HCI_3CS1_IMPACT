@@ -14,7 +14,7 @@ class Dragbox(object):
         self.resting = True #unused for now
         self.defaultPos = (640,550)
         self.img = pygame.image.load("assets\\cards\\democard.png")
-        self.speed = 500
+        self.speed = 10
 
         #animated positing junk
         self.destination = None # is a Tuple x,y
@@ -29,43 +29,12 @@ class Dragbox(object):
 
     # change of position on screen (calculation)
     def update(self, dTime, mouseX, mouseY):
-        # if self.isHeld == True:
-        #     self.distance = math.hypot((self.defaultPos[0] - self.posX), (self.defaultPos[1] - self.posY))
-        #     # print(distance)
-        #     self.posX = mouseX - (self.width *0.75)
-        #     self.posY = mouseY - (self.height *0.75)
-        #     self.resting = False
-        # elif self.isHeld == False and self.resting == False: # condition dropped to illegal zone
-        #     self.set_target(self.defaultPos[0], self.defaultPos[1])
-        #     travelled =  math.hypot(self.vector[0]*dTime, self.vector[1]*dTime)
-        #     self.distance -= travelled
-        #     if self.distance <= 0:  # destination reached
-        #         self.posX = self.defaultPos[0] * dTime
-        #         self.posY = self.defaultPos[1] * dTime
-        #         self.resting = True
-        #     else:
-        #         self.posX += self.vector[0]
-        #         self.posY += self.vector[1]
+
         if self.destination:
             if self.isHeld == True:
                 self.posX = mouseX - self.width*0.75
                 self.posY = mouseY - self.height*0.75
-                '''
-                self.set_destination(mouseX, mouseY)
-                # print ("TRUE")
-                travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
-                self.distance -= travelled
-                if self.distance <= 0:  # destination reached
-                    self.posX = self.defaultPos[0] #* dTime     I think this was somehow the issue, moved it down to 'else'
-                    self.posY = self.defaultPos[1] #* dTime
-                    self.resting = True
-                    self.destination = None
-                    # print("lol")
-                else:
-                    self.posX += self.vector[0] *dTime
-                    self.posY += self.vector[1] *dTime
-                    # print("lol2")
-                    '''
+
             # animating but not held card
             elif self.isHeld == False and self.resting == False:
                 self.set_destination(self.defaultPos[0], self.defaultPos[1])
@@ -79,6 +48,7 @@ class Dragbox(object):
                 else:
                     self.posX += self.vector[0] *dTime
                     self.posY += self.vector[1] *dTime
+
     # setting of destination, or the relative vector to location
     def set_destination(self, x, y):
         print("set desti: {0}, {1}".format(x,y))
@@ -90,7 +60,7 @@ class Dragbox(object):
         yDistance = y - self.posY
         self.distance = math.hypot(xDistance, yDistance)  # distance from default position
         try:
-            self.vector = self.speed * xDistance / self.distance, self.speed * yDistance / self.distance
+            self.vector = (self.speed + (self.distance*10))* xDistance / self.distance, (self.speed + (self.distance*10)) * yDistance / self.distance
             self.destination = list((x,y))
         except ZeroDivisionError:
             pass
@@ -123,7 +93,6 @@ class Engine(object):
     # handles events which happen in the program
     def eventLoop(self):
         for event in pygame.event.get():
-
             if event.type == pygame.QUIT:
                 self.done = True
             if event.type == pygame.MOUSEBUTTONDOWN:
