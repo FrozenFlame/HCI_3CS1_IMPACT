@@ -1,0 +1,35 @@
+Loop Logic rough draft
+Main loop:
+	Menu loop:
+		Play Solo loop:
+		  Profile Select Loop:
+		    New Profile Loop:
+		    Hero Select Loop:
+			Game loop:
+		Play 1v1 Loop:
+		  Profile Select Loop:
+                    New Profile Loop:
+		    Hero Select Loop:
+			Game loop:
+		Options loop:
+			<brightness>, <SFX Vol>,
+			Profile Select (Options) Loop:
+				New Profile Loop:
+				Delete Profile Loop:
+				
+		
+---   [END OF LOOP DISCUSSION]	 ---
+
+[Card  properties:]
+	Name
+	Effect Name
+	Effect Desc
+	Gold Val
+	x,y (screen coordinate)
+	w,h (card dimensions)
+
+
+[Font choice]
+Card Name:
+Effect Name:
+Effect Desc:

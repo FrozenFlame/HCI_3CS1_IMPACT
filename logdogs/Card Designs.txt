@@ -1,0 +1,47 @@
+[Commons Cards]
+// let's start with raw Gold val cards w/no effect
+1) Bag of Cash [10C]
+	- Effect: None
+2) Deed [25C]
+	- Effect: None
+3) Big Bag of Cash [20C]
+	- Effect: None
+4) Dolla dolla bills [7C]
+	- Effect: None
+5) Maid [15C]
+	- Effect: None
+
+// cards w/ effect/s
+
+6) Loan Slip [Spell]
+	- Effect: Draw 2 cards, after 2 turns lose 15C
+
+7) Lemonade Stand [5C]
+	- Effect: Increase C value by 3 per start of turn.
+
+8) Credit Card [Spell] //could be opaf BUT ITS GWENT
+	- Effect: Play as many cards as you can this turn. Gold values increasingly 	diminish by 2. e.g. -2 -> -4 -> -6 ...
+
+9) Butler [10C]
+	- Effect: Adjacent cards increase in value by 5C
+10) Arsonist [0C]
+	- Effect: Destroy Opposing Column's Structures
+11) 
+
+
+[Unique Cards]
+Ruling:
+3 Units
+3 Objects
+2 Spells
+2 Structs
+1 Hero Power
+
+<King of Beggars> {Beggar}
+
+1) Black Market[15C]
+	- Effect: Increase C value by X per start of turn. X is determined by no. of 		Objects played on your field.
+
+<Uncle Billy> {Farmer - Blue Collar}
+
+<The Suit> {Professional - White Collar}
