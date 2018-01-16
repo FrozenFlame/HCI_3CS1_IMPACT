@@ -1,4 +1,5 @@
 import pygame, math, time
+from scripts.Globals import Globals
 '''
 This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
 '''
@@ -106,7 +107,7 @@ class Engine(object):
         self.screen = pygame.display.set_mode((1280,720))
         self.screen_rect = self.screen.get_rect()
         self.clock = pygame.time.Clock()
-        self.fps = 60
+        self.fps = Globals.fps
         self.done = False
         self.card = Dragbox()
 
