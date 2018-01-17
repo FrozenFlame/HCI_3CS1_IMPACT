@@ -9,16 +9,17 @@ class Dragbox(object):
     def __init__(self):
         self.height = 100
         self.width = 75
-        self.posX = 640
+        self.posX = 640     # added some overwrite @ the outer-draw method, when blitted=False, posX,posY becomes defaultPos
         self.posY = 250
         self.isHeld = False
         self.resting = True #unused for now
-        self.defaultPos = (640,250)
+        self.defaultPos = (65,500)
         self.img = pygame.image.load("assets\\cards\\democard.png")
         self.img = self.img.convert_alpha()
         self.speed = 10
+        self.blitted = False
 
-        #animated positing junk
+        #animated positioning junk
         self.destination = None # is a Tuple x,y
         self.distance = 0.0
         self.vector = None
@@ -57,11 +58,6 @@ class Dragbox(object):
 
     # setting of destination, or the relative vector to location
     def set_destination(self, x, y):
-        # print("set desti: {0}, {1}".format(x,y))
-        # print("Mouse pos {0}".format(pygame.mouse.get_pos()))
-        # print("Distance {0}".format(self.distance))
-        # print("Vector: {0}".format(self.vector))
-        # print()
         xDistance = x - self.posX
         yDistance = y - self.posY
         self.distance = math.hypot(xDistance, yDistance)  # distance from default position
@@ -70,20 +66,14 @@ class Dragbox(object):
             self.destination = list((x,y))
         except ZeroDivisionError:
             pass
-        # print(self.distance, xDistance, yDistance)
-        # if distance > 0: # not at destination, perform operations below
         '''
         Distance: 100 (random angle)
         posX 100 defX 0 posY 200 defY 0
-        
-        '''
-        '''old code
-        self.posX = self.defaultPos[0]
-        self.posY = self.defaultPos[1]
         '''
 
     def draw(self, screen):
         screen.blit(self.img, (self.posX, self.posY))
+        self.blitted = True
 
     def collidepoint(self,x,y):
         collide = False
@@ -147,6 +137,7 @@ class Engine(object):
                     self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])]     #pygame.Rect.collidepoint 	— 	test if a point is inside a rectangle
                                                                                                                                          #checking if mouse clicked on one of the hand cards
                     if len(self.clickedCard) == 1:                   # just mirroring self.card lol, more mirrored instances below @ update and draw function
+                        print("handcard clicked")
                         self.clickedCard[0].isHeld = True
                         self.clickedCard[0].resting = False
                         self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
@@ -162,8 +153,10 @@ class Engine(object):
                 if click[0] == 0:
                     print("unheld")
                     self.card.isHeld = False
-                    if len(self.clickedCard) == 1:
+                    if not len(self.clickedCard) == 0:
                         self.clickedCard[0].isHeld = False
+                        if self.clickedCard[0].destination == None:
+                            self.clickedCard.pop()
 
 
 
@@ -173,23 +166,19 @@ class Engine(object):
         if not self.card.resting:
             self.card.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-        # if len(self.clickedCard) == 0:
-        x = 80
-        y = 570
-        for h in self.handList:                     # some kind of issue around here i guess, when clicking cards toofast (one card is still moving but then you click another card and move it)
-            if not h.resting and h == self.clickedCard[0]:
+        x = 220
+        y = 600
+        for h in self.handList:
+            if not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                if h.destination == None:
-                    self.clickedCard.pop()
-            elif h.resting and len(self.clickedCard) == 0:              # i think this refreshes all 10 cards after the moved card gets back to the hand, i meant for this part to just
-                                                                        # initialize the first 10 cards ( run only once at the beginning of the program/ round in a game
+            elif h.resting and not h.blitted:
                 h.update(deltaTime,x,y)
                 h.defaultPos = (x,y)
-                x += 100
+                x += 80
 
-        self.deckImgHolder1.update(deltaTime, 1120, 500)
-        self.deckImgHolder2.update(deltaTime, 1130, 500)
-        self.deckImgHolder3.update(deltaTime, 1140, 500)
+        self.deckImgHolder1.update(deltaTime, 1170, 565)
+        self.deckImgHolder2.update(deltaTime, 1175, 564)
+        self.deckImgHolder3.update(deltaTime, 1180, 563)
 
         pass
 
@@ -197,6 +186,9 @@ class Engine(object):
     def draw(self):
         self.board.draw(self.screen)
         # self.screen.fill((100,100,100))
+        if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
+            self.card.posX, self.card.posY = self.card.defaultPos
+            self.card.blitted = True
         self.card.draw(self.screen)
 
         for h in self.handList:
