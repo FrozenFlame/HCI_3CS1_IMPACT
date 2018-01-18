@@ -9,8 +9,8 @@ class Dragbox(object):
     def __init__(self):
         self.height = 100
         self.width = 75
-        self.posX = 640     # added some overwrite @ the outer-draw method, when blitted=False, posX,posY becomes defaultPos
-        self.posY = 250
+        self.posX = 1181     # offset by 1 from deckImgHolder3 because the card latches to the mouse cursor if its equal (deckImgHolder3 = 1180,563)
+        self.posY = 563
         self.isHeld = False
         self.resting = True #unused for now
         self.defaultPos = (65,500)
@@ -195,7 +195,22 @@ class Engine(object):
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
 
-        self.deckImgHolder1 = Dragbox()     # add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
+        '''scenario: the 10 hand cards start at the top of the deck/deckImgHolder3, then use waitTick so that 1 card animates(similarly to the click-and-drag animation)
+         to its hand position every 1 second
+         formula for wait:
+                  if currentTick - self.waitTick >= self.drawCardWait:
+                        self.waitTick = currentTick
+                        [do stuff]
+        '''
+        self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
+        self.waitTick = pygame.time.get_ticks()                                #will be used to for computing how long it has already waited
+        self.drawCardWait = 1000                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
+        self.opening = True
+        self.openingIndex = 0
+        self.x = 220
+        self.y = 600
+
+        self.deckImgHolder1 = Dragbox()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Dragbox()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Dragbox()
 
@@ -244,15 +259,27 @@ class Engine(object):
         if not self.card.resting:
             self.card.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-        x = 220
-        y = 600
+        if self.opening == True:
+            currentTick = pygame.time.get_ticks()
+            if currentTick - self.waitTick >= self.drawCardWait:
+                if self.openingIndex < 10:
+                    self.waitTick = currentTick
+                    self.drawCardSound.play()
+                    self.handList[self.openingIndex].resting = False
+                    self.handList[self.openingIndex].set_destination(1180, 563)
+                    self.handList[self.openingIndex].defaultPos = (self.x, self.y)
+                    self.handList[self.openingIndex].update(deltaTime, self.x, self.y)
+                    self.x += 80
+                    self.openingIndex += 1
+                if self.openingIndex == 10:
+                    self.opening = False
+
+            print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
+
+
         for h in self.handList:
             if not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-            elif h.resting and not h.blitted:
-                h.update(deltaTime,x,y)
-                h.defaultPos = (x,y)
-                x += 80
 
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
