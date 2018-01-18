@@ -115,6 +115,17 @@ class Engine(object):
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
 
+        '''scenario: the 10 hand cards start at the top of the deck/deckImgHolder3, then use waitTick so that 1 card animates(similarly to the click-and-drag animation)
+         to its hand position every 1 second
+         formula for wait:
+                  if currentTick - self.waitTick >= self.drawCardWait:
+                        self.waitTick = currentTick
+                        [do stuff]
+        '''
+        self.drawCard = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
+        self.waitTick = pygame.time.get_ticks()                                #will be used to for computing how long it has already waited
+        self.drawCardWait = 1000                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
+
         self.deckImgHolder1 = Dragbox()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Dragbox()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Dragbox()
@@ -168,6 +179,14 @@ class Engine(object):
 
         x = 220
         y = 600
+
+        currentTick = pygame.time.get_ticks()
+        if currentTick - self.waitTick >= self.drawCardWait:
+            self.drawCard.play()        #comment this out for peace and tranquility
+            self.waitTick = currentTick
+        print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
+
+
         for h in self.handList:
             if not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
