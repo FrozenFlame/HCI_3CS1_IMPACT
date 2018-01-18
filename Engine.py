@@ -1,4 +1,4 @@
-import pygame, math, time
+import pygame, math, time, random
 from scripts.Globals import Globals
 '''
 This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
@@ -16,6 +16,7 @@ class Dragbox(object):
         self.defaultPos = (65,500)
         self.img = pygame.image.load("assets\\cards\\democard.png")
         self.img = self.img.convert_alpha()
+        self.backimg = None # Card backs for opposing cards and for cards in deck.
         self.speed = 10
         self.blitted = False
 
@@ -81,15 +82,91 @@ class Dragbox(object):
                 collide = True
         return collide
 
+
+'''
+GAMEBOARD NOTES:
+Needs:
+Standard coordinates (and corresponding area for blitting) for rows, coin, portraits, playername, and etc. 
+I'm sure we can come up with an algorithm so that we can have the cards that have been set to reposition when another 
+card gets played
+
+Biggest issue of them all (I think):
+Phases of the game
+Rough code estimate would be like:
+
+(a loop, 2-3 times)
+    round starts
+    <draw cards for both players>
+    player1 receives first 10 cards
+    player2 receives first 10 cards
+    <larger hand cards displayed on screen>
+    player1 chooses to mulligan or not
+    player2 chooses to mulligan or not
+    <cards assume hand coordinates and scale>
+    <coin toss animation> - first player to take turn decided
+    (an inner round loop, repeats however many times possible)
+        start turn
+        <animations expected for this phase> - this part lol
+        end of turn
+    (end of inner round loop, repeat)
+
+(end of phase, repeat)
+<victory animation> - a player gets crowned victorious
+'''
 #this too, THESE NEED TO GO TO THEIR OWN CLASSES AT SOME POINT LADS
-class dummyboard(object):
+class Dummyboard(object):
     def __init__(self):
+        # graphics related
         self.posX = 0.0
         self.posY = 0.0
-        self.img = pygame.image.load("assets\\board\\DemoGameboard.png").convert_alpha()
+        self.specialEffects = None # a class which is responsible for spawning certain graphics like smoke fire rain coins etc. which are temporary
+        self.coin = self.Coin() # coin held by dummyboard
+        self.animating = False
+        self.img = pygame.image.load("assets\\board\\DemoGameboard.png").convert_alpha() #img converted
+        self.endTurnImg = None # image of turn end button
+        self.handButtonImg = None # image of "show hand" button. for multiplayer purposes.
+        self.pauseImg = None # when a player decides to access the menu w/ Esc
+        self.phaseImg = None # image that flies by when a player is about to take a turn (accompanied with some text)
+        self.cardPreview = None # big card to the right, duplicates appearance of card being moused over.
+
+        # game related
+        self.player1 = None # player class
+        self.player2 = None # player class
+        self.hand1 = None
+        self.hand2 = None
+        self.deck1 = None
+        self.deck2 = None
+        self.grave1 = None
+        self.grave2 = None
+
+
+        # Row Lists for fields (from the bottom)
+        self.row1 = [] # bottom most - player's back row
+        self.row2 = []
+        self.row3 = []
+        self.row4 = [] # top most - opponent's back row
+
     def draw(self, screen):
             screen.blit(self.img, (self.posX, self.posY))
-            self.blitted = True
+            self.blitted = True # currently was an experiment only.
+
+    def tossCoin(self):
+        self.coin.toss()
+    def flipCoin(self):
+        self.coin.flip()
+
+    class Coin(object):
+        def __init__(self):
+            # self.img have image here
+            self.side = 0 # 0 and 1 for heads and tails
+            self.animating = False # spinning in the air
+        def flip(self):
+            self.side = 0 if self.side != 0 else 1
+        def toss(self): # random first toss in the game
+            self.side = random.randrange(0,2)
+
+
+
 class Engine(object):
     def __init__(self):
         pygame.init()
@@ -99,6 +176,9 @@ class Engine(object):
         self.clock = pygame.time.Clock()
         self.fps = Globals.fps
         self.done = False
+
+        self.board = Dummyboard()
+
         self.card = Dragbox()
 
         self.hand1 = Dragbox()
@@ -115,11 +195,9 @@ class Engine(object):
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
 
-        self.deckImgHolder1 = Dragbox()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
+        self.deckImgHolder1 = Dragbox()     # add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Dragbox()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Dragbox()
-        self.board = dummyboard()
-
 
     # handles events which happen in the program
     def eventLoop(self):
@@ -203,7 +281,6 @@ class Engine(object):
 
 
     def main_loop(self):
-
         while not self.done:
             # dt is multiplied to the vector values here in order to simulate the movements over time.
             # without it, it would cause the graphic to teleport to the location instantaneously
