@@ -5,7 +5,7 @@ This class is responsible for holding the main loop, graphics rendering, and sce
 '''
 
 #THIS IS JUS A DUMMY OBJECT
-class Dragbox(object):
+class Card(object):
     def __init__(self):
         self.height = 100
         self.width = 75
@@ -76,6 +76,7 @@ class Dragbox(object):
         screen.blit(self.img, (self.posX, self.posY))
         self.blitted = True
 
+    # return boolean if card instance is moused over once function is called
     def collidepoint(self,x,y):
         collide = False
         if (self.posX + self.width) >= x >= self.posX  and (self.posY + self.height) >= y >= self.posY:
@@ -127,8 +128,8 @@ class Dummyboard(object):
         self.handButtonImg = None # image of "show hand" button. for multiplayer purposes.
         self.pauseImg = None # when a player decides to access the menu w/ Esc
         self.phaseImg = None # image that flies by when a player is about to take a turn (accompanied with some text)
-        self.cardPreview = None # big card to the right, duplicates appearance of card being moused over.
-
+        self.previewCard = None # big card to the right, duplicates appearance of card being moused over.
+        self.hasPreviewCard = False
         # game related
         self.player1 = None # player class
         self.player2 = None # player class
@@ -139,7 +140,6 @@ class Dummyboard(object):
         self.grave1 = None
         self.grave2 = None
 
-
         # Row Lists for fields (from the bottom)
         self.row1 = [] # bottom most - player's back row
         self.row2 = []
@@ -147,13 +147,22 @@ class Dummyboard(object):
         self.row4 = [] # top most - opponent's back row
 
     def draw(self, screen):
-            screen.blit(self.img, (self.posX, self.posY))
-            self.blitted = True # currently was an experiment only.
+        screen.blit(self.img, (self.posX, self.posY))
+        self.blitted = True # currently was an experiment only.
+        if self.hasPreviewCard:
+            # tempC = self.previewCard.img.scale(self.previewCard.height*1.5, self.previewCard.width*1.5)
+            tempC = pygame.transform.scale(self.previewCard.img,(150, 200))
+
+            screen.blit(tempC, (1280 * 0.83, 720 * 0.27))
 
     def tossCoin(self):
         self.coin.toss()
+
     def flipCoin(self):
         self.coin.flip()
+
+    # def previewCard(self, card):
+    #     self.previewCard = card
 
     class Coin(object):
         def __init__(self):
@@ -165,8 +174,6 @@ class Dummyboard(object):
         def toss(self): # random first toss in the game
             self.side = random.randrange(0,2)
 
-
-
 class Engine(object):
     def __init__(self):
         pygame.init()
@@ -177,20 +184,22 @@ class Engine(object):
         self.fps = Globals.fps
         self.done = False
 
+        self.holdingCard = False
+
         self.board = Dummyboard()
 
-        self.card = Dragbox()
+        self.card = Card()
 
-        self.hand1 = Dragbox()
-        self.hand2 = Dragbox()
-        self.hand3 = Dragbox()
-        self.hand4 = Dragbox()
-        self.hand5 = Dragbox()
-        self.hand6 = Dragbox()
-        self.hand7 = Dragbox()
-        self.hand8 = Dragbox()
-        self.hand9 = Dragbox()
-        self.hand10 = Dragbox()
+        self.hand1 = Card()
+        self.hand2 = Card()
+        self.hand3 = Card()
+        self.hand4 = Card()
+        self.hand5 = Card()
+        self.hand6 = Card()
+        self.hand7 = Card()
+        self.hand8 = Card()
+        self.hand9 = Card()
+        self.hand10 = Card()
 
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
@@ -204,22 +213,41 @@ class Engine(object):
         '''
         self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
         self.waitTick = pygame.time.get_ticks()                                #will be used to for computing how long it has already waited
-        self.drawCardWait = 1000                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
+        self.drawCardWait = 400                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
         self.opening = True
         self.openingIndex = 0
         self.x = 220
         self.y = 600
 
-        self.deckImgHolder1 = Dragbox()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
-        self.deckImgHolder2 = Dragbox()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
-        self.deckImgHolder3 = Dragbox()
+        self.deckImgHolder1 = Card()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
+        self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
+        self.deckImgHolder3 = Card()
 
     # handles events which happen in the program
+    def cardMousedOver(self, xy) -> bool:
+        self.clickedCard = [s for s in self.handList if s.collidepoint(xy[0], xy[1])]
+        return True if len(self.clickedCard) == 1 else False
+    def cardMousedOver2(self, xy):
+        self.clickedCard = [s for s in self.handList if s.collidepoint(xy[0], xy[1])]
+
+        return self.clickedCard
     def eventLoop(self):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.done = True
+            #if self.board.hasPreviewCard:
+             #   print("Previewing card.")
+            #card is being moused over
+            if self.cardMousedOver2(pygame.mouse.get_pos()):
+                print("Mousingover")
+                self.board.hasPreviewCard = True
+                self.board.previewCard = self.clickedCard[0]
+            elif not self.cardMousedOver(pygame.mouse.get_pos()):
+                print("notmousing")
+                self.board.hasPreviewCard = False if not self.holdingCard else True
+
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print("Pos: {0} , {1}".format(event.pos()[0], event.pos()[1]))
                 click = pygame.mouse.get_pressed()
@@ -228,16 +256,19 @@ class Engine(object):
                 if click[0] == 1 :
 
                     self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])]     #pygame.Rect.collidepoint 	— 	test if a point is inside a rectangle
-                                                                                                                                         #checking if mouse clicked on one of the hand cards
+                                                                                                                                  #checking if mouse clicked on one of the hand cards
                     if len(self.clickedCard) == 1:                   # just mirroring self.card lol, more mirrored instances below @ update and draw function
                         print("handcard clicked")
                         self.clickedCard[0].isHeld = True
+                        self.holdingCard = True
                         self.clickedCard[0].resting = False
                         self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                        self.drawCardSound.play()
 
                     if (self.card.posX + self.card.width) >= pygame.mouse.get_pos()[0] >= self.card.posX and (self.card.posY + self.card.height) >= pygame.mouse.get_pos()[1] >= self.card.posY:
                         print("clicked")
                         self.card.isHeld = True
+                        self.holdingCard = True
                         self.card.resting = False
                         self.card.set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
@@ -246,6 +277,8 @@ class Engine(object):
                 if click[0] == 0:
                     print("unheld")
                     self.card.isHeld = False
+                    self.holdingCard = False
+                    self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
                         self.clickedCard[0].isHeld = False
                         if self.clickedCard[0].destination == None:
