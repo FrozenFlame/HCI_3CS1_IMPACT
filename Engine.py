@@ -3,7 +3,6 @@ from scripts.Globals import Globals
 '''
 This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
 '''
-
 #THIS IS JUS A DUMMY OBJECT
 class Card(object):
     def __init__(self):
@@ -26,19 +25,16 @@ class Card(object):
         self.vector = None
         
     #rename method soon
-    def decider(self):
-        if not self.resting:
-
-            pass
+    # def decider(self):
+    #     if not self.resting:
+    #         pass
 
     # change of position on screen (calculation)
     def update(self, dTime, mouseX, mouseY):
-
         if self.destination:
             if self.isHeld == True:
                 self.posX = mouseX - self.width*0.75
                 self.posY = mouseY - self.height*0.75
-
             # animating but not held card
             elif self.isHeld == False and self.resting == False:
                 self.set_destination(self.defaultPos[0], self.defaultPos[1])
@@ -52,7 +48,6 @@ class Card(object):
                 else:
                     self.posX += self.vector[0] *dTime
                     self.posY += self.vector[1] *dTime
-
         else:
             self.posX = mouseX
             self.posY = mouseY
@@ -82,7 +77,6 @@ class Card(object):
         if (self.posX + self.width) >= x >= self.posX  and (self.posY + self.height) >= y >= self.posY:
                 collide = True
         return collide
-
 
 '''
 GAMEBOARD NOTES:
@@ -152,7 +146,6 @@ class Dummyboard(object):
         if self.hasPreviewCard:
             # tempC = self.previewCard.img.scale(self.previewCard.height*1.5, self.previewCard.width*1.5)
             tempC = pygame.transform.scale(self.previewCard.img,(150, 200))
-
             screen.blit(tempC, (1280 * 0.83, 720 * 0.27))
 
     def tossCoin(self):
@@ -160,9 +153,6 @@ class Dummyboard(object):
 
     def flipCoin(self):
         self.coin.flip()
-
-    # def previewCard(self, card):
-    #     self.previewCard = card
 
     class Coin(object):
         def __init__(self):
@@ -247,7 +237,6 @@ class Engine(object):
                 print("notmousing")
                 self.board.hasPreviewCard = False if not self.holdingCard else True
 
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # print("Pos: {0} , {1}".format(event.pos()[0], event.pos()[1]))
                 click = pygame.mouse.get_pressed()
@@ -284,8 +273,6 @@ class Engine(object):
                         if self.clickedCard[0].destination == None:
                             self.clickedCard.pop()
 
-
-
     # orders individual elements to update themselves (your coordinates, sprite change, etc)
     def update(self, deltaTime):
         # demo 1 card only lang naman
@@ -309,7 +296,6 @@ class Engine(object):
 
             print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
 
-
         for h in self.handList:
             if not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
@@ -317,8 +303,6 @@ class Engine(object):
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
-
-        pass
 
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self):
@@ -339,7 +323,6 @@ class Engine(object):
         # FPS
         pygame.display.set_caption("Avarice - A Greed-Based Card Game - FPS: {0:.2f}".format(self.clock.get_fps()))
 
-
     def main_loop(self):
         while not self.done:
             # dt is multiplied to the vector values here in order to simulate the movements over time.
@@ -351,5 +334,3 @@ class Engine(object):
             self.update(deltaTime)
             self.draw()
             pygame.display.update()
-
-
