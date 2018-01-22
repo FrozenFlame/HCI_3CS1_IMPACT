@@ -106,6 +106,9 @@ class Card(object):
         '''
         if colliderect == true:
             boardList.append(card)
+
+        then over to engine.update():
+        boardx = 200(whatev starting number)
         boardy = 200
 
         for boardCard in boardList:
