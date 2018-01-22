@@ -102,13 +102,16 @@ class Card(object):
         print(tempRect)
         boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
         print(boardCollide)
+
         '''
-        board.posX1 *0.40
-        board.posX2 *0.60
-        board.posY1 *0.40
-        board.posY2 *0.60
-        
-        if
+        if colliderect == true:
+            boardList.append(card)
+        boardy = 200
+
+        for boardCard in boardList:
+        boardCard.defaultPos[0] = boardx
+        boardCArd.defaultPos[1] = boardy
+        boardx += 80
         
         
         '''
