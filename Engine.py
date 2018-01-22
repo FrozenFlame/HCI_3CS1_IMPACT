@@ -3,6 +3,15 @@ from scripts.Globals import Globals
 '''
 This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
 '''
+
+class BoardField(object):
+    def __init__(self,x1=0,y1=0,x2=0,y2=0,c=None):
+        self.xStart = x1
+        self.xEnd = x2
+        self.yStart = y1
+        self.yEnd = y2
+        self.card = c
+
 #THIS IS JUS A DUMMY OBJECT
 class Card(object):
     def __init__(self):
@@ -77,6 +86,35 @@ class Card(object):
         if (self.posX + self.width) >= x >= self.posX  and (self.posY + self.height) >= y >= self.posY:
                 collide = True
         return collide
+
+    def colliderect(self, x1,y1,x2,y2):
+        boardCollide = False
+        x1rect = x1 + ((x2-x1) * 0.40)
+        y1rect = y1 + ((y2-y1) * 0.40)
+        # x2rect = x2 + ((x2-x1) * 0.60)
+        # y2rect = y2 + ((y2-y1) * 0.60)
+        x2rect = x1rect+15
+        y2rect = y1rect+15
+        boardRect = pygame.Rect(x1rect, y1rect, (x2rect-x1rect), (y2rect-y1rect))
+        tempRect = pygame.Rect(self.posX, self.posY, self.width, self.height)
+        print("rect output:")
+        print(boardRect)
+        print(tempRect)
+        boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
+        print(boardCollide)
+        '''
+        board.posX1 *0.40
+        board.posX2 *0.60
+        board.posY1 *0.40
+        board.posY2 *0.60
+        
+        if
+        
+        
+        '''
+        # if [self.posX -> (self.posX + self.width)] and (self.posY + self.height) >= y1 >= self.posY:
+        #     pass
+        return boardCollide
 
 '''
 GAMEBOARD NOTES:
@@ -164,6 +202,7 @@ class Dummyboard(object):
         def toss(self): # random first toss in the game
             self.side = random.randrange(0,2)
 
+# class which holds the entire program.
 class Engine(object):
     def __init__(self):
         pygame.init()
@@ -174,12 +213,13 @@ class Engine(object):
         self.fps = Globals.fps
         self.done = False
 
+        # logic booleans
         self.holdingCard = False
 
+        # objects
         self.board = Dummyboard()
-
+        # card and hand might be handled differently from this. These items might be found on the board instead.
         self.card = Card()
-
         self.hand1 = Card()
         self.hand2 = Card()
         self.hand3 = Card()
@@ -190,9 +230,16 @@ class Engine(object):
         self.hand8 = Card()
         self.hand9 = Card()
         self.hand10 = Card()
-
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
+
+        self.bField1 = BoardField(230,380,305,480)
+        self.bField2 = BoardField(325,380,400,480)
+        self.bField3 = BoardField(420,380,495,480)
+        self.bField4 = BoardField(515,380,590,480)
+        self.bField5 = BoardField(610,380,685,480)
+        self.bField6 = BoardField(705,380,780,480)
+        self.boardFieldList = [self.bField1, self.bField2, self.bField3, self.bField4, self.bField5, self.bField6]
 
         '''scenario: the 10 hand cards start at the top of the deck/deckImgHolder3, then use waitTick so that 1 card animates(similarly to the click-and-drag animation)
          to its hand position every 1 second
@@ -219,26 +266,26 @@ class Engine(object):
         return True if len(self.clickedCard) == 1 else False
     def cardMousedOver2(self, xy):
         self.clickedCard = [s for s in self.handList if s.collidepoint(xy[0], xy[1])]
-
         return self.clickedCard
-    def eventLoop(self):
 
+    def eventLoop(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.done = True
             #if self.board.hasPreviewCard:
              #   print("Previewing card.")
             #card is being moused over
-            if self.cardMousedOver2(pygame.mouse.get_pos()):
-                print("Mousingover")
+            if self.cardMousedOver(pygame.mouse.get_pos()):
+                # print("Mousingover")
                 self.board.hasPreviewCard = True
                 self.board.previewCard = self.clickedCard[0]
             elif not self.cardMousedOver(pygame.mouse.get_pos()):
-                print("notmousing")
+                # print("notmousing")
                 self.board.hasPreviewCard = False if not self.holdingCard else True
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # print("Pos: {0} , {1}".format(event.pos()[0], event.pos()[1]))
+
+                print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
                 click = pygame.mouse.get_pressed()
                 # print("Clicked: {0}".format(click))
 
@@ -294,11 +341,18 @@ class Engine(object):
                 if self.openingIndex == 10:
                     self.opening = False
 
-            print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
+            # print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
 
         for h in self.handList:
-            if not h.resting:
+            if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
+                print("Hurrah")
+                h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
+                h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
+
+
+            elif not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
 
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
@@ -309,7 +363,7 @@ class Engine(object):
         self.board.draw(self.screen)
         # self.screen.fill((100,100,100))
         if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
-            self.card.posX, self.card.posY = self.card.defaultPos
+            self.card.posX, self.card.posY = self.bField1.xStart, self.bField1.yStart
             self.card.blitted = True
         self.card.draw(self.screen)
 
