@@ -1,126 +1,16 @@
 import pygame, math, time, random
+from HCI_3CS1_IMPACT.BoardField import BoardField
+from HCI_3CS1_IMPACT.Card import Card
+from HCI_3CS1_IMPACT.Board import Board
+
 from scripts.Globals import Globals
 '''
 This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
 '''
 
-class BoardField(object):
-    def __init__(self,x1=0,y1=0,x2=0,y2=0,c=None):
-        self.xStart = x1
-        self.xEnd = x2
-        self.yStart = y1
-        self.yEnd = y2
-        self.card = c
+
 
 #THIS IS JUS A DUMMY OBJECT
-class Card(object):
-    def __init__(self):
-        self.height = 100
-        self.width = 75
-        self.posX = 1181     # offset by 1 from deckImgHolder3 because the card latches to the mouse cursor if its equal (deckImgHolder3 = 1180,563)
-        self.posY = 563
-        self.isHeld = False
-        self.resting = True #unused for now
-        self.defaultPos = (65,500)
-        self.img = pygame.image.load("assets\\cards\\democard.png")
-        self.img = self.img.convert_alpha()
-        self.backimg = None # Card backs for opposing cards and for cards in deck.
-        self.speed = 10
-        self.blitted = False
-
-        #animated positioning junk
-        self.destination = None # is a Tuple x,y
-        self.distance = 0.0
-        self.vector = None
-        
-    #rename method soon
-    # def decider(self):
-    #     if not self.resting:
-    #         pass
-
-    # change of position on screen (calculation)
-    def update(self, dTime, mouseX, mouseY):
-        if self.destination:
-            if self.isHeld == True:
-                self.posX = mouseX - self.width*0.75
-                self.posY = mouseY - self.height*0.75
-            # animating but not held card
-            elif self.isHeld == False and self.resting == False:
-                self.set_destination(self.defaultPos[0], self.defaultPos[1])
-                travelled = math.hypot(self.vector[0]*dTime, self.vector[1]*dTime)
-                self.distance -= travelled
-                if self.distance <= 0:  # destination reached
-                    self.posX = self.defaultPos[0] #* dTime
-                    self.posY = self.defaultPos[1] #* dTime
-                    self.resting = True
-                    self.destination = None
-                else:
-                    self.posX += self.vector[0] *dTime
-                    self.posY += self.vector[1] *dTime
-        else:
-            self.posX = mouseX
-            self.posY = mouseY
-
-    # setting of destination, or the relative vector to location
-    def set_destination(self, x, y):
-        xDistance = x - self.posX
-        yDistance = y - self.posY
-        self.distance = math.hypot(xDistance, yDistance)  # distance from default position
-        try:
-            self.vector = (self.speed + (self.distance*10))* xDistance / self.distance, (self.speed + (self.distance*10)) * yDistance / self.distance
-            self.destination = list((x,y))
-        except ZeroDivisionError:
-            pass
-        '''
-        Distance: 100 (random angle)
-        posX 100 defX 0 posY 200 defY 0
-        '''
-
-    def draw(self, screen):
-        screen.blit(self.img, (self.posX, self.posY))
-        self.blitted = True
-
-    # return boolean if card instance is moused over once function is called
-    def collidepoint(self,x,y):
-        collide = False
-        if (self.posX + self.width) >= x >= self.posX  and (self.posY + self.height) >= y >= self.posY:
-                collide = True
-        return collide
-
-    def colliderect(self, x1,y1,x2,y2):
-        boardCollide = False
-        x1rect = x1 + ((x2-x1) * 0.40)
-        y1rect = y1 + ((y2-y1) * 0.40)
-        # x2rect = x2 + ((x2-x1) * 0.60)
-        # y2rect = y2 + ((y2-y1) * 0.60)
-        x2rect = x1rect+15
-        y2rect = y1rect+15
-        boardRect = pygame.Rect(x1rect, y1rect, (x2rect-x1rect), (y2rect-y1rect))
-        tempRect = pygame.Rect(self.posX, self.posY, self.width, self.height)
-        print("rect output:")
-        print(boardRect)
-        print(tempRect)
-        boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
-        print(boardCollide)
-
-        '''
-        if colliderect == true:
-            boardList.append(card)
-
-        then over to engine.update():
-        boardx = 200(whatev starting number)
-        boardy = 200
-
-        for boardCard in boardList:
-        boardCard.defaultPos[0] = boardx
-        boardCArd.defaultPos[1] = boardy
-        boardx += 80
-        
-        
-        '''
-        # if [self.posX -> (self.posX + self.width)] and (self.posY + self.height) >= y1 >= self.posY:
-        #     pass
-        return boardCollide
 
 '''
 GAMEBOARD NOTES:
@@ -153,60 +43,6 @@ Rough code estimate would be like:
 <victory animation> - a player gets crowned victorious
 '''
 #this too, THESE NEED TO GO TO THEIR OWN CLASSES AT SOME POINT LADS
-class Dummyboard(object):
-    def __init__(self):
-        # graphics related
-        self.posX = 0.0
-        self.posY = 0.0
-        self.specialEffects = None # a class which is responsible for spawning certain graphics like smoke fire rain coins etc. which are temporary
-        self.coin = self.Coin() # coin held by dummyboard
-        self.animating = False
-        self.img = pygame.image.load("assets\\board\\DemoGameboard.png").convert_alpha() #img converted
-        self.endTurnImg = None # image of turn end button
-        self.handButtonImg = None # image of "show hand" button. for multiplayer purposes.
-        self.pauseImg = None # when a player decides to access the menu w/ Esc
-        self.phaseImg = None # image that flies by when a player is about to take a turn (accompanied with some text)
-        self.previewCard = None # big card to the right, duplicates appearance of card being moused over.
-        self.hasPreviewCard = False
-        # game related
-        self.player1 = None # player class
-        self.player2 = None # player class
-        self.hand1 = None
-        self.hand2 = None
-        self.deck1 = None
-        self.deck2 = None
-        self.grave1 = None
-        self.grave2 = None
-
-        # Row Lists for fields (from the bottom)
-        self.row1 = [] # bottom most - player's back row
-        self.row2 = []
-        self.row3 = []
-        self.row4 = [] # top most - opponent's back row
-
-    def draw(self, screen):
-        screen.blit(self.img, (self.posX, self.posY))
-        self.blitted = True # currently was an experiment only.
-        if self.hasPreviewCard:
-            # tempC = self.previewCard.img.scale(self.previewCard.height*1.5, self.previewCard.width*1.5)
-            tempC = pygame.transform.scale(self.previewCard.img,(150, 200))
-            screen.blit(tempC, (1280 * 0.83, 720 * 0.27))
-
-    def tossCoin(self):
-        self.coin.toss()
-
-    def flipCoin(self):
-        self.coin.flip()
-
-    class Coin(object):
-        def __init__(self):
-            # self.img have image here
-            self.side = 0 # 0 and 1 for heads and tails
-            self.animating = False # spinning in the air
-        def flip(self):
-            self.side = 0 if self.side != 0 else 1
-        def toss(self): # random first toss in the game
-            self.side = random.randrange(0,2)
 
 # class which holds the entire program.
 class Engine(object):
@@ -223,7 +59,7 @@ class Engine(object):
         self.holdingCard = False
 
         # objects
-        self.board = Dummyboard()
+        self.board = Board()
         # card and hand might be handled differently from this. These items might be found on the board instead.
         self.card = Card()
         self.hand1 = Card()
@@ -239,13 +75,8 @@ class Engine(object):
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
         self.clickedCard = list()
 
-        self.bField1 = BoardField(230,380,305,480)
-        self.bField2 = BoardField(325,380,400,480)
-        self.bField3 = BoardField(420,380,495,480)
-        self.bField4 = BoardField(515,380,590,480)
-        self.bField5 = BoardField(610,380,685,480)
-        self.bField6 = BoardField(705,380,780,480)
-        self.boardFieldList = [self.bField1, self.bField2, self.bField3, self.bField4, self.bField5, self.bField6]
+        self.boardField = BoardField(225,390,1010,470)
+        self.boardCardList = list()
 
         '''scenario: the 10 hand cards start at the top of the deck/deckImgHolder3, then use waitTick so that 1 card animates(similarly to the click-and-drag animation)
          to its hand position every 1 second
@@ -289,17 +120,33 @@ class Engine(object):
                 # print("notmousing")
                 self.board.hasPreviewCard = False if not self.holdingCard else True
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
 
                 print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
                 click = pygame.mouse.get_pressed()
                 # print("Clicked: {0}".format(click))
 
-                if click[0] == 1 :
+                if click[0] == 1:
 
-                    self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])]     #pygame.Rect.collidepoint 	— 	test if a point is inside a rectangle
-                                                                                                                                  #checking if mouse clicked on one of the hand cards
-                    if len(self.clickedCard) == 1:                   # just mirroring self.card lol, more mirrored instances below @ update and draw function
+                    # self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and not s.disabled and not s.onBoard]
+                    #
+                    # if len(self.clickedCard) == 1:
+                    #     print("handcard clicked")
+                    #     self.clickedCard[0].isHeld = True
+                    #     self.holdingCard = True
+                    #     self.clickedCard[0].resting = False
+                    #     self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    #     self.drawCardSound.play()
+
+                    for s in self.handList:
+                        print("Disabled? {0}   Onboard? {1}".format(s.disabled,s.onBoard))
+                        if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and s.disabled and not s.onBoard:   #card should only be clickable if not s.disabled and not s.onBoard
+                            self.clickedCard.append(s)                                                                              #for now, it is "and s.disabled" just to display the current progress on hand to board
+                            s.onTop = True
+                            self.handList.pop(self.handList.index(s))
+                            self.handList.append(s)
+
+                    if len(self.clickedCard) == 1:
                         print("handcard clicked")
                         self.clickedCard[0].isHeld = True
                         self.holdingCard = True
@@ -323,8 +170,15 @@ class Engine(object):
                     self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
                         self.clickedCard[0].isHeld = False
+
+                        if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
+                            self.boardCardList.append(self.clickedCard[0])
+                            self.clickedCard[0].onBoard = True
+
                         if self.clickedCard[0].destination == None:
                             self.clickedCard.pop()
+
+
 
     # orders individual elements to update themselves (your coordinates, sprite change, etc)
     def update(self, deltaTime):
@@ -347,16 +201,20 @@ class Engine(object):
                 if self.openingIndex == 10:
                     self.opening = False
 
-            # print("currentTick= {0} waitTick= {1} currentTick-waitTick= {2}".format(currentTick,self.waitTick,currentTick-self.waitTick))
+        boardx = 220
+        boardy = 380
+        for boardCard in self.boardCardList:
+            boardCard.defaultPos = boardx,boardy
+            boardx += 80
 
         for h in self.handList:
-            if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
-                print("Hurrah")
-                h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
-                h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
+            # if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
+            #     print("Hurrah")
+            #     h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
+            #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
 
 
-            elif not h.resting:
+            if not h.resting:
                 h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
 
@@ -369,12 +227,19 @@ class Engine(object):
         self.board.draw(self.screen)
         # self.screen.fill((100,100,100))
         if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
-            self.card.posX, self.card.posY = self.bField1.xStart, self.bField1.yStart
+            self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
             self.card.blitted = True
         self.card.draw(self.screen)
 
+        onTopCard = None
         for h in self.handList:
-            h.draw(self.screen)
+            if not h.onTop:
+                h.draw(self.screen)
+            else:
+                onTopCard = h
+        if onTopCard != None:
+            onTopCard.draw(self.screen)
+            onTopCard.onTop = False
 
         self.deckImgHolder1.draw(self.screen)
         self.deckImgHolder2.draw(self.screen)
