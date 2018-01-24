@@ -73,10 +73,13 @@ class Engine(object):
         self.hand9 = Card()
         self.hand10 = Card()
         self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
-        self.clickedCard = list()
 
         self.boardField = BoardField(225,390,1010,470)
         self.boardCardList = list()
+
+        self.allCardsList = list()
+
+        self.clickedCard = list()
 
         '''scenario: the 10 hand cards start at the top of the deck/deckImgHolder3, then use waitTick so that 1 card animates(similarly to the click-and-drag animation)
          to its hand position every 1 second
@@ -90,8 +93,8 @@ class Engine(object):
         self.drawCardWait = 400                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
         self.opening = True
         self.openingIndex = 0
-        self.x = 220
-        self.y = 600
+        self.openingX = 220                # hand coordinate is from 220 to 1020
+        self.openingY = 600
 
         self.deckImgHolder1 = Card()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
@@ -99,10 +102,10 @@ class Engine(object):
 
     # handles events which happen in the program
     def cardMousedOver(self, xy) -> bool:
-        self.clickedCard = [s for s in self.handList if s.collidepoint(xy[0], xy[1])]
+        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
         return True if len(self.clickedCard) == 1 else False
     def cardMousedOver2(self, xy):
-        self.clickedCard = [s for s in self.handList if s.collidepoint(xy[0], xy[1])]
+        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
         return self.clickedCard
 
     def eventLoop(self):
@@ -121,6 +124,8 @@ class Engine(object):
                 self.board.hasPreviewCard = False if not self.holdingCard else True
 
             if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
+                print(len(self.clickedCard))
+                print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList),len(self.handList),len(self.boardCardList)))
 
                 print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
                 click = pygame.mouse.get_pressed()
@@ -138,21 +143,21 @@ class Engine(object):
                     #     self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                     #     self.drawCardSound.play()
 
-                    for s in self.handList:
-                        print("Disabled? {0}   Onboard? {1}".format(s.disabled,s.onBoard))
-                        if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and s.disabled and not s.onBoard:   #card should only be clickable if not s.disabled and not s.onBoard
-                            self.clickedCard.append(s)                                                                              #for now, it is "and s.disabled" just to display the current progress on hand to board
+                    for s in self.allCardsList:
+                        if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
+                            self.clickedCard.append(s)
                             s.onTop = True
-                            self.handList.pop(self.handList.index(s))
-                            self.handList.append(s)
+                            self.allCardsList.pop(self.allCardsList.index(s))
+                            self.allCardsList.append(s)
 
-                    if len(self.clickedCard) == 1:
-                        print("handcard clicked")
-                        self.clickedCard[0].isHeld = True
-                        self.holdingCard = True
-                        self.clickedCard[0].resting = False
-                        self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                        self.drawCardSound.play()
+                    if len(self.clickedCard) > 0:
+                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
+                            print("handcard clicked")
+                            self.clickedCard[0].isHeld = True
+                            self.holdingCard = True
+                            self.clickedCard[0].resting = False
+                            self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                            self.drawCardSound.play()
 
                     if (self.card.posX + self.card.width) >= pygame.mouse.get_pos()[0] >= self.card.posX and (self.card.posY + self.card.height) >= pygame.mouse.get_pos()[1] >= self.card.posY:
                         print("clicked")
@@ -194,9 +199,10 @@ class Engine(object):
                     self.drawCardSound.play()
                     self.handList[self.openingIndex].resting = False
                     self.handList[self.openingIndex].set_destination(1180, 563)
-                    self.handList[self.openingIndex].defaultPos = (self.x, self.y)
-                    self.handList[self.openingIndex].update(deltaTime, self.x, self.y)
-                    self.x += 80
+                    self.handList[self.openingIndex].defaultPos = (self.openingX, self.openingY)
+                    self.handList[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
+                    self.allCardsList.append(self.handList[self.openingIndex])
+                    self.openingX += 80
                     self.openingIndex += 1
                 if self.openingIndex == 10:
                     self.opening = False
@@ -207,15 +213,29 @@ class Engine(object):
             boardCard.defaultPos = boardx,boardy
             boardx += 80
 
-        for h in self.handList:
+        for a in self.allCardsList:
             # if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
             #     print("Hurrah")
             #     h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
             #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
+            if not a.resting:
+                a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
+        for h in self.handList:
+            initialHandlength = len(self.handList)
+            if h.onBoard:
+                self.handList.pop(self.handList.index(h))
+            if len(self.handList) < initialHandlength:
+                initialHandlength = len(self.handList)
+                newX = 620 - (40*len(self.handList))
+                for h2 in self.handList:
+                    h2.resting = False
+                    h2.set_destination(h.posX, h.posY)
 
-            if not h.resting:
-                h.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    # xRange of handList Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                    h2.defaultPos = (newX, 600)    # 600 = self.openingY
+                    h2.update(deltaTime, newX, 600)
+                    newX += 80
 
 
         self.deckImgHolder1.update(deltaTime, 1170, 565)
@@ -232,11 +252,11 @@ class Engine(object):
         self.card.draw(self.screen)
 
         onTopCard = None
-        for h in self.handList:
-            if not h.onTop:
-                h.draw(self.screen)
+        for a in self.allCardsList:
+            if not a.onTop:
+                a.draw(self.screen)
             else:
-                onTopCard = h
+                onTopCard = a
         if onTopCard != None:
             onTopCard.draw(self.screen)
             onTopCard.onTop = False
