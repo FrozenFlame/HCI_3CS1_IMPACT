@@ -1,9 +1,22 @@
 import pygame
-import Engine
+
+
+from scripts import tools
+from scripts.states import Engine #states imported
+from scripts.Globals import Globals
 
 def main():
-    avarice = Engine.Engine()
-    avarice.main_loop()
+    coordinator = tools.Coordinator("Avarice - A Greed-Based Card Game")
+    # avarice = Engine.Engine()
+    # avarice.main_loop()
+    states = {"AVARICE": Engine.Engine(),
+              #"MAIN_MENU": theoretical.MainMenu()
+              #"OPTIONS": theoretical.Options()
+              #"HERO_SELECT": theoretical.HeroSelect()
+              #"GAME_SUMMARY": theoretical.GameSummary()
+              }
+    coordinator.prepstates(states, Globals.state)
+    coordinator.main_loop()
     pygame.quit()
     quit()
 

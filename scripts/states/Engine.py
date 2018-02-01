@@ -1,14 +1,15 @@
 import pygame, math, time, random
-from HCI_3CS1_IMPACT.BoardField import BoardField
-from HCI_3CS1_IMPACT.Card import Card
-from HCI_3CS1_IMPACT.Board import Board
+from .classes.BoardField import BoardField
+from .classes.Card import Card
+from .classes.Board import Board
 
-from scripts.Globals import Globals
+from .. import tools
+
+from ..Globals import Globals
 '''
-This class is responsible for holding the main loop, graphics rendering, and scene/event handling.
+This class is the actual game between two players
 '''
-
-
+print("[Engine.py]Engine Loaded")
 
 #THIS IS JUS A DUMMY OBJECT
 
@@ -47,13 +48,16 @@ Rough code estimate would be like:
 # class which holds the entire program.
 class Engine(object):
     def __init__(self):
-        pygame.init()
-        pygame.display.set_caption("Avarice - A Greed-Based Card Game")
-        self.screen = pygame.display.set_mode((1280,720))
-        self.screen_rect = self.screen.get_rect()
-        self.clock = pygame.time.Clock()
-        self.fps = Globals.fps
-        self.done = False
+        tools.State.__init__(self)
+        # pygame.init()
+        # pygame.display.set_caption("Avarice - A Greed-Based Card Game")
+        # self.screen = pygame.display.set_mode((1280,720))
+        # self.screen_rect = self.screen.get_rect()
+        # self.clock = pygame.time.Clock()
+        # self.fps = Globals.fps
+        # self.done = False
+        self.next = "GAME_SUMMARY"  # the next state by default would be the victory/defeat summary screen
+        self.bgm = None  # the bgm of the hero
 
         # logic booleans
         self.holdingCard = False
@@ -108,94 +112,95 @@ class Engine(object):
         self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
         return self.clickedCard
 
-    def eventLoop(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.done = True
-            #if self.board.hasPreviewCard:
-             #   print("Previewing card.")
-            #card is being moused over
-            if self.cardMousedOver(pygame.mouse.get_pos()):
-                # print("Mousingover")
-                self.board.hasPreviewCard = True
-                self.board.previewCard = self.clickedCard[0]
-            elif not self.cardMousedOver(pygame.mouse.get_pos()):
-                # print("notmousing")
-                self.board.hasPreviewCard = False if not self.holdingCard else True
+    def get_evt(self, event):
 
-            if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
-                print(len(self.clickedCard))
-                print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList),len(self.handList),len(self.boardCardList)))
+        if event.type == pygame.QUIT:
+            self.done = True
+        #if self.board.hasPreviewCard:
+         #   print("Previewing card.")
+        #card is being moused over
+        if self.cardMousedOver(pygame.mouse.get_pos()):
+            # print("Mousingover")
+            self.board.hasPreviewCard = True
+            self.board.previewCard = self.clickedCard[0]
+        elif not self.cardMousedOver(pygame.mouse.get_pos()):
+            # print("notmousing")
+            self.board.hasPreviewCard = False if not self.holdingCard else True
 
-                print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
-                click = pygame.mouse.get_pressed()
-                # print("Clicked: {0}".format(click))
+        if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
+            print(len(self.clickedCard))
+            print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList),len(self.handList),len(self.boardCardList)))
 
-                if click[0] == 1:
+            print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
+            click = pygame.mouse.get_pressed()
+            # print("Clicked: {0}".format(click))
 
-                    # self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and not s.disabled and not s.onBoard]
-                    #
-                    # if len(self.clickedCard) == 1:
-                    #     print("handcard clicked")
-                    #     self.clickedCard[0].isHeld = True
-                    #     self.holdingCard = True
-                    #     self.clickedCard[0].resting = False
-                    #     self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                    #     self.drawCardSound.play()
+            if click[0] == 1:
 
-                    for s in self.allCardsList:
-                        if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
-                            self.clickedCard.append(s)
-                            s.onTop = True
-                            self.allCardsList.pop(self.allCardsList.index(s))
-                            self.allCardsList.append(s)
+                # self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and not s.disabled and not s.onBoard]
+                #
+                # if len(self.clickedCard) == 1:
+                #     print("handcard clicked")
+                #     self.clickedCard[0].isHeld = True
+                #     self.holdingCard = True
+                #     self.clickedCard[0].resting = False
+                #     self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                #     self.drawCardSound.play()
 
-                    if len(self.clickedCard) > 0:
-                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
-                            print("handcard clicked")
-                            self.clickedCard[0].isHeld = True
-                            self.holdingCard = True
-                            self.clickedCard[0].resting = False
-                            self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                            self.drawCardSound.play()
+                for s in self.allCardsList:
+                    if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
+                        self.clickedCard.append(s)
+                        s.onTop = True
+                        self.allCardsList.pop(self.allCardsList.index(s))
+                        self.allCardsList.append(s)
 
-                    if (self.card.posX + self.card.width) >= pygame.mouse.get_pos()[0] >= self.card.posX and (self.card.posY + self.card.height) >= pygame.mouse.get_pos()[1] >= self.card.posY:
-                        print("clicked")
-                        self.card.isHeld = True
+                if len(self.clickedCard) > 0:
+                    if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
+                        print("handcard clicked")
+                        self.clickedCard[0].isHeld = True
                         self.holdingCard = True
-                        self.card.resting = False
-                        self.card.set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                        self.clickedCard[0].resting = False
+                        self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                        self.drawCardSound.play()
 
-            if event.type == pygame.MOUSEBUTTONUP:
-                click = pygame.mouse.get_pressed()
-                if click[0] == 0:
-                    print("unheld")
-                    self.card.isHeld = False
-                    self.holdingCard = False
-                    self.board.hasPreviewCard = False
-                    if not len(self.clickedCard) == 0:
-                        self.clickedCard[0].isHeld = False
+                if (self.card.posX + self.card.width) >= pygame.mouse.get_pos()[0] >= self.card.posX and (self.card.posY + self.card.height) >= pygame.mouse.get_pos()[1] >= self.card.posY:
+                    print("clicked")
+                    self.card.isHeld = True
+                    self.holdingCard = True
+                    self.card.resting = False
+                    self.card.set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-                        if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
-                            self.boardCardList.append(self.clickedCard[0])
-                            self.clickedCard[0].onBoard = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            click = pygame.mouse.get_pressed()
+            if click[0] == 0:
+                print("unheld")
+                self.card.isHeld = False
+                self.holdingCard = False
+                self.board.hasPreviewCard = False
+                if not len(self.clickedCard) == 0:
+                    self.clickedCard[0].isHeld = False
 
-                        if self.clickedCard[0].destination == None:
-                            self.clickedCard.pop()
+                    if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
+                        self.boardCardList.append(self.clickedCard[0])
+                        self.clickedCard[0].onBoard = True
+
+                    if self.clickedCard[0].destination == None:
+                        self.clickedCard.pop()
 
 
 
     # orders individual elements to update themselves (your coordinates, sprite change, etc)
-    def update(self, deltaTime):
+    def update(self, screen, keys, currentTime, deltaTime):
         # demo 1 card only lang naman
         if not self.card.resting:
             self.card.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
         if self.opening == True:
-            currentTick = pygame.time.get_ticks()
+            currentTick = currentTime
             if currentTick - self.waitTick >= self.drawCardWait:
                 if self.openingIndex < 10:
                     self.waitTick = currentTick
+                    # self.drawCardSound.stop()
                     self.drawCardSound.play()
                     self.handList[self.openingIndex].resting = False
                     self.handList[self.openingIndex].set_destination(1180, 563)
@@ -237,45 +242,31 @@ class Engine(object):
                     h2.update(deltaTime, newX, 600)
                     newX += 80
 
-
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
+        self.draw(screen)
 
     # orders individual elements to draw themselves in the correct order (your blits)
-    def draw(self):
-        self.board.draw(self.screen)
+    def draw(self, screen):
+        self.board.draw(screen)
         # self.screen.fill((100,100,100))
         if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
             self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
             self.card.blitted = True
-        self.card.draw(self.screen)
+        self.card.draw(screen)
 
         onTopCard = None
         for a in self.allCardsList:
             if not a.onTop:
-                a.draw(self.screen)
+                a.draw(screen)
             else:
                 onTopCard = a
         if onTopCard != None:
-            onTopCard.draw(self.screen)
+            onTopCard.draw(screen)
             onTopCard.onTop = False
 
-        self.deckImgHolder1.draw(self.screen)
-        self.deckImgHolder2.draw(self.screen)
-        self.deckImgHolder3.draw(self.screen)
+        self.deckImgHolder1.draw(screen)
+        self.deckImgHolder2.draw(screen)
+        self.deckImgHolder3.draw(screen)
 
-        # FPS
-        pygame.display.set_caption("Avarice - A Greed-Based Card Game - FPS: {0:.2f}".format(self.clock.get_fps()))
-
-    def main_loop(self):
-        while not self.done:
-            # dt is multiplied to the vector values here in order to simulate the movements over time.
-            # without it, it would cause the graphic to teleport to the location instantaneously
-            deltaTime = self.clock.tick(self.fps)/1000 # delta time (for framerate independence)
-
-            #have input listener stage
-            self.eventLoop()
-            self.update(deltaTime)
-            self.draw()
-            pygame.display.update()

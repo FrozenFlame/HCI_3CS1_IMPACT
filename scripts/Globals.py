@@ -1,3 +1,4 @@
 class Globals:
-    scene = "main_menu"
+    print("[Globals.py]Globals loaded")
     fps = 60.0
+    state = "AVARICE" #default for now
