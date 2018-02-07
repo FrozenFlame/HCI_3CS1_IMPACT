@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, time
 class Card(object):
     def __init__(self):
         self.height = 100
@@ -8,8 +8,9 @@ class Card(object):
         self.isHeld = False
         self.resting = True  # unused for now
         self.defaultPos = (65, 500)
-        self.img = pygame.image.load("assets\\cards\\democard.png")
-        self.img = self.img.convert_alpha()
+
+
+
         self.backimg = None  # Card backs for opposing cards and for cards in deck.
         self.speed = 10
         self.blitted = False
@@ -24,7 +25,10 @@ class Card(object):
         self.vector = None
 
         self.frontImg = pygame.image.load("assets\\cards\\democard.png")
-        self.backImg = pygame.image.load("assets\\cards\\democard.png")
+        self.backImg = pygame.image.load("assets\\cards\\democardBack.png")
+
+        self.img = self.backImg
+        self.img = self.img.convert_alpha()
 
     # rename method soon
     # def decider(self):
@@ -95,4 +99,26 @@ class Card(object):
         return boardCollide
 
     def flip(self):
-        pass
+        # waitTick = wTick
+        # currentTick = pygame.time.get_ticks()
+        # waitTime = 10 #millisecond
+        # if currentTick - waitTick >= waitTime:
+        #     waitTick = currentTick
+
+        x = 75
+        while x > 0:
+            pygame.transform.scale(self.img, (x, 100))
+            x -= 1
+            #time.sleep(0.001)
+
+        if self.img == self.frontImg:
+            self.img = self.backImg
+        else:#if self.img == self.backImg:
+            self.img = self.frontImg
+
+        while x < 75:
+            pygame.transform.scale(self.img, (x, 100))
+            x += 1
+            #time.sleep(0.001)
+
+

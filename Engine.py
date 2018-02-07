@@ -175,6 +175,7 @@ class Engine(object):
                     self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
                         self.clickedCard[0].isHeld = False
+                        self.clickedCard[0].flip()
 
                         if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                             self.boardCardList.append(self.clickedCard[0])
