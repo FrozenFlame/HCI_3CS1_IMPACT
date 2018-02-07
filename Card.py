@@ -23,6 +23,9 @@ class Card(object):
         self.distance = 0.0
         self.vector = None
 
+        self.frontImg = pygame.image.load("assets\\cards\\democard.png")
+        self.backImg = pygame.image.load("assets\\cards\\democard.png")
+
     # rename method soon
     # def decider(self):
     #     if not self.resting:
@@ -90,3 +93,6 @@ class Card(object):
         boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
 
         return boardCollide
+
+    def flip(self):
+        pass
