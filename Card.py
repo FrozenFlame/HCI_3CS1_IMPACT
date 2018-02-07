@@ -99,16 +99,19 @@ class Card(object):
         return boardCollide
 
     def flip(self):
-        # waitTick = wTick
-        # currentTick = pygame.time.get_ticks()
-        # waitTime = 10 #millisecond
-        # if currentTick - waitTick >= waitTime:
-        #     waitTick = currentTick
+        waitTick = pygame.time.get_ticks()
+        currentTick = pygame.time.get_ticks()
+        waitTime = 10 #millisecond
 
         x = 75
         while x > 0:
-            pygame.transform.scale(self.img, (x, 100))
-            x -= 1
+            currentTick = pygame.time.get_ticks()
+            if currentTick - waitTick >= waitTime:
+                waitTick = currentTick
+                self.img = pygame.transform.scale(self.img, (x, 100))
+                x -= 1
+            else:
+                continue
             #time.sleep(0.001)
 
         if self.img == self.frontImg:
@@ -117,8 +120,13 @@ class Card(object):
             self.img = self.frontImg
 
         while x < 75:
-            pygame.transform.scale(self.img, (x, 100))
-            x += 1
+            currentTick = pygame.time.get_ticks()
+            if currentTick - waitTick >= waitTime:
+                waitTick = currentTick
+                self.img = pygame.transform.scale(self.img, (x, 100))
+                x += 1
+            else:
+                continue
             #time.sleep(0.001)
 
 
