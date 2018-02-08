@@ -29,6 +29,11 @@ class Card(object):
 
         self.img = self.backImg
         self.img = self.img.convert_alpha()
+        self.flipAnimating = False
+        self.flipped = False
+        self.flipX = 74
+        self.front = False
+        self.back = True #the card is face down initially. is this wrong?
 
     # rename method soon
     # def decider(self):
@@ -99,34 +104,36 @@ class Card(object):
         return boardCollide
 
     def flip(self):
-        waitTick = pygame.time.get_ticks()
-        currentTick = pygame.time.get_ticks()
-        waitTime = 10 #millisecond
+        self.flipAnimating = True
 
-        x = 75
-        while x > 0:
-            currentTick = pygame.time.get_ticks()
-            if currentTick - waitTick >= waitTime:
-                waitTick = currentTick
-                self.img = pygame.transform.scale(self.img, (x, 100))
-                x -= 1
-            else:
-                continue
-            #time.sleep(0.001)
-
-        if self.img == self.frontImg:
-            self.img = self.backImg
-        else:#if self.img == self.backImg:
-            self.img = self.frontImg
-
-        while x < 75:
-            currentTick = pygame.time.get_ticks()
-            if currentTick - waitTick >= waitTime:
-                waitTick = currentTick
-                self.img = pygame.transform.scale(self.img, (x, 100))
-                x += 1
-            else:
-                continue
-            #time.sleep(0.001)
+        # waitTick = pygame.time.get_ticks()
+        # currentTick = pygame.time.get_ticks()
+        # waitTime = 10 #millisecond
+        #
+        # x = 75
+        # while x > 0:
+        #     currentTick = pygame.time.get_ticks()
+        #     if currentTick - waitTick >= waitTime:
+        #         waitTick = currentTick
+        #         self.img = pygame.transform.scale(self.img, (x, 100))
+        #         x -= 1
+        #     else:
+        #         continue
+        #     #time.sleep(0.001)
+        #
+        # if self.img == self.frontImg:
+        #     self.img = self.backImg
+        # else:#if self.img == self.backImg:
+        #     self.img = self.frontImg
+        #
+        # while x < 75:
+        #     currentTick = pygame.time.get_ticks()
+        #     if currentTick - waitTick >= waitTime:
+        #         waitTick = currentTick
+        #         self.img = pygame.transform.scale(self.img, (x, 100))
+        #         x += 1
+        #     else:
+        #         continue
+        #     #time.sleep(0.001)
 
 

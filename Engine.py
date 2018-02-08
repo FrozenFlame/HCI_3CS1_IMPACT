@@ -192,7 +192,7 @@ class Engine(object):
         if not self.card.resting:
             self.card.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-        if self.opening == True:
+        if self.opening:
             currentTick = pygame.time.get_ticks()
             if currentTick - self.waitTick >= self.drawCardWait:
                 if self.openingIndex < 10:
@@ -221,6 +221,52 @@ class Engine(object):
             #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
             if not a.resting:
                 a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+            if a.flipAnimating:
+                waitTime = 10  # millisecond
+                if a.flipX > 0 and not a.flipped:
+                    print(a.flipX)
+                    currentTick = pygame.time.get_ticks()
+                    if currentTick - self.waitTick >= waitTime:
+                        print("flipAnimating")
+                        self.waitTick = currentTick
+                        a.img = pygame.transform.smoothscale(a.img, (a.flipX, 100))
+                        a.flipX -= 20
+        ################################################################################
+                elif a.flipX <= 0 and not a.flipped:
+                    a.flipX += 20
+                    if a.front:
+                        print("front to back")
+                        a.img = pygame.transform.smoothscale(a.backImg, (a.flipX, 100))
+                        a.flipped = True
+                        a.back = True
+                        a.front = False
+                    elif a.back:  # if self.img == self.backImg:
+                        print("back to front")
+                        a.img = pygame.transform.smoothscale(a.frontImg, (a.flipX, 100))
+                        a.flipped = True
+                        a.back = False
+                        a.front = True
+        ################################################################################
+                elif a.flipX <= 74 and a.flipped:
+                    print(a.flipX)
+                    currentTick = pygame.time.get_ticks()
+                    if currentTick - self.waitTick >= waitTime:
+                        print("flipAnimating")
+                        self.waitTick = currentTick
+                        a.img = pygame.transform.smoothscale(a.img, (a.flipX, 100))
+                        a.flipX += 20
+        ################################################################################
+                elif a.flipX >= 75 and a.flipped:
+                    if a.front:
+                        a.img = a.frontImg
+                    if a.back:
+                        a.img = a.backImg
+                    a.flipped = False
+                    a.flipAnimating = False
+                    a.flipX = 74
+
+
 
         for h in self.handList:
             initialHandlength = len(self.handList)
