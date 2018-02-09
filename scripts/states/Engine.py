@@ -108,9 +108,10 @@ class Engine(object):
     def cardMousedOver(self, xy) -> bool:
         self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
         return True if len(self.clickedCard) == 1 else False
-    def cardMousedOver2(self, xy):
-        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
-        return self.clickedCard
+
+    # def cardMousedOver2(self, xy):
+    #     self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
+    #     return self.clickedCard
 
     def get_evt(self, event):
 
@@ -214,7 +215,7 @@ class Engine(object):
 
         boardx = 220
         boardy = 380
-        for boardCard in self.boardCardList:
+        for boardCard in self.boardCardList: #THIS IS FOR THE POSITION OF CARD WHILE DEPLOYING
             boardCard.defaultPos = boardx,boardy
             boardx += 80
 

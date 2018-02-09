@@ -1,0 +1,15 @@
+character = Surface((247,70),pygame.SRCALPHA)
+character.blit(spritesheet,(-1,0))
+character = pygame.transform.scale(character, (247*3,70*3))
+startButtonNormal = character
+
+character = Surface((263,72),pygame.SRCALPHA)
+character.blit(spritesheet,(1,-72))
+character = pygame.transform.scale(character, (263*3,72*3))
+startButtonHover = character
+
+character = Surface((263,72),pygame.SRCALPHA)
+character.blit(spritesheet,(1,-143))
+character = pygame.transform.scale(character, (263*3,72*3))
+startButtonClicked = character
+

@@ -10,10 +10,8 @@ class Card(object):
         self.defaultPos = (65, 500)
         self.img = pygame.image.load("assets\\cards\\democard.png")
         self.img = self.img.convert_alpha()
-        self.backimg = pygame.image.load("assets\\cards\\democardBack.png")  # Card backs for opposing cards and for cards in deck.
-        self.backimg = self.backimg.convert_alpha()
+        self.backimg = None  # Card backs for opposing cards and for cards in deck.
         self.speed = 10
-        self.faceUp = False  # if card is facing up on the screen
         self.blitted = False
 
         self.onBoard = False
@@ -46,7 +44,7 @@ class Card(object):
                     self.posY = self.defaultPos[1]  # * dTime
                     self.resting = True
                     self.destination = None
-                else:
+                else: #this is for returning the card to your hand with animation
                     self.posX += self.vector[0] * dTime
                     self.posY += self.vector[1] * dTime
         else:
@@ -92,7 +90,3 @@ class Card(object):
         boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
 
         return boardCollide
-
-    #flip card
-    def flip(self):
-        pass

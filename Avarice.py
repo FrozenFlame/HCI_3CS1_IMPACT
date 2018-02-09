@@ -3,6 +3,7 @@ import pygame
 
 from scripts import tools
 from scripts.states import Engine #states imported
+from scripts.states import MainMenu
 from scripts.Globals import Globals
 
 def main():
@@ -10,7 +11,7 @@ def main():
     # avarice = Engine.Engine()
     # avarice.main_loop()
     states = {"AVARICE": Engine.Engine(),
-              #"MAIN_MENU": theoretical.MainMenu()
+              "MAIN_MENU": MainMenu.MainMenu()
               #"OPTIONS": theoretical.Options()
               #"HERO_SELECT": theoretical.HeroSelect()
               #"GAME_SUMMARY": theoretical.GameSummary()

@@ -64,9 +64,6 @@ class Coordinator(object):
 
 
 class State(object):
-    '''
-    The base class of all states
-    '''
 
     def __init__(self):
         self.startTime = 0.0  # time when the state started
