@@ -13,7 +13,7 @@ DEPTH = 32
 FLAGS = 0
 
 # Spritesheet
-decode = "D:/Avarice/HCI_3CS1_IMPACT/button-start-spritesheet.png"
+decode = "D:/Avarice/HCI_3CS1_IMPACT/assets/buttons/button-start-spritesheet.png"
 spritesheet = pygame.image.load(decode)
 
 

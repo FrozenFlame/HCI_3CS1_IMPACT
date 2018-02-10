@@ -1,7 +1,7 @@
 import pygame
 from pygame import *
 
-spritesheet = pygame.image.load("assets\\buttons\\button-start-spritesheet.png")
+spritesheet = pygame.image.load("D:/Avarice/HCI_3CS1_IMPACT/assets/buttons/button-start-spritesheet.png")
 
 character = pygame.Surface((247,70),pygame.SRCALPHA)
 character.blit(spritesheet,(-1,0))

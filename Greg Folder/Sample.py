@@ -15,7 +15,7 @@ DEPTH = 32 #use to display the windows
 FLAGS = 0
 CAMERA_SLACK = 30 #the idea that was never implemented
 
-spritesheet = pygame.image.load("D:/Avarice/HCI_3CS1_IMPACT/mario_003.png")
+spritesheet = pygame.image.load("C:\HCI_3CS1_IMPACT\mario_003.png")
 
 character = Surface((14,28),pygame.SRCALPHA)
 character.blit(spritesheet,(-46,-100))

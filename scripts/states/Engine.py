@@ -271,3 +271,18 @@ class Engine(object):
         self.deckImgHolder2.draw(screen)
         self.deckImgHolder3.draw(screen)
 
+    def startup(self, currentTime, persistent):
+        '''
+        Add variables passed in persistent to the proper attributes and
+        set the start time of the State to the current time.
+        @ Overwritten portion
+        '''
+        self.persist = persistent
+        self.startTime = currentTime
+
+
+    def cleanup(self):
+        self.done = False
+        return self.persist
+
+

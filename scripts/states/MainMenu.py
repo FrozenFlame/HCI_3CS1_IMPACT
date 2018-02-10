@@ -38,6 +38,7 @@ class MainMenu(object):
     def get_evt(self,event):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
+
         if event.type == pygame.QUIT:
             self.done = True
             #animation for the button
@@ -50,15 +51,18 @@ class MainMenu(object):
             self.buttons.image = startButtonNormal
             self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
 
-
             #for changing states button
         if event.type == pygame.MOUSEBUTTONDOWN:
             if click[0] == 1 and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
                 self.buttons.image = startButtonClicked
                 self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
                 self.buttons.startButton.convert()
-                print("Change State")
-                print(mouse)
+                Globals.state = "AVARICE"
+                self.next = Globals.state
+                self.finished = True
+
+            elif click[2] == 1:
+                print(Globals.state)
 
         if event.type == pygame.MOUSEBUTTONUP:
             pass
@@ -68,9 +72,18 @@ class MainMenu(object):
 
         pass
 
+    def startup(self, currentTime, persistent):
+        '''
+        Add variables passed in persistent to the proper attributes and
+        set the start time of the State to the current time.
+        @ Overwritten portion
+        '''
+        self.persist = persistent
+        self.startTime = currentTime
 
 
-
-
+    def cleanup(self):
+        self.done = False
+        return self.persist
 
 
