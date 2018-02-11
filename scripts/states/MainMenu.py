@@ -29,7 +29,9 @@ class MainMenu(object):
         self.buttons = Buttons()
         self.buttonHovered = False
         self.hover = False
+        self.startPrime = False  # start button has been held down
         self.globals = Globals()
+
 
     def draw(self, screen):
         pygame.draw.rect(screen, black, (500,300,245,100))
@@ -41,31 +43,41 @@ class MainMenu(object):
 
         if event.type == pygame.QUIT:
             self.done = True
-            #animation for the button
-        if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
+        #animation for the button
+
+        # mouse over
+        if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
             self.buttons.image = startButtonHover
             self.buttons.startButton = pygame.transform.scale(self.buttons.image, (self.buttons.width, self.buttons.height)).convert_alpha()
 
+        # mouse back on while held start button
+        elif self.startPrime and (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
+            self.buttons.image = startButtonClicked
+            self.buttons.startButton = pygame.transform.scale(self.buttons.image, (self.buttons.width, self.buttons.height)).convert_alpha()
+            self.buttons.startButton.convert()
 
-        elif not (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
+        # mouse off
+        elif not (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX or not (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
             self.buttons.image = startButtonNormal
             self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
 
-            #for changing states button
+        #for changing states button
         if event.type == pygame.MOUSEBUTTONDOWN:
             if click[0] == 1 and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
                 self.buttons.image = startButtonClicked
                 self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
                 self.buttons.startButton.convert()
-                Globals.state = "AVARICE"
-                self.next = Globals.state
-                self.finished = True
-
+                self.startPrime = True
             elif click[2] == 1:
                 print(Globals.state)
 
         if event.type == pygame.MOUSEBUTTONUP:
-            pass
+            if click[0] == 0 and self.startPrime and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
+                Globals.state = "AVARICE"
+                self.next = Globals.state
+                self.finished = True
+            if self.startPrime:
+                self.startPrime = False
 
     def update(self, screen, keys, currentTime, dt):
         self.draw(screen)

@@ -180,7 +180,7 @@ class Engine(object):
                 self.board.hasPreviewCard = False
                 if not len(self.clickedCard) == 0:
                     self.clickedCard[0].isHeld = False
-
+                    self.clickedCard[0].flip()
                     if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                         self.boardCardList.append(self.clickedCard[0])
                         self.clickedCard[0].onBoard = True
@@ -226,6 +226,9 @@ class Engine(object):
             #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
             if not a.resting:
                 a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+            if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
+                a.flipAnim(self.waitTick)
 
         for h in self.handList:
             initialHandlength = len(self.handList)

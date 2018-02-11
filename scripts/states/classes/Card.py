@@ -8,9 +8,16 @@ class Card(object):
         self.isHeld = False
         self.resting = True  # unused for now
         self.defaultPos = (65, 500)
-        self.img = pygame.image.load("assets\\cards\\democard.png")
-        self.img = self.img.convert_alpha()
-        self.backimg = None  # Card backs for opposing cards and for cards in deck.
+        self.frontImg = pygame.image.load("assets\\cards\\democard.png")
+        self.flipAnimating = False
+        self.flipped = False
+        self.flipX = 74
+        self.front = False
+        self.back = True  # the card is face down initially. is this wrong?
+        self.img = None
+        self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
+        self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
+        self.img = self.backImg
         self.speed = 10
         self.blitted = False
 
@@ -90,3 +97,93 @@ class Card(object):
         boardCollide = pygame.Rect.colliderect(tempRect, boardRect)
 
         return boardCollide
+
+    def flip(self):  # flip initiator
+        self.flipAnimating = True
+        # self.flipAnimation()
+
+    def flipAnim(self, waitTick):  # flip animation to be called per tick.
+        waitTime = 10
+
+        if self.flipX > 0 and not self.flipped:  # shrinking animation
+            # print("Engine.py - "); print(a.flipX)
+            currentTick = pygame.time.get_ticks()
+            if currentTick - waitTick >= waitTime:
+                # print("flipAnimating")
+                waitTick = currentTick
+                self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
+                self.posX = int(self.posX + self.img.get_rect().size[0] / 4)
+                print("[Engine.py] - SHRINK posX: {0}: ".format(self.posX))
+                print("[Engine.py] - flipX: {0}".format(self.flipX))
+                print("[Engine.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
+
+                self.flipX -= 20
+        ################################################################################
+        elif self.flipX <= 0 and not self.flipped:  # time to flip trigger + changing of image
+            self.flipX += 20
+            if self.front:
+                print("front to back")
+                self.img = pygame.transform.smoothscale(self.backImg, (self.flipX, 100))
+                self.flipped = True
+                self.back = True
+                self.front = False
+            elif self.back:  # growing animation to face up
+                print("back to front")
+                self.img = pygame.transform.smoothscale(self.frontImg, (self.flipX, 100))
+                self.flipped = True
+                self.back = False
+                self.front = True
+        ################################################################################
+        elif self.flipX <= 74 and self.flipped:  # growing animation
+            print("ANJING")
+            print("[Engine.py] - GROW posX: {0}: ".format(self.posX))
+            # print(a.flipX)
+            currentTick = pygame.time.get_ticks()
+            if currentTick - waitTick >= waitTime:
+                # print("flipAnimating")
+                waitTick = currentTick
+                self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
+                self.posX = int(self.posX - self.img.get_rect().size[0] / 4)
+                self.flipX += 20
+        ################################################################################
+        elif self.flipX >= 75 and self.flipped:  # animation completed, new image face set
+            if self.front:
+                self.img = self.frontImg
+            if self.back:
+                self.img = self.backImg
+            self.flipped = False
+            self.flipAnimating = False
+            self.flipX = 74
+            self.posX = self.defaultPos[0]
+
+    # waitTick = pygame.time.get_ticks()
+    # currentTick = pygame.time.get_ticks()
+    # waitTime = 10 #millisecond
+    #
+    # x = 75
+    # while x > 0:
+    #     currentTick = pygame.time.get_ticks()
+    #     if currentTick - waitTick >= waitTime:
+    #         waitTick = currentTick
+    #         self.img = pygame.transform.scale(self.img, (x, 100))
+    #         x -= 1
+    #     else:
+    #         continue
+    #     #time.sleep(0.001)
+    #
+    # if self.img == self.frontImg:
+    #     self.img = self.backImg
+    # else:#if self.img == self.backImg:
+    #     self.img = self.frontImg
+    #
+    # while x < 75:
+    #     currentTick = pygame.time.get_ticks()
+    #     if currentTick - waitTick >= waitTime:
+    #         waitTick = currentTick
+    #         self.img = pygame.transform.scale(self.img, (x, 100))
+    #         x += 1
+    #     else:
+    #         continue
+    #     #time.sleep(0.001)
+
+
