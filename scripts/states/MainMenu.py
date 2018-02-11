@@ -3,21 +3,21 @@ from scripts import tools
 from .classes.Buttons import Buttons
 from ..Globals import Globals
 
-spritesheet = pygame.image.load("assets\\buttons\\button-start-spritesheet.png")
+spritesheet = pygame.image.load("assets\\buttons\\button-start.png")
 
-character = pygame.Surface((247,70),pygame.SRCALPHA)
-character.blit(spritesheet,(-1,0))
-character = pygame.transform.scale(character, (247*3,70*3))
+character = pygame.Surface((203, 74),pygame.SRCALPHA)   # first line is dimension of the button
+character.blit(spritesheet,(0,0))                       # second line is the DISPLACEMENT on the sprite sheet
+# character = pygame.transform.scale(character, (203*3,73*3))
 startButtonNormal = character
 
-character = pygame.Surface((263,72),pygame.SRCALPHA)
-character.blit(spritesheet,(1,-72))
-character = pygame.transform.scale(character, (263*3,72*3))
+character = pygame.Surface((203,74),pygame.SRCALPHA)
+character.blit(spritesheet,(0,-74))
+# character = pygame.transform.scale(character, (203*3,147*3))
 startButtonHover = character
 
-character = pygame.Surface((263,72),pygame.SRCALPHA)
-character.blit(spritesheet,(1,-143))
-character = pygame.transform.scale(character, (263*3,72*3))
+character = pygame.Surface((203,74),pygame.SRCALPHA)
+character.blit(spritesheet,(0,-148))
+# character = pygame.transform.scale(character, (203*3,222*3))
 startButtonClicked = character
 
 black = (0,0,0)
@@ -48,25 +48,24 @@ class MainMenu(object):
         # mouse over
         if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
             self.buttons.image = startButtonHover
-            self.buttons.startButton = pygame.transform.scale(self.buttons.image, (self.buttons.width, self.buttons.height)).convert_alpha()
+            self.buttons.startButton = self.buttons.image.convert_alpha()
 
         # mouse back on while held start button
         elif self.startPrime and (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
             self.buttons.image = startButtonClicked
-            self.buttons.startButton = pygame.transform.scale(self.buttons.image, (self.buttons.width, self.buttons.height)).convert_alpha()
+            self.buttons.startButton = self.buttons.image.convert_alpha()
             self.buttons.startButton.convert()
 
         # mouse off
         elif not (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX or not (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
             self.buttons.image = startButtonNormal
-            self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
+            self.buttons.startButton = self.buttons.image.convert_alpha()
 
         #for changing states button
         if event.type == pygame.MOUSEBUTTONDOWN:
             if click[0] == 1 and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
                 self.buttons.image = startButtonClicked
-                self.buttons.startButton = pygame.transform.scale(self.buttons.image,(self.buttons.width, self.buttons.height)).convert_alpha()
-                self.buttons.startButton.convert()
+                self.buttons.startButton = self.buttons.image.convert_alpha()
                 self.startPrime = True
             elif click[2] == 1:
                 print(Globals.state)

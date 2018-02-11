@@ -1,12 +1,15 @@
 import pygame
 from pygame import *
 
-spritesheet = pygame.image.load("assets/buttons/button-start-spritesheet.png")
+spritesheet = pygame.image.load("assets/buttons/button-start.png")
 
 character = pygame.Surface((247,70),pygame.SRCALPHA)
 character.blit(spritesheet,(-1,0))
 character = pygame.transform.scale(character, (247*3,70*3))
 startButtonNormal = character
+
+
+#203, 73, rect of first button
 
 class Buttons(object):
     def __init__(self):

@@ -17,6 +17,7 @@ class Coordinator(object):
         self.state = None
         self.done = False # end of program flag
 
+
     def prepstates(self, states, initstate):
         self.state_dictionary = states
         self.state_name = initstate
