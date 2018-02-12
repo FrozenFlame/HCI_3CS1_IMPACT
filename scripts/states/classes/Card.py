@@ -29,6 +29,7 @@ class Card(object):
         self.destination = None  # is a Tuple x,y
         self.distance = 0.0
         self.vector = None
+        self.flipDisplace = 0
 
     # rename method soon
     # def decider(self):
@@ -112,10 +113,14 @@ class Card(object):
                 # print("flipAnimating")
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
-                self.posX = int(self.posX + self.img.get_rect().size[0] / 4)
-                print("[Engine.py] - SHRINK posX: {0}: ".format(self.posX))
-                print("[Engine.py] - flipX: {0}".format(self.flipX))
-                print("[Engine.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
+                # posXDisplace = int(self.posX + (self.img.get_rect().size[0] / 4))
+                # self.displaceLimit = int(self.posX + (self.img.get_rect().size[0] / 2))
+                # self.posX = self.displaceLimit if self.displaceLimit < self.posX else self.posX
+                self.flipDisplace = (self.width - self.img.get_rect()[0])
+                self.posX = self.posX + self.flipDisplace
+                print("[Card.py] - SHRINK posX: {0}: ".format(self.posX))
+                print("[Card.py] - flipX: {0}".format(self.flipX))
+                print("[Card.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
 
                 self.flipX -= 20
         ################################################################################
@@ -143,7 +148,8 @@ class Card(object):
                 # print("flipAnimating")
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
-                self.posX = int(self.posX - self.img.get_rect().size[0] / 4)
+                self.flipDisplace = (self.width - self.img.get_rect()[0])
+                self.posX = self.posX - self.flipDisplace
                 self.flipX += 20
         ################################################################################
         elif self.flipX >= 75 and self.flipped:  # animation completed, new image face set
@@ -153,7 +159,6 @@ class Card(object):
                 self.img = self.backImg
             self.flipped = False
             self.flipAnimating = False
-            self.flipX = 74
             self.posX = self.defaultPos[0]
 
     # waitTick = pygame.time.get_ticks()

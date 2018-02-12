@@ -39,6 +39,11 @@ class Coordinator(object):
         previous, self.state_name = self.state_name, self.state.next
         persist = self.state.cleanup()
         self.state = self.state_dictionary[self.state_name]
+        tempState = self.state_dictionary[previous]
+        item = {previous, tempState}
+        print(previous)
+        self.state_dictionary.pop()
+        self.state_dictionary.append(item)
         self.state.startup(self.currentTime, persist)
         self.state.previous = previous
 
@@ -51,10 +56,10 @@ class Coordinator(object):
                 self.keys = pygame.key.get_pressed()
             elif event.type == pygame.KEYUP:
                 self.keys = pygame.key.get_pressed()
-            self.state.get_evt(event) #the passing of events into a state
+            self.state.get_evt(event)  #the passing of events into a state
 
     def main_loop(self):
-        #the main loop of the whole program
+        # the main loop of the whole program
         while not self.done:
             delta_time = self.clock.tick(self.fps)/1000.0
             self.evt_loop()

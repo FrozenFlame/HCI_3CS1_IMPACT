@@ -3,21 +3,21 @@ from scripts import tools
 from .classes.Buttons import Buttons
 from ..Globals import Globals
 
-spritesheet = pygame.image.load("assets\\buttons\\button-start.png")
+spritesheet = pygame.image.load("assets\\buttons\\button-start-spritesheet-old.png")
 
 character = pygame.Surface((203, 74),pygame.SRCALPHA)   # first line is dimension of the button
 character.blit(spritesheet,(0,0))                       # second line is the DISPLACEMENT on the sprite sheet
-# character = pygame.transform.scale(character, (203*3,73*3))
+character = pygame.transform.scale(character, (203*3,73*3))
 startButtonNormal = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-74))
-# character = pygame.transform.scale(character, (203*3,147*3))
+character = pygame.transform.scale(character, (203*3,147*3))
 startButtonHover = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-148))
-# character = pygame.transform.scale(character, (203*3,222*3))
+character = pygame.transform.scale(character, (203*3,222*3))
 startButtonClicked = character
 
 black = (0,0,0)
@@ -45,8 +45,8 @@ class MainMenu(object):
             self.done = True
         #animation for the button
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_o:
-                print ("Lagot")
+            if event.key == pygame.K_p:
+                print("Lagot2")
 
         # mouse over
         if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
@@ -75,7 +75,7 @@ class MainMenu(object):
 
         if event.type == pygame.MOUSEBUTTONUP:
             if click[0] == 0 and self.startPrime and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
-                Globals.state = "AVARICE"
+                Globals.state = "MAIN_MENU"
                 self.next = Globals.state
                 self.finished = True
             if self.startPrime:

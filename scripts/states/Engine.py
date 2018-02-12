@@ -119,7 +119,14 @@ class Engine(object):
             self.done = True
         #if self.board.hasPreviewCard:
          #   print("Previewing card.")
-        #card is being moused over
+        #card is being moused
+        # print("[Engine.py] - KEYDOWN: {0}".format(pygame.key.get_pressed()))
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                print("Jebaited")
+                # TEMPORARY METHOD:
+                self.backToMain()
+        #     pass
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
             self.board.hasPreviewCard = True
@@ -255,10 +262,10 @@ class Engine(object):
     def draw(self, screen):
         self.board.draw(screen)
         # self.screen.fill((100,100,100))
-        if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
-            self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
-            self.card.blitted = True
-        self.card.draw(screen)
+        # if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
+        #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
+        #     self.card.blitted = True
+        # self.card.draw(screen)
 
         onTopCard = None
         for a in self.allCardsList:
@@ -274,6 +281,12 @@ class Engine(object):
         self.deckImgHolder2.draw(screen)
         self.deckImgHolder3.draw(screen)
 
+    def backToMain(self):
+        Globals.state = "MAIN_MENU2"
+        self.next = Globals.state
+        self.finished = True
+
+
     def startup(self, currentTime, persistent):
         '''
         Add variables passed in persistent to the proper attributes and
@@ -283,8 +296,8 @@ class Engine(object):
         self.persist = persistent
         self.startTime = currentTime
 
-
     def cleanup(self):
+
         self.done = False
         return self.persist
 
