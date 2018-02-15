@@ -113,11 +113,9 @@ class Card(object):
                 # print("flipAnimating")
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
-                # posXDisplace = int(self.posX + (self.img.get_rect().size[0] / 4))
-                # self.displaceLimit = int(self.posX + (self.img.get_rect().size[0] / 2))
-                # self.posX = self.displaceLimit if self.displaceLimit < self.posX else self.posX
-                self.flipDisplace = (self.width - self.img.get_rect()[0])
-                self.posX = self.posX + self.flipDisplace
+                self.flipDisplace = (self.width - self.img.get_rect().size[0])
+                self.posX = self.defaultPos[0] + self.flipDisplace/2
+                print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width, self.img.get_rect().size[0], self.flipDisplace))
                 print("[Card.py] - SHRINK posX: {0}: ".format(self.posX))
                 print("[Card.py] - flipX: {0}".format(self.flipX))
                 print("[Card.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
@@ -140,16 +138,18 @@ class Card(object):
                 self.front = True
         ################################################################################
         elif self.flipX <= 74 and self.flipped:  # growing animation
-            print("ANJING")
-            print("[Engine.py] - GROW posX: {0}: ".format(self.posX))
+            print("[Card.py] - GROW posX: {0}: ".format(self.posX))
+            print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width,
+                                                                                        self.img.get_rect().size[0],
+                                                                                        self.flipDisplace))
             # print(a.flipX)
             currentTick = pygame.time.get_ticks()
             if currentTick - waitTick >= waitTime:
                 # print("flipAnimating")
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
-                self.flipDisplace = (self.width - self.img.get_rect()[0])
-                self.posX = self.posX - self.flipDisplace
+                self.flipDisplace = (self.width - self.img.get_rect().size[0])
+                self.posX = self.defaultPos[0] + self.flipDisplace/2
                 self.flipX += 20
         ################################################################################
         elif self.flipX >= 75 and self.flipped:  # animation completed, new image face set
@@ -160,6 +160,7 @@ class Card(object):
             self.flipped = False
             self.flipAnimating = False
             self.posX = self.defaultPos[0]
+            self.flipX = 74  # restoring flipX back to original value
 
     # waitTick = pygame.time.get_ticks()
     # currentTick = pygame.time.get_ticks()

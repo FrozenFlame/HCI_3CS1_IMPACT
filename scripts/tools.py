@@ -42,10 +42,10 @@ class Coordinator(object):
         tempState = self.state_dictionary[previous]
         item = {previous, tempState}
         print(previous)
-        self.state_dictionary.pop()
-        self.state_dictionary.append(item)
-        self.state.startup(self.currentTime, persist)
-        self.state.previous = previous
+        # self.state_dictionary.pop()
+        # self.state_dictionary.append(item)
+        # self.state.startup(self.currentTime, persist)
+        # self.state.previous = previous
 
     def evt_loop(self):
         # general event loop, mostly keystrokes etc. finer tuning in per-State's respective event handler
