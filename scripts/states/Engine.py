@@ -114,7 +114,6 @@ class Engine(object):
     #     return self.clickedCard
 
     def get_evt(self, event):
-
         if event.type == pygame.QUIT:
             self.done = True
         #if self.board.hasPreviewCard:
@@ -123,7 +122,7 @@ class Engine(object):
         # print("[Engine.py] - KEYDOWN: {0}".format(pygame.key.get_pressed()))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                print("Jebaited")
+                print("[Engine(STATE)] Escape Pressed")
                 # TEMPORARY METHOD:
                 self.backToMain()
         #     pass
@@ -282,7 +281,7 @@ class Engine(object):
         self.deckImgHolder3.draw(screen)
 
     def backToMain(self):
-        Globals.state = "MAIN_MENU2"
+        Globals.state = "MAIN_MENU"
         self.next = Globals.state
         self.finished = True
 
@@ -297,7 +296,6 @@ class Engine(object):
         self.startTime = currentTime
 
     def cleanup(self):
-
         self.done = False
         return self.persist
 

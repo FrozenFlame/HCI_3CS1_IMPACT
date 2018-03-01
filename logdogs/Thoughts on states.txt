@@ -1,0 +1,10 @@
+01-Mar-18
+Okay well clutch or kick, basically states are persistent regardless of what state you are in.
+Thus, it can be found that once you've set a state to be 'finished' then proceed to the next state,
+the previous state's information would be in "stasis", meaning once you return to it, it'll be the way you've left it.
+This means that pause screens naturally would freeze the game world (if you so choose), and it also means that you will
+have to (again if you so choose) "place the chess pieces back" to where they used to be when you decide to go back,
+else you'll go back there finding it the same way you've left it. That's where the cleanup method does its thing.
+
+States are painful.
+--DD

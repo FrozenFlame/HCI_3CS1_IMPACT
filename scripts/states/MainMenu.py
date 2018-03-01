@@ -32,9 +32,8 @@ class MainMenu(object):
         self.startPrime = False  # start button has been held down
         self.globals = Globals()
 
-
     def draw(self, screen):
-        pygame.draw.rect(screen, black, (500,300,245,100))
+        pygame.draw.rect(screen, black, (000,000,1280,720))  # background
         self.buttons.draw(screen)
 
     def get_evt(self,event):
@@ -46,7 +45,7 @@ class MainMenu(object):
         #animation for the button
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_o:
-                print ("Lagot")
+                print ("[MainMenu(STATE)] O button pressed")
 
         # mouse over
         if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
@@ -71,7 +70,7 @@ class MainMenu(object):
                 self.buttons.startButton = self.buttons.image.convert_alpha()
                 self.startPrime = True
             elif click[2] == 1:
-                print(Globals.state)
+                print("[MainMenu(STATE)] Rightclick pressed, state revealed as: {0}".format(Globals.state))
 
         if event.type == pygame.MOUSEBUTTONUP:
             if click[0] == 0 and self.startPrime and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
@@ -94,7 +93,6 @@ class MainMenu(object):
         '''
         self.persist = persistent
         self.startTime = currentTime
-
 
     def cleanup(self):
         self.done = False
