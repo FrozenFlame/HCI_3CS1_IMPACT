@@ -33,15 +33,16 @@ class Coordinator(object):
             self.flip_state()
         self.state.update(self.screen, self.keys, self.currentTime, dt)
 
-
     def flip_state(self):
-        #changes the state you are in
+        # changes the state you are in
+        self.state.finished = False # this will prevent the state from instantly ending if you've ended that state previously
         previous, self.state_name = self.state_name, self.state.next
         persist = self.state.cleanup()
         self.state = self.state_dictionary[self.state_name]
         tempState = self.state_dictionary[previous]
         item = {previous, tempState}
-        print(previous)
+        print("[tools] Current state found in globals: {0}".format(Globals.state))
+        print("[tools] STATE FLIPPING! Previous State: {0}, Next state: {1}".format(previous,self.state.next))
         # self.state_dictionary.pop()
         # self.state_dictionary.append(item)
         # self.state.startup(self.currentTime, persist)
@@ -74,7 +75,7 @@ class State(object):
     def __init__(self):
         self.startTime = 0.0  # time when the state started
         self.currentTime = 0.0  # time of the state currently
-        self.finished = False  # end of this state
+        self.finished = False  # end of this state, cue state flip
         self.quit = False  # quitting the game from this state
         self.next = None  # the next state to be loaded
         self.previous = None  # the state loaded before this one

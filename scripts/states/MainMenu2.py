@@ -46,7 +46,7 @@ class MainMenu(object):
         #animation for the button
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
-                print("Lagot2")
+                print("[MainMenu2(STATE)] P button pressed")
 
         # mouse over
         if (self.buttons.posX + 236) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
@@ -71,7 +71,7 @@ class MainMenu(object):
                 self.buttons.startButton = self.buttons.image.convert_alpha()
                 self.startPrime = True
             elif click[2] == 1:
-                print(Globals.state)
+                print("[MainMenu2(STATE)] Rightclick pressed, state revealed as: {0}".format(Globals.state))
 
         if event.type == pygame.MOUSEBUTTONUP:
             if click[0] == 0 and self.startPrime and (self.buttons.posX + 240) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
@@ -94,7 +94,6 @@ class MainMenu(object):
         '''
         self.persist = persistent
         self.startTime = currentTime
-
 
     def cleanup(self):
         self.done = False

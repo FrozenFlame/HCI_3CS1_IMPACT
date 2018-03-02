@@ -105,7 +105,6 @@ class Card(object):
 
     def flipAnim(self, waitTick):  # flip animation to be called per tick.
         waitTime = 10
-
         if self.flipX > 0 and not self.flipped:  # shrinking animation
             # print("Engine.py - "); print(a.flipX)
             currentTick = pygame.time.get_ticks()
@@ -114,7 +113,7 @@ class Card(object):
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
                 self.flipDisplace = (self.width - self.img.get_rect().size[0])
-                self.posX = self.defaultPos[0] + self.flipDisplace/2
+                # self.posX = self.defaultPos[0] + self.flipDisplace/2 # currently using defaultPos[0] would cause a jump in the animation to occur
                 print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width, self.img.get_rect().size[0], self.flipDisplace))
                 print("[Card.py] - SHRINK posX: {0}: ".format(self.posX))
                 print("[Card.py] - flipX: {0}".format(self.flipX))
@@ -149,7 +148,7 @@ class Card(object):
                 waitTick = currentTick
                 self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
                 self.flipDisplace = (self.width - self.img.get_rect().size[0])
-                self.posX = self.defaultPos[0] + self.flipDisplace/2
+                # self.posX = self.defaultPos[0] + self.flipDisplace/2 # currently using defaultPos[0] would cause a jump in the animation to occur
                 self.flipX += 20
         ################################################################################
         elif self.flipX >= 75 and self.flipped:  # animation completed, new image face set
@@ -159,7 +158,7 @@ class Card(object):
                 self.img = self.backImg
             self.flipped = False
             self.flipAnimating = False
-            self.posX = self.defaultPos[0]
+            # self.posX = self.defaultPos[0] # apparently negligible if your calculations are correct
             self.flipX = 74  # restoring flipX back to original value
 
     # waitTick = pygame.time.get_ticks()

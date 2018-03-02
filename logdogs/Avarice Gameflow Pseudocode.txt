@@ -1,0 +1,55 @@
+1.	Match Starts
+2.	Round 1 starts
+3.	Coin flip
+4.	Winner of coin flip becomes player 1
+5.	Draw starting 10 cards of both players (face down)
+
+[Player 1 Sequence]
+6.	Wait for player 1's confirmation
+7.	Display player 1's cards
+8.	Player 1 plays a card
+ 8.1	 Cards effect activates
+  8.1.a	  Player 1 chooses target of the effect
+9.	Card values change (if applicable)
+10.	Total player score/value changes
+11.	Player 1's cards turn face down
+
+[Player 2 Sequence]
+12.	Player 2's turn; Wait for confirmation
+13.	Display player 2's cards
+14.	Player 2 plays a card
+ 14.1	 Cards effect activates
+  14.1.a	  Player 2 chooses target of the effect
+15.	Card values change (if applicable)
+16.	Total player score/value changes
+17.	Player 2's cards turn face down
+
+Repeat Player 1/ Player 2 Sequence until both players Pass the round
+
+18.	Add 1 win to the player with higher score at the end of the round; Add 1 win to both players if its a draw
+
+19.	Round 2 Starts
+20.	Winner of last round becomes "PLAYER 1"		ex. var Player1 = round.winner
+21.	Draw two cards for each player; face down
+[start Player 1 Sequence]
+[start Player 2 Sequence]
+
+Repeat Player 1/ Player 2 Sequence until both players Pass the round
+
+22.	Start round 3 only if no one has 2 wins; Sample Code:
+
+	if Player1.wins = 1:
+		round3 = true
+	else
+		round3 = false (if var Player1 has 0 wins, that means whoever is in var Player2 already won and if var Player1 has 2 wins, he already one)
+	
+[ROUND 3]
+23.	Winner of the last round becomes "PLAYER 1"
+24.	Draw one card for each player; face down
+[start Player 1 sequence]
+[start Player 2 sequence]
+
+25. Display profile name of winning player followed by VICTORY!	(Player1.profName)(?)
+
+*Pass = passing player's hand cards turn face down; unable to play anymore cards
+*Pseudocode ended up suggesting class Round, class Player, class Profile
