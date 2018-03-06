@@ -43,12 +43,13 @@ Rough code estimate would be like:
 (end of phase, repeat)
 <victory animation> - a player gets crowned victorious
 '''
-#this too, THESE NEED TO GO TO THEIR OWN CLASSES AT SOME POINT LADS
 
-# class which holds the entire program.
+# class which holds the game flow
 class Engine(object):
+    # def __init__(self): we're gonna create
     def __init__(self):
-        tools.State.__init__(self)
+
+        tools.State.__init__(self)  # inheriting from State class.
         # pygame.init()
         # pygame.display.set_caption("Avarice - A Greed-Based Card Game")
         # self.screen = pygame.display.set_mode((1280,720))
@@ -129,7 +130,7 @@ class Engine(object):
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
             self.board.hasPreviewCard = True
-            self.board.previewCard = self.clickedCard[0]
+            self.board.previewCard = self.clickedCard[0] # this actually must be the card that's being moused over.
         elif not self.cardMousedOver(pygame.mouse.get_pos()):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True

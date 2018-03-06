@@ -1,29 +1,44 @@
 import pygame, math
 class Card(object):
     def __init__(self):
-        self.height = 100
-        self.width = 75
-        self.posX = 1181  # offset by 1 from deckImgHolder3 because the card latches to the mouse cursor if its equal (deckImgHolder3 = 1180,563)
-        self.posY = 563
-        self.isHeld = False
-        self.resting = True  # unused for now
-        self.defaultPos = (65, 500)
-        self.frontImg = pygame.image.load("assets\\cards\\democard.png")
-        self.flipAnimating = False
-        self.flipped = False
-        self.flipX = 74
-        self.front = False
-        self.back = True  # the card is face down initially. is this wrong?
-        self.img = None
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
-        self.img = self.backImg
-        self.speed = 10
-        self.blitted = False
+        self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
+        self.width = self.img.get_rect().size[0]  # img's initial width
+        self.height = self.img.get_rect().size[1]  # img's initial height
+        print("XXXXXXXXX {0}, {1}".format(self.width, self.height))
+
+        self.posX = 1181  # offset by 1 from deckImgHolder3 because the card latches to the mouse cursor if its equal (deckImgHolder3 = 1180,563)
+        self.posY = 563
+
+        self.defaultPos = (65, 500)
+
+        self.flipX = self.width
+
+        self.speed = 10  # movespeed on the screen
+
+        # self.owner = player  # the owner of the card
+
+        #
+        #  ____              _
+        # |  _ \            | |
+        # | |_) | ___   ___ | | ___  __ _ _ __  ___
+        # |  _ < / _ \ / _ \| |/ _ \/ _` | '_ \/ __|
+        # | |_) | (_) | (_) | |  __/ (_| | | | \__ \
+        # |____/ \___/ \___/|_|\___|\__,_|_| |_|___/
+        #
 
         self.onBoard = False
         self.disabled = False
         self.onTop = False
+        self.mayBePreviewed = False  # makes it so only cards you are allowed to see get a preview.
+        self.flipAnimating = False
+        self.flipped = False
+        self.front = False
+        self.back = True  # the card is face down initially. is this wrong?
+        self.blitted = False
+        self.isHeld = False
+        self.resting = True  # unused for now
 
         # animated positioning junk
         self.destination = None  # is a Tuple x,y
@@ -111,84 +126,61 @@ class Card(object):
             if currentTick - waitTick >= waitTime:
                 # print("flipAnimating")
                 waitTick = currentTick
-                self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
+                self.img = pygame.transform.smoothscale(self.img, (self.flipX, self.height))
                 self.flipDisplace = (self.width - self.img.get_rect().size[0])
                 # self.posX = self.defaultPos[0] + self.flipDisplace/2 # currently using defaultPos[0] would cause a jump in the animation to occur
-                print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width, self.img.get_rect().size[0], self.flipDisplace))
-                print("[Card.py] - SHRINK posX: {0}: ".format(self.posX))
-                print("[Card.py] - flipX: {0}".format(self.flipX))
-                print("[Card.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
+                # print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width, self.img.get_rect().size[0], self.flipDisplace))
+                # print("[Card.py] - SHRINK posX: {0}: ".format(self.posX))
+                # print("[Card.py] - flipX: {0}".format(self.flipX))
+                # print("[Card.py] - img.get_rect().size {0}".format(self.img.get_rect().size[0] / 2))
 
                 self.flipX -= 20
         ################################################################################
         elif self.flipX <= 0 and not self.flipped:  # time to flip trigger + changing of image
             self.flipX += 20
             if self.front:
-                print("front to back")
-                self.img = pygame.transform.smoothscale(self.backImg, (self.flipX, 100))
+                # print("front to back")
+                self.img = pygame.transform.smoothscale(pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))), (self.flipX, self.height))
                 self.flipped = True
                 self.back = True
                 self.front = False
             elif self.back:  # growing animation to face up
-                print("back to front")
-                self.img = pygame.transform.smoothscale(self.frontImg, (self.flipX, 100))
+                # print("back to front")
+                self.img = pygame.transform.smoothscale(pygame.transform.smoothscale(self.frontImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))), (self.flipX, self.height))
                 self.flipped = True
                 self.back = False
                 self.front = True
         ################################################################################
         elif self.flipX <= 74 and self.flipped:  # growing animation
-            print("[Card.py] - GROW posX: {0}: ".format(self.posX))
-            print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width,
-                                                                                        self.img.get_rect().size[0],
-                                                                                        self.flipDisplace))
+            # print("[Card.py] - GROW posX: {0}: ".format(self.posX))
+            # print("[Card.py] - width[{0}] - img_rect [{1}] = flipDisplace[{2}] ".format(self.width,
+            #                                                                             self.img.get_rect().size[0],
+            #                                                                             self.flipDisplace))
             # print(a.flipX)
             currentTick = pygame.time.get_ticks()
             if currentTick - waitTick >= waitTime:
                 # print("flipAnimating")
                 waitTick = currentTick
-                self.img = pygame.transform.smoothscale(self.img, (self.flipX, 100))
+                self.img = pygame.transform.smoothscale(self.img, (self.flipX, self.height))
                 self.flipDisplace = (self.width - self.img.get_rect().size[0])
                 # self.posX = self.defaultPos[0] + self.flipDisplace/2 # currently using defaultPos[0] would cause a jump in the animation to occur
                 self.flipX += 20
         ################################################################################
         elif self.flipX >= 75 and self.flipped:  # animation completed, new image face set
             if self.front:
-                self.img = self.frontImg
+                self.img = pygame.transform.smoothscale(self.frontImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33)))
             if self.back:
-                self.img = self.backImg
+                self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33)))
             self.flipped = False
             self.flipAnimating = False
             # self.posX = self.defaultPos[0] # apparently negligible if your calculations are correct
             self.flipX = 74  # restoring flipX back to original value
 
-    # waitTick = pygame.time.get_ticks()
-    # currentTick = pygame.time.get_ticks()
-    # waitTime = 10 #millisecond
-    #
-    # x = 75
-    # while x > 0:
-    #     currentTick = pygame.time.get_ticks()
-    #     if currentTick - waitTick >= waitTime:
-    #         waitTick = currentTick
-    #         self.img = pygame.transform.scale(self.img, (x, 100))
-    #         x -= 1
-    #     else:
-    #         continue
-    #     #time.sleep(0.001)
-    #
-    # if self.img == self.frontImg:
-    #     self.img = self.backImg
-    # else:#if self.img == self.backImg:
-    #     self.img = self.frontImg
-    #
-    # while x < 75:
-    #     currentTick = pygame.time.get_ticks()
-    #     if currentTick - waitTick >= waitTime:
-    #         waitTick = currentTick
-    #         self.img = pygame.transform.scale(self.img, (x, 100))
-    #         x += 1
-    #     else:
-    #         continue
-    #     #time.sleep(0.001)
+    def set_owner(self, new_owner):  # new_owner is type Player
+        self.owner = new_owner
+
+    def rfrsh_heightwidth(self):  # refreshes width and height values
+        self.width = self.img.get_rect().size[0]  # img's initial width
+        self.height = self.img.get_rect().size[1]  # img's initial height
 
 

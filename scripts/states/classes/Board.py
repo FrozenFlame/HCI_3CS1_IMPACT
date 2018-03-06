@@ -1,4 +1,6 @@
 import pygame
+from ...Globals import Globals
+
 class Board(object):
     def __init__(self):
         # graphics related
@@ -35,13 +37,13 @@ class Board(object):
         self.blitted = True # currently was an experiment only.
         if self.hasPreviewCard and not self.previewCard.flipAnimating:
             # tempC = self.previewCard.img.scale(self.previewCard.height*1.5, self.previewCard.width*1.5)
-            tempC = pygame.transform.scale(self.previewCard.img,(150, 200))
-            screen.blit(tempC, (1280 * 0.83, 720 * 0.27))
+            # tempC = pygame.transform.scale(self.previewCard.img,(150, 200))
+            screen.blit(self.previewCard.frontImg, (Globals.RESOLUTION_X * 0.81, Globals.RESOLUTION_Y * 0.265))
 
-    def tossCoin(self):
+    def tossCoin(self):  # the first flip of the game.
         self.coin.toss()
 
-    def flipCoin(self):
+    def flipCoin(self):  # the basic turnover
         self.coin.flip()
 
     class Coin(object):
