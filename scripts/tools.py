@@ -17,7 +17,6 @@ class Coordinator(object):
         self.state = None
         self.done = False # end of program flag
 
-
     def prepstates(self, states, initstate):
         self.state_dictionary = states
         self.state_name = initstate
@@ -35,11 +34,14 @@ class Coordinator(object):
 
     def flip_state(self):
         # changes the state you are in
-        self.state.finished = False # this will prevent the state from instantly ending if you've ended that state previously
+        self.state.finished = False  # this will prevent the state from instantly ending if you've ended that state previously
         previous, self.state_name = self.state_name, self.state.next
         persist = self.state.cleanup()
         self.state = self.state_dictionary[self.state_name]
         tempState = self.state_dictionary[previous]
+
+        self.state.startup(self.currentTime, persist)
+
         item = {previous, tempState}
         print("[tools] Current state found in globals: {0}".format(Globals.state))
         print("[tools] STATE FLIPPING! Previous State: {0}, Next state: {1}".format(previous,self.state.next))

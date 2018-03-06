@@ -1,6 +1,10 @@
 import pygame
 from scripts import tools
 from .classes.Buttons import Buttons
+from .classes.Player import Player
+from .classes.Hero import Hero
+from .classes.User import User
+
 from ..Globals import Globals
 
 spritesheet = pygame.image.load("assets\\buttons\\button-start.png")
@@ -94,8 +98,23 @@ class MainMenu(object):
         self.persist = persistent
         self.startTime = currentTime
 
-    def cleanup(self):
+    def cleanup(self):  # state is finished
         self.done = False
+
+        '''
+            TEST ONLY STATIC PERSIST
+        '''
+        usera = User("Champion", 99, 0)
+        userb = User("Challenger", 0, 0)
+        heroa = Hero("Victoria", "this is supposed to be an surface, not a string")
+        herob = Hero("King of Beggars", "this is supposed to be an surface, not a string")
+        playera = Player(usera, heroa)
+        playerb = Player(userb, herob)
+
+        self.persist['playerA'] = playera
+        self.persist['playerB'] = playerb
+        self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+
         return self.persist
 
 

@@ -6,7 +6,6 @@ class Card(object):
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
         self.width = self.img.get_rect().size[0]  # img's initial width
         self.height = self.img.get_rect().size[1]  # img's initial height
-        print("XXXXXXXXX {0}, {1}".format(self.width, self.height))
 
         self.posX = 1181  # offset by 1 from deckImgHolder3 because the card latches to the mouse cursor if its equal (deckImgHolder3 = 1180,563)
         self.posY = 563
@@ -67,7 +66,8 @@ class Card(object):
                     self.posY = self.defaultPos[1]  # * dTime
                     self.resting = True
                     self.destination = None
-                else: #this is for returning the card to your hand with animation
+                else:  #this is for returning the card to your hand with animation
+                    print("RETREAT")
                     self.posX += self.vector[0] * dTime
                     self.posY += self.vector[1] * dTime
         else:

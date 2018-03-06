@@ -48,38 +48,29 @@ Rough code estimate would be like:
 class Engine(object):
     # def __init__(self): we're gonna create
     def __init__(self):
-
         tools.State.__init__(self)  # inheriting from State class.
-        # pygame.init()
-        # pygame.display.set_caption("Avarice - A Greed-Based Card Game")
-        # self.screen = pygame.display.set_mode((1280,720))
-        # self.screen_rect = self.screen.get_rect()
-        # self.clock = pygame.time.Clock()
-        # self.fps = Globals.fps
-        # self.done = False
-        self.next = "GAME_SUMMARY"  # the next state by default would be the victory/defeat summary screen
-        self.bgm = None  # the bgm of the hero
 
+        self.next = "GAME_SUMMARY"  # the next state by default would be the victory/defeat summary screen
+
+        self.bgm = None  # the bgm of the hero
         # logic booleans
         self.holdingCard = False
 
         # objects
-        self.board = Board()
-        # card and hand might be handled differently from this. These items might be found on the board instead.
-        self.card = Card()
-        self.hand1 = Card()
-        self.hand2 = Card()
-        self.hand3 = Card()
-        self.hand4 = Card()
-        self.hand5 = Card()
-        self.hand6 = Card()
-        self.hand7 = Card()
-        self.hand8 = Card()
-        self.hand9 = Card()
-        self.hand10 = Card()
-        self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
-
-        self.boardField = BoardField(225,390,1010,470)
+        self.board = None  # this rarely changes, maybe the board graphic but idk
+        # self.hand1 = Card()
+        # self.hand2 = Card()
+        # self.hand3 = Card()
+        # self.hand4 = Card()
+        # self.hand5 = Card()
+        # self.hand6 = Card()
+        # self.hand7 = Card()
+        # self.hand8 = Card()
+        # self.hand9 = Card()
+        # self.hand10 = Card()
+        # self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
+        self.handList = None
+        self.boardField = None
         self.boardCardList = list()
 
         self.allCardsList = list()
@@ -171,18 +162,10 @@ class Engine(object):
                         self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                         self.drawCardSound.play()
 
-                if (self.card.posX + self.card.width) >= pygame.mouse.get_pos()[0] >= self.card.posX and (self.card.posY + self.card.height) >= pygame.mouse.get_pos()[1] >= self.card.posY:
-                    print("clicked")
-                    self.card.isHeld = True
-                    self.holdingCard = True
-                    self.card.resting = False
-                    self.card.set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-
         if event.type == pygame.MOUSEBUTTONUP:
             click = pygame.mouse.get_pressed()
             if click[0] == 0:
                 print("unheld")
-                self.card.isHeld = False
                 self.holdingCard = False
                 self.board.hasPreviewCard = False
                 if not len(self.clickedCard) == 0:
@@ -199,10 +182,6 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-        # demo 1 card only lang naman
-        if not self.card.resting:
-            self.card.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-
         if self.opening == True:
             currentTick = currentTime
             if currentTick - self.waitTick >= self.drawCardWait:
@@ -295,6 +274,19 @@ class Engine(object):
         '''
         self.persist = persistent
         self.startTime = currentTime
+
+        '''
+        testing persistent objects
+        '''
+        print("[Engine] {0}({1}) vs {2}({3})".format(self.persist['playerA'].user.username, self.persist['playerA'].hero.name, self.persist['playerB'].user.username, self.persist['playerB'].hero.name))
+        print("[Engine] THE BATTLE BEGINS")
+
+        '''
+        setting of board objects
+        '''
+        self.board = Board()
+        self.boardField = BoardField(225,390,1010,470)
+        self.handList = self.persist['playerA'].deck
 
     def cleanup(self):
         self.done = False
