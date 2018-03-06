@@ -58,18 +58,10 @@ class Engine(object):
 
         # objects
         self.board = None  # this rarely changes, maybe the board graphic but idk
-        # self.hand1 = Card()
-        # self.hand2 = Card()
-        # self.hand3 = Card()
-        # self.hand4 = Card()
-        # self.hand5 = Card()
-        # self.hand6 = Card()
-        # self.hand7 = Card()
-        # self.hand8 = Card()
-        # self.hand9 = Card()
-        # self.hand10 = Card()
-        # self.handList = [self.hand1, self.hand2, self.hand3, self.hand4, self.hand5, self.hand6, self.hand7, self.hand8, self.hand9, self.hand10]
-        self.handList = None
+        self.deck = None
+        self.hand = None
+        self.opponent_deck = None
+        self.opponent_hand = None
         self.boardField = None
         self.boardCardList = list()
 
@@ -105,6 +97,19 @@ class Engine(object):
     #     self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
     #     return self.clickedCard
 
+    '''
+     Engine functions
+     '''
+
+    def get_first_cards(self, deck):
+        random.shuffle(deck)
+        first_ten = []
+        for i in range(0, 10):  # self minus due to simultaneous pop will offset this
+            first_ten.append(deck[i-i])
+            deck.pop(i-i)
+
+        return first_ten
+
     def get_evt(self, event):
         if event.type == pygame.QUIT:
             self.done = True
@@ -117,6 +122,12 @@ class Engine(object):
                 print("[Engine(STATE)] Escape Pressed")
                 # TEMPORARY METHOD:
                 self.backToMain()
+            if event.key == pygame.K_d:
+                print("[Engine] self.allCardsList[0]: ", self.allCardsList[0])
+                self.allCardsList[0].resting = False
+                self.allCardsList[0].set_destination(100,100)
+            if event.key == pygame.K_a:
+                print("defaultpos0 ",self.allCardsList[0].defaultPos[0]," defaultpos1 ", self.allCardsList[0].defaultPos[1])
         #     pass
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
@@ -128,23 +139,13 @@ class Engine(object):
 
         if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
             print(len(self.clickedCard))
-            print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList),len(self.handList),len(self.boardCardList)))
+            print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
 
             print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
             click = pygame.mouse.get_pressed()
             # print("Clicked: {0}".format(click))
 
             if click[0] == 1:
-
-                # self.clickedCard = [s for s in self.handList if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) and not s.disabled and not s.onBoard]
-                #
-                # if len(self.clickedCard) == 1:
-                #     print("handcard clicked")
-                #     self.clickedCard[0].isHeld = True
-                #     self.holdingCard = True
-                #     self.clickedCard[0].resting = False
-                #     self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                #     self.drawCardSound.play()
 
                 for s in self.allCardsList:
                     if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
@@ -180,7 +181,7 @@ class Engine(object):
 
 
 
-    # orders individual elements to update themselves (your coordinates, sprite change, etc)
+    # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
         if self.opening == True:
             currentTick = currentTime
@@ -189,11 +190,11 @@ class Engine(object):
                     self.waitTick = currentTick
                     # self.drawCardSound.stop()
                     self.drawCardSound.play()
-                    self.handList[self.openingIndex].resting = False
-                    self.handList[self.openingIndex].set_destination(1180, 563)
-                    self.handList[self.openingIndex].defaultPos = (self.openingX, self.openingY)
-                    self.handList[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
-                    self.allCardsList.append(self.handList[self.openingIndex])
+                    self.hand[self.openingIndex].resting = False
+                    self.hand[self.openingIndex].set_destination(1180, 563)
+                    self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
+                    self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
+                    self.allCardsList.append(self.hand[self.openingIndex])
                     self.openingX += 80
                     self.openingIndex += 1
                 if self.openingIndex == 10:
@@ -205,36 +206,39 @@ class Engine(object):
             boardCard.defaultPos = boardx,boardy
             boardx += 80
 
-        for a in self.allCardsList:
+        for a in self.allCardsList:  # updates all existing cards
             # if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
             #     print("Hurrah")
             #     h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
             #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
             if not a.resting:
-                a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                if a.isHeld:
+                    a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                else:
+                    a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
 
             if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
                 a.flipAnim(self.waitTick)
 
-        for h in self.handList:
-            initialHandlength = len(self.handList)
+        for h in self.hand:
+            initialHandlength = len(self.hand)
             if h.onBoard:
-                self.handList.pop(self.handList.index(h))
-            if len(self.handList) < initialHandlength:
-                initialHandlength = len(self.handList)
-                newX = 620 - (40*len(self.handList))
-                for h2 in self.handList:
+                self.hand.pop(self.hand.index(h))
+            if len(self.hand) < initialHandlength:
+                initialHandlength = len(self.hand)
+                newX = 620 - (40 * len(self.hand))
+                for h2 in self.hand:
                     h2.resting = False
                     h2.set_destination(h.posX, h.posY)
 
-                    # xRange of handList Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                    # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
                     h2.defaultPos = (newX, 600)    # 600 = self.openingY
                     h2.update(deltaTime, newX, 600)
                     newX += 80
-
-        self.deckImgHolder1.update(deltaTime, 1170, 565)
-        self.deckImgHolder2.update(deltaTime, 1175, 564)
-        self.deckImgHolder3.update(deltaTime, 1180, 563)
+        #
+        # self.deckImgHolder1.update(deltaTime, 1170, 565)
+        # self.deckImgHolder2.update(deltaTime, 1175, 564)
+        # self.deckImgHolder3.update(deltaTime, 1180, 563)
         self.draw(screen)
 
     # orders individual elements to draw themselves in the correct order (your blits)
@@ -256,9 +260,9 @@ class Engine(object):
             onTopCard.draw(screen)
             onTopCard.onTop = False
 
-        self.deckImgHolder1.draw(screen)
-        self.deckImgHolder2.draw(screen)
-        self.deckImgHolder3.draw(screen)
+        # self.deckImgHolder1.draw(screen)
+        # self.deckImgHolder2.draw(screen)
+        # self.deckImgHolder3.draw(screen)
 
     def backToMain(self):
         Globals.state = "MAIN_MENU"
@@ -282,14 +286,24 @@ class Engine(object):
         print("[Engine] THE BATTLE BEGINS")
 
         '''
-        setting of board objects
+        setting of board objects and setting of first perspective
         '''
         self.board = Board()
         self.boardField = BoardField(225,390,1010,470)
-        self.handList = self.persist['playerA'].deck
+        self.deck = self.persist['playerB'].deck
+        self.opponent_deck = self.persist['playerA'].deck
+        self.hand = self.get_first_cards(self.deck)
+        self.opponent_hand = self.get_first_cards(self.opponent_deck)
+
+        self.opening = True
 
     def cleanup(self):
+        self.board = None
+        self.boardField = None
+        self.deck = None
+        self.opponent_deck = None
+        self.hand = None
+        self.opponent_hand = None
+        self.opening = False
         self.done = False
         return self.persist
-
-

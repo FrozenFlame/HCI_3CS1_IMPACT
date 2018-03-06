@@ -67,7 +67,6 @@ class Card(object):
                     self.resting = True
                     self.destination = None
                 else:  #this is for returning the card to your hand with animation
-                    print("RETREAT")
                     self.posX += self.vector[0] * dTime
                     self.posY += self.vector[1] * dTime
         else:
