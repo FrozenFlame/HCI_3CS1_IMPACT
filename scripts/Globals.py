@@ -5,3 +5,7 @@ class Globals:
 
     RESOLUTION_X = 1280
     RESOLUTION_Y = 720
+
+
+    # temp vals
+    gameStart = False

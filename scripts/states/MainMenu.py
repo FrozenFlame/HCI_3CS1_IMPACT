@@ -104,16 +104,19 @@ class MainMenu(object):
         '''
             TEST ONLY STATIC PERSIST
         '''
-        usera = User("Champion", 99, 0)
-        userb = User("Challenger", 0, 0)
-        heroa = Hero("Victoria", "this is supposed to be an surface, not a string")
-        herob = Hero("King of Beggars", "this is supposed to be an surface, not a string")
-        playera = Player(usera, heroa)
-        playerb = Player(userb, herob)
+        if not Globals.gameStart:  # game is the selected next state
+            usera = User("Champion", 99, 0)
+            userb = User("Challenger", 0, 0)
+            heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
+            herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
+            playera = Player(usera, heroa)
+            playerb = Player(userb, herob)
 
-        self.persist['playerA'] = playera
-        self.persist['playerB'] = playerb
-        self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            self.persist['playerA'] = playera
+            self.persist['playerB'] = playerb
+            self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            Globals.gameStart = True
+
 
         return self.persist
 

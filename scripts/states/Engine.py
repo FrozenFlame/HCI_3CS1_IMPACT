@@ -88,18 +88,19 @@ class Engine(object):
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
-    # handles events which happen in the program
-    def cardMousedOver(self, xy) -> bool:
-        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
-        return True if len(self.clickedCard) == 1 else False
+#
+#  _____                       ______                _   _
+# |  __ \                      |  ___|              | | (_)
+# | |  \/ __ _ _ __ ___   ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+# | | __ / _` | '_ ` _ \ / _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+# | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
+#  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+#
 
-    # def cardMousedOver2(self, xy):
-    #     self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
-    #     return self.clickedCard
 
-    '''
-     Engine functions
-     '''
+
+
+
 
     def get_first_cards(self, deck):
         random.shuffle(deck)
@@ -110,12 +111,54 @@ class Engine(object):
 
         return first_ten
 
+    def flip_coin(self):
+        pass
+
+
+#
+#  _____                        _                 _
+# |  __ \                      | |               (_)
+# | |  \/ __ _ _ __ ___   ___  | |     ___   __ _ _  ___
+# | | __ / _` | '_ ` _ \ / _ \ | |    / _ \ / _` | |/ __|
+# | |_\ \ (_| | | | | | |  __/ | |___| (_) | (_| | | (__
+#  \____/\__,_|_| |_| |_|\___| \_____/\___/ \__, |_|\___|
+#                                            __/ |
+#                                           |___/
+#
+
+
+
+    def cardMousedOver(self, xy) -> bool:
+        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
+        return True if len(self.clickedCard) == 1 else False
+
+    # def cardMousedOver2(self, xy):
+    #     self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
+    #     return self.clickedCard
+
+
+    def backToMain(self):
+        Globals.state = "MAIN_MENU"
+        self.next = Globals.state
+        self.finished = True
+
+#
+#  _____ _        _        ______                _   _
+# /  ___| |      | |       |  ___|              | | (_)
+# \ `--.| |_ __ _| |_ ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+#  `--. \ __/ _` | __/ _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+# /\__/ / || (_| | ||  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
+# \____/ \__\__,_|\__\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+#
+#
+
     def get_evt(self, event):
         if event.type == pygame.QUIT:
             self.done = True
         #if self.board.hasPreviewCard:
          #   print("Previewing card.")
         #card is being moused
+
         # print("[Engine.py] - KEYDOWN: {0}".format(pygame.key.get_pressed()))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -264,10 +307,6 @@ class Engine(object):
         # self.deckImgHolder2.draw(screen)
         # self.deckImgHolder3.draw(screen)
 
-    def backToMain(self):
-        Globals.state = "MAIN_MENU"
-        self.next = Globals.state
-        self.finished = True
 
 
     def startup(self, currentTime, persistent):
@@ -282,9 +321,10 @@ class Engine(object):
         '''
         testing persistent objects
         '''
+        print("[Engine] ########################### ")
         print("[Engine] {0}({1}) vs {2}({3})".format(self.persist['playerA'].user.username, self.persist['playerA'].hero.name, self.persist['playerB'].user.username, self.persist['playerB'].hero.name))
         print("[Engine] THE BATTLE BEGINS")
-
+        print("[Engine] gameStart: ", Globals.gameStart)
         '''
         setting of board objects and setting of first perspective
         '''
@@ -306,4 +346,7 @@ class Engine(object):
         self.opponent_hand = None
         self.opening = False
         self.done = False
+        Globals.gameStart = False
         return self.persist
+
+

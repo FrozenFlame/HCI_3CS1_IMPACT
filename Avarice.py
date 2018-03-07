@@ -9,6 +9,8 @@ def main():
     coordinator = tools.Coordinator("Avarice - A Greed-Based Card Game")
     # avarice = Engine.Engine()
     # avarice.main_loop()
+
+    # okay, I'm guessing this is first preload. But eventually, you'll have to push and pop new instances here
     states = {"MAIN_MENU": MainMenu.MainMenu(),
               "MAIN_MENU2": MainMenu2.MainMenu(),
               "AVARICE": Engine.Engine()

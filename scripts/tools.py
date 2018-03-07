@@ -1,5 +1,6 @@
 import pygame
 from scripts.Globals import Globals
+from .states.Engine import Engine
 #this class dictates which state the program is in
 print("[tools.py]Coordinator loaded")
 class Coordinator(object):
@@ -37,6 +38,10 @@ class Coordinator(object):
         self.state.finished = False  # this will prevent the state from instantly ending if you've ended that state previously
         previous, self.state_name = self.state_name, self.state.next
         persist = self.state.cleanup()
+
+        if Globals.gameStart:  # gets a new Engine() object
+            self.state_dictionary.pop("AVARICE")
+            self.state_dictionary["AVARICE"] = Engine()
         self.state = self.state_dictionary[self.state_name]
         tempState = self.state_dictionary[previous]
 
