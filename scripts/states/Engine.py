@@ -1,4 +1,5 @@
 import pygame, math, time, random
+from enum import Enum, auto
 from .classes.BoardField import BoardField
 from .classes.Card import Card
 from .classes.Board import Board
@@ -53,8 +54,19 @@ class Engine(object):
         self.next = "GAME_SUMMARY"  # the next state by default would be the victory/defeat summary screen
 
         self.bgm = None  # the bgm of the hero
+        self.waitTick = pygame.time.get_ticks()  # will be used to for computing how long it has already waited  # up for deletion
+        # Game phase trackers
+        self.dictionary = {} # names made available to the phasemanager
+
+        self.phasemgr = PhaseManager(self.dictionary, self.waitTick)
+
+        self.turn_no = 0
+        self.phasemgr.set_phase(Phase.OPENING)
+
+
         # logic booleans
         self.holdingCard = False
+        # self.opening = True
 
         # objects
         self.board = None  # this rarely changes, maybe the board graphic but idk
@@ -77,16 +89,19 @@ class Engine(object):
                         [do stuff]
         '''
         self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
-        self.waitTick = pygame.time.get_ticks()                                #will be used to for computing how long it has already waited
-        self.drawCardWait = 400                                               #wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
-        self.opening = True
-        self.openingIndex = 0
-        self.openingX = 220                # hand coordinate is from 220 to 1020
-        self.openingY = 600
+
+        # self.opening = True  # moved val to dictionary
+        ## up for deletion ##
+        # self.drawCardWait = 250  # wait for 1 second, adjust this kasi parang ang bagal mag draw nung initial 10 cards
+        # self.openingIndex = 0
+        # self.openingX = 220                # hand coordinate is from 220 to 1020
+        # self.openingY = 600
+        ## up for deletion ##
 
         self.deckImgHolder1 = Card()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
+
 
 #
 #  _____                       ______                _   _
@@ -114,7 +129,8 @@ class Engine(object):
     def flip_coin(self):
         pass
 
-
+    def shuffle_deck(self, deck):
+        random.shuffle(deck)
 #
 #  _____                        _                 _
 # |  __ \                      | |               (_)
@@ -142,14 +158,12 @@ class Engine(object):
         self.next = Globals.state
         self.finished = True
 
-#
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
 # \ `--.| |_ __ _| |_ ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
 #  `--. \ __/ _` | __/ _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
 # /\__/ / || (_| | ||  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
 # \____/ \__\__,_|\__\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-#
 #
 
     def get_evt(self, event):
@@ -180,7 +194,7 @@ class Engine(object):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
 
-        if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
+        if event.type == pygame.MOUSEBUTTONDOWN and not self.dictionary['opening']:
             print(len(self.clickedCard))
             print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
 
@@ -226,26 +240,27 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-        if self.opening == True:
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-                if self.openingIndex < 10:
-                    self.waitTick = currentTick
-                    # self.drawCardSound.stop()
-                    self.drawCardSound.play()
-                    self.hand[self.openingIndex].resting = False
-                    self.hand[self.openingIndex].set_destination(1180, 563)
-                    self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
-                    self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
-                    self.allCardsList.append(self.hand[self.openingIndex])
-                    self.openingX += 80
-                    self.openingIndex += 1
-                if self.openingIndex == 10:
-                    self.opening = False
+        self.phasemgr.update(currentTime, deltaTime)
+        # if self.opening == True:
+        #     currentTick = currentTime
+        #     if currentTick - self.waitTick >= self.drawCardWait:
+        #         if self.openingIndex < 10:
+        #             self.waitTick = currentTick
+        #             # self.drawCardSound.stop()
+        #             self.drawCardSound.play()
+        #             self.hand[self.openingIndex].resting = False
+        #             self.hand[self.openingIndex].set_destination(1180, 563)
+        #             self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
+        #             self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
+        #             self.allCardsList.append(self.hand[self.openingIndex])
+        #             self.openingX += 80
+        #             self.openingIndex += 1
+        #         if self.openingIndex == 10:
+        #             self.opening = False
 
         boardx = 220
         boardy = 380
-        for boardCard in self.boardCardList: #THIS IS FOR THE POSITION OF CARD WHILE DEPLOYING
+        for boardCard in self.boardCardList: #THIS IS FOR THE POSITION OF CARD WHILE DEPLOYING onto the board
             boardCard.defaultPos = boardx,boardy
             boardx += 80
 
@@ -279,9 +294,9 @@ class Engine(object):
                     h2.update(deltaTime, newX, 600)
                     newX += 80
         #
-        # self.deckImgHolder1.update(deltaTime, 1170, 565)
-        # self.deckImgHolder2.update(deltaTime, 1175, 564)
-        # self.deckImgHolder3.update(deltaTime, 1180, 563)
+        self.deckImgHolder1.update(deltaTime, 1170, 565)
+        self.deckImgHolder2.update(deltaTime, 1175, 564)
+        self.deckImgHolder3.update(deltaTime, 1180, 563)
         self.draw(screen)
 
     # orders individual elements to draw themselves in the correct order (your blits)
@@ -303,9 +318,9 @@ class Engine(object):
             onTopCard.draw(screen)
             onTopCard.onTop = False
 
-        # self.deckImgHolder1.draw(screen)
-        # self.deckImgHolder2.draw(screen)
-        # self.deckImgHolder3.draw(screen)
+        self.deckImgHolder1.draw(screen)
+        self.deckImgHolder2.draw(screen)
+        self.deckImgHolder3.draw(screen)
 
 
 
@@ -335,7 +350,19 @@ class Engine(object):
         self.hand = self.get_first_cards(self.deck)
         self.opponent_hand = self.get_first_cards(self.opponent_deck)
 
-        self.opening = True
+        # self.opening = True
+
+        # setting of initial dictionary key value pairs, made available to our PhaseManager
+
+        self.dictionary.update({"opening_index": 0,
+                                "hand": self.hand,
+                                "opp_hand": self.opponent_hand,
+                                "all_cards_list": self.allCardsList,
+                                "openingX": 220,
+                                "openingY": 600,
+                                "opening": True,
+                                "draw_wait_tick": 250,
+                                "draw_sound": self.drawCardSound})
 
     def cleanup(self):
         self.board = None
@@ -348,5 +375,68 @@ class Engine(object):
         self.done = False
         Globals.gameStart = False
         return self.persist
+
+
+#  _____                        _____ _
+# |_   _|                      /  __ \ |
+#   | | _ __  _ __   ___ _ __  | /  \/ | __ _ ___ ___  ___  ___
+#   | || '_ \| '_ \ / _ \ '__| | |   | |/ _` / __/ __|/ _ \/ __|
+#  _| || | | | | | |  __/ |    | \__/\ | (_| \__ \__ \  __/\__ \
+#  \___/_| |_|_| |_|\___|_|     \____/_|\__,_|___/___/\___||___/
+#
+
+# Handles phase logic
+class PhaseManager():
+    def __init__(self, dictionary={}, wait=pygame.time.get_ticks()):
+        self.phase = None
+        self.waitTick = wait
+        self.d = dictionary    # things which this class has been passed on in a dictionary. Might go unused? Since update will be provided a dictionary
+        pass
+    def set_phase(self, phase):
+        self.phase = phase
+        pass
+    # the update thing here makes it so that each phase would update. Depends on the phase
+    def update(self, currentTime, deltaTime):
+        if self.phase == Phase.PLAY:
+            pass
+
+        elif self.phase == Phase.OPENING:
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.d['draw_wait_tick']:
+                if self.d['opening_index'] < 10:
+                    self.waitTick = currentTick
+                    # self.drawCardSound.stop()
+                    self.d['draw_sound'].play()
+                    self.d['hand'][self.d['opening_index']].resting = False
+                    self.d['hand'][self.d['opening_index']].set_destination(1180, 563)
+                    self.d['hand'][self.d['opening_index']].defaultPos = (self.d['openingX'], self.d['openingY'])
+                    self.d['hand'][self.d['opening_index']].update(deltaTime, self.d['openingX'], self.d['openingY'])
+                    self.d['all_cards_list'].append(self.d['hand'][self.d['opening_index']])
+                    self.d['openingX'] += 80
+                    self.d['opening_index'] += 1
+                if self.d['opening_index'] == 10:
+                    self.d['opening'] = False
+
+
+
+    def set_dictionary(self, dictionary):
+        self.d = dictionary
+    def addto_dictionary(self, key, val):
+        self.d[key] = val
+    def delfrom_dictionary(self, key):
+        del self.d[key]
+    def empty_dictionary(self):
+        self.d = {}
+
+        pass
+# gives the cues to our Phase Manager
+class Phase(Enum):
+    # auto() is an enum function that makes it decide what type to use for that enum
+    OPENING = auto()        # 10 cards drawn, coin flipped
+    ROUND_TWO = auto()      # Two cards drawn
+    FINAL_ROUND = auto()    # One card drawn
+    SWAP = auto()           # Screen fades out, board flips
+    PLAY = auto()           # Player controls are enabled, can click around etc.
+
 
 
