@@ -16,7 +16,7 @@ class Card(object):
 
         self.speed = 10  # movespeed on the screen
 
-        # self.owner = player  # the owner of the card
+        self.owner = ""  # the owner of the card
 
         #
         #  ____              _
@@ -100,7 +100,7 @@ class Card(object):
             collide = True
         return collide
 
-    def colliderect(self, x1, y1, x2, y2):
+    def collide_rect(self, x1, y1, x2, y2):
         boardCollide = False
         # x1rect = x1 + ((x2 - x1) * 0.40)
         # y1rect = y1 + ((y2 - y1) * 0.40)
