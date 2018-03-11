@@ -21,7 +21,7 @@ class BoardField(object):
     def get_dimensions(self):
         # return (self.xStart, self.yStart, self.xEnd, self.yEnd)
         # return trim down bottom
-        return (self.xStart, self.yStart, self.xEnd, self.yEnd-50)
+        return (self.xStart, self.yStart, self.xEnd, self.yEnd-35)
 
     def get_rect(self):
         return self.rect
@@ -31,3 +31,5 @@ class BoardField(object):
         self.cardList.append(card)
         # this is the TEMP WAY. We need to calculate based on num of cards in list.
         self.boardx += 80
+
+    # make this class draw its cards within this class in order to have them render below non-board cards.

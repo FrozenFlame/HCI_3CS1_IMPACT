@@ -54,16 +54,21 @@ class Engine(object):
 
         self.bgm = None  # the bgm of the hero
         self.waitTick = pygame.time.get_ticks()  # will be used to for computing how long it has already waited  # up for deletion
+
         # Game trackers
-
-        # self.phasemgr = PhaseManager(self.dictionary, self.waitTick)
-
         self.turn_no = 0
-        # self.phasemgr.set_phase(Phase.OPENING)
-        self.phase = Phase.OPENING
+        self.player = None
+        self.player2 = None
+        self.first_player = None # does not change after coin toss
+        self.opponent = None
+        self.phase = Phase.COIN_TOSS
 
         # logic booleans
+        self.first_player_set = False  # becomes true after coin toss, and hands/decks set
         self.holdingCard = False
+        self.done_turn = False
+        self.may_flip_board = False
+        self.may_count_turn = False
         # self.opening = True
 
         # objects
@@ -106,8 +111,7 @@ class Engine(object):
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
-
-#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
 # | |  \/ __ _ _ __ ___   ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
@@ -115,6 +119,7 @@ class Engine(object):
 # | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
 #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def flip_hand(self, hand):
         for h in hand:
@@ -124,17 +129,28 @@ class Engine(object):
         random.shuffle(deck)
         first_ten = []
         for i in range(0, 10):  # self minus due to simultaneous pop will offset this
+            print("GETFIRST ", i)
             first_ten.append(deck[i-i])
             deck.pop(i-i)
-
         return first_ten
 
     def flip_coin(self):
-        pass
+        self.board.flipCoin()
+    def toss_coin(self):
+        self.board.tossCoin()
+    def coin_side(self):
+        return self.board.coin.side
 
     def shuffle_deck(self, deck):
         random.shuffle(deck)
-#
+
+    def swap_player(self, player):
+        temp = player
+        self.player = self.player2
+        self.player2 = temp
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _                 _
 # |  __ \                      | |               (_)
 # | |  \/ __ _ _ __ ___   ___  | |     ___   __ _ _  ___
@@ -143,7 +159,7 @@ class Engine(object):
 #  \____/\__,_|_| |_| |_|\___| \_____/\___/ \__, |_|\___|
 #                                            __/ |
 #                                           |___/
-#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
@@ -161,6 +177,9 @@ class Engine(object):
         self.next = Globals.state
         self.finished = True
 
+    def play_card(self):  # initial concept, listener type thing.
+        self.done_turn = True
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
 # \ `--.| |_ __ _| |_ ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
@@ -168,6 +187,7 @@ class Engine(object):
 # /\__/ / || (_| | ||  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
 # \____/ \__\__,_|\__\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def get_evt(self, event):
         if event.type == pygame.QUIT:
@@ -191,41 +211,19 @@ class Engine(object):
         #     pass
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
+
             self.board.hasPreviewCard = True
             self.board.previewCard = self.clickedCard[0] # this actually must be the card that's being moused over.
         elif not self.cardMousedOver(pygame.mouse.get_pos()):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
 
-        if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
-            print(len(self.clickedCard))
-            # print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
-
-            print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
-            click = pygame.mouse.get_pressed()
-            # print("Clicked: {0}".format(click))
-
-            if click[0] == 1:
-
-                for s in self.allCardsList:
-                    if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
-                        self.clickedCard.append(s)
-                        s.onTop = True
-                        self.allCardsList.pop(self.allCardsList.index(s))
-                        self.allCardsList.append(s)
-
-                if len(self.clickedCard) > 0:
-                    if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
-                        print("handcard clicked")
-                        self.clickedCard[0].isHeld = True
-                        self.holdingCard = True
-                        self.clickedCard[0].resting = False
-                        self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                        self.drawCardSound.play()
-
-
         '''
-        PHASES
+         ____  _  _   __   ____  ____  ____ 
+        (  _ \/ )( \ / _\ / ___)(  __)/ ___)
+         ) __/) __ (/    \\___ \ ) _) \___ \
+        (__)  \_)(_/\_/\_/(____/(____)(____/
+        
         '''
         if self.phase == Phase.PLAY:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -249,6 +247,7 @@ class Engine(object):
                                 # bF.cardList.append(self.clickedCard[0])
                                 self.clickedCard[0].onBoard = True
                                 print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
+                                self.play_card()
 
                         # OPPONENT Board placement/collision logic
                         # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
@@ -263,20 +262,168 @@ class Engine(object):
                             self.clickedCard.pop()
 
 
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
+                # print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
+
+                print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
+                click = pygame.mouse.get_pressed()
+                # print("Clicked: {0}".format(click))
+
+                if click[0] == 1:
+
+                    for s in self.allCardsList:
+                        if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
+                            self.clickedCard.append(s)
+                            s.onTop = True
+                            self.allCardsList.pop(self.allCardsList.index(s))
+                            self.allCardsList.append(s)
+
+                    if len(self.clickedCard) > 0:
+                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
+                            print("handcard clicked")
+                            self.clickedCard[0].isHeld = True
+                            self.holdingCard = True
+                            self.clickedCard[0].resting = False
+                            self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                            self.drawCardSound.play()
+
+        elif self.phase == Phase.SWAP:
+            # have some fade animation play here, give flag to swap elements, and prep someone to play >mostly flags in get_evt
+            # pseudo flag fade out
+            # pseudo flag delay, allow update to spin the board
+            self.may_flip_board = True
+            # pseudo flag fade in
+            # pseudo flag cue prep phase
+            pass
+        elif self.phase == Phase.PREP:
+            # accept click stroke onto "Show" Button
+            # clicking this will set phase to Play
+            self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
+
+        if self.done_turn:
+            self.phase = Phase.SWAP
+            self.done_turn = False
+
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
 
+
+        '''
+         ____  _  _   __   ____  ____  ____ 
+        (  _ \/ )( \ / _\ / ___)(  __)/ ___)
+         ) __/) __ (/    \\___ \ ) _) \___ \ 
+        (__)  \_)(_/\_/\_/(____/(____)(____/
+        
+        '''
+        if self.phase == Phase.PLAY:
+            if not self.done_turn:
+                pass
+            else:
+                self.phase == Phase.SWAP
+                self.done_turn = False
+        elif self.phase == Phase.SWAP:
+            # fade value changes fading in
+            # FLIPPING BOARD #
+            tempHand = self.hand
+            tempDeck = self.deck
+            tempBackRow = self.boardField2
+            tempFrontRow = self.boardField
+            tempBoardFieldList = self.boardFieldList
+
+            self.hand = self.opponent_hand
+            self.deck = self.opponent_deck
+            self.boardField = self.boardFieldOpp
+            self.boardField2 = self.boardFieldOpp2
+            self.boardFieldList = [self.boardField, self.boardField2]
+            # setting opponent
+            self.opponent_hand = tempHand
+            self.opponent_deck = tempDeck
+            self.boardFieldOpp = tempFrontRow
+            self.boardFieldOpp2 = tempBackRow
+            self.boardFieldList = tempBoardFieldList
+
+            del tempHand
+            del tempDeck
+            del tempBackRow
+            del tempFrontRow
+            del tempBoardFieldList
+            # END OF FLIPPING BOARD #
+            # fade value changes fading out
+
+            if self.may_count_turn:
+                self.turn_no += 1
+                self.may_count_turn = False
+            if self.first_player == self.player:
+                self.may_count_turn = True
+
+            self.swap_player(self.player)
+
+            self.phase = Phase.PREP
+        elif self.phase == Phase.PREP:
+            # more on animations updates
+            pass
+        elif self.phase == Phase.OPENING:
+            currentTick = currentTime
+
+            # for now player 1 ALWAYS chooses heads
+            if not self.first_player_set:
+                if self.coin_side() == 0:
+                    print("LANDED HEADS")
+                    self.deck = self.persist['playerA'].deck
+                    self.opponent_deck = self.persist['playerB'].deck
+                    self.hand = self.get_first_cards(self.deck)
+                    self.opponent_hand = self.get_first_cards(self.opponent_deck)
+
+                    self.player = self.persist['playerA']
+                    self.first_player = self.persist['playerA']
+                    self.player2 = self.persist['playerB']
+                    self.first_player_set = True
+                else:
+                    print("LANDED TAILS")
+                    self.deck = self.persist['playerB'].deck
+                    self.opponent_deck = self.persist['playerA'].deck
+                    self.hand = self.get_first_cards(self.deck)
+                    self.opponent_hand = self.get_first_cards(self.opponent_deck)
+
+                    self.player = self.persist['playerB']
+                    self.first_player = self.persist['playerB']
+                    self.player2 = self.persist['playerA']
+                    self.first_player_set = True
+
+            if currentTick - self.waitTick >= self.drawCardWait:
+                if self.openingIndex < 10:
+                    self.waitTick = currentTick
+                    self.drawCardSound.stop()
+                    self.drawCardSound.play()
+                    self.hand[self.openingIndex].resting = False
+                    self.hand[self.openingIndex].set_destination(1180, 563)
+                    self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
+                    self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
+                    self.allCardsList.append(self.hand[self.openingIndex])
+                    self.openingX += 80
+                    self.openingIndex += 1
+                if self.openingIndex == 10:
+
+                    self.opening = False
+                    self.flip_hand(self.hand)
+                    self.phase = Phase.PLAY
+        elif self.phase == Phase.COIN_TOSS:
+            # additional animation updates
+            self.toss_coin()
+            self.phase = Phase.OPENING
+
+        if not self.opening:
+            print(self.player.user.username)
+            print(self.turn_no)
+            print(self.boardField.yStart)
+            print(self.hand[0].name)
+
         for a in self.allCardsList:  # updates all existing cards
-            # if not h.resting and h.colliderect(self.bField1.xStart, self.bField1.yStart, self.bField1.xEnd, self.bField1.yEnd):
-            #     print("Hurrah")
-            #     h.defaultPos = (self.bField1.xStart, self.bField1.yStart)
-            #     h.update(deltaTime, self.bField1.xStart, self.bField1.yStart)
             if not a.resting:
                 if a.isHeld:
                     a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 else:
                     a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
-
             if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
                 a.flipAnim(self.waitTick)
 
@@ -292,7 +439,7 @@ class Engine(object):
                     h2.set_destination(h.posX, h.posY)
 
                     # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-                    h2.defaultPos = (newX, 600)    # 600 = self.openingY
+                    h2.defaultPos = (newX, 600)  # 600 = self.openingY
                     h2.update(deltaTime, newX, 600)
                     newX += 80
         #
@@ -300,36 +447,7 @@ class Engine(object):
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
 
-
-
-        self.draw(screen)
-
-        '''
-        PHASES
-        '''
-        if self.phase == Phase.OPENING:
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-                if self.openingIndex < 10:
-                    self.waitTick = currentTick
-                    self.drawCardSound.stop()
-                    self.drawCardSound.play()
-                    self.hand[self.openingIndex].resting = False
-                    self.hand[self.openingIndex].set_destination(1180, 563)
-                    self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
-                    self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
-                    self.allCardsList.append(self.hand[self.openingIndex])
-                    self.openingX += 80
-                    self.openingIndex += 1
-                if self.openingIndex == 10:
-                    self.opening = False
-                    self.flip_hand(self.hand)
-                    self.phase = Phase.PLAY
-        elif self.phase == Phase.PLAY:
-            ##
-
-            pass
-
+        self.draw(screen) # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
@@ -355,13 +473,8 @@ class Engine(object):
         self.deckImgHolder3.draw(screen)
 
 
-
     def startup(self, currentTime, persistent):
-        '''
-        Add variables passed in persistent to the proper attributes and
-        set the start time of the State to the current time.
-        @ Overwritten portion
-        '''
+
         self.persist = persistent
         self.startTime = currentTime
 
@@ -383,24 +496,20 @@ class Engine(object):
         self.boardField2 = BoardField(225,525,1010,605)  # player back row
         self.boardFieldList = [self.boardField, self.boardField2]
         self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
-        self.deck = self.persist['playerB'].deck
-        self.opponent_deck = self.persist['playerA'].deck
-        self.hand = self.get_first_cards(self.deck)
-        self.opponent_hand = self.get_first_cards(self.opponent_deck)
+
+        # #temp
+        # self.deck = self.persist['playerB'].deck
+        # self.opponent_deck = self.persist['playerA'].deck
+        # self.hand = self.get_first_cards(self.deck)
+        # self.opponent_hand = self.get_first_cards(self.opponent_deck)
+        # self.player = self.persist['playerB']
+        # self.first_player = self.persist['playerB']
+        # self.player2 = self.persist['playerA']
+        # #endtemp
 
         self.opening = True
+        self.done_turn = False
 
-        # setting of initial dictionary key value pairs, made available to our PhaseManager
-
-        # self.dictionary.update({"opening_index": 0,
-        #                         "hand": self.hand,
-        #                         "opp_hand": self.opponent_hand,
-        #                         "all_cards_list": self.allCardsList,
-        #                         "openingX": 220,
-        #                         "openingY": 600,
-        #                         "opening": True,
-        #                         "draw_wait_tick": 250,
-        #                         "draw_sound": self.drawCardSound})
 
     def cleanup(self):
         self.board = None
@@ -414,7 +523,7 @@ class Engine(object):
         Globals.gameStart = False
         return self.persist
 
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _____ _
 # |_   _|                      /  __ \ |
 #   | | _ __  _ __   ___ _ __  | /  \/ | __ _ ___ ___  ___  ___
@@ -422,15 +531,19 @@ class Engine(object):
 #  _| || | | | | | |  __/ |    | \__/\ | (_| \__ \__ \  __/\__ \
 #  \___/_| |_|_| |_|\___|_|     \____/_|\__,_|___/___/\___||___/
 #
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
-    OPENING = auto()        # 10 cards drawn, coin flipped
-    ROUND_TWO = auto()      # Two cards drawn
-    FINAL_ROUND = auto()    # One card drawn
+    COIN_TOSS = auto()      # flipping of coin, decides player1 and 2
+    OPENING = auto()        # 10 cards drawn
+
     SWAP = auto()           # Screen fades out, board flips
+    PREP = auto()           # Player about to start turn
     PLAY = auto()           # Player controls are enabled, can click around etc.
 
-
-
+    # currently not yet used
+    END_ROUND = auto()      # Round won by a player / ended in draw
+    ROUND_DRAW = auto()     # Two cards drawn
+    ROUND_TWO = auto()      # Two cards drawn
+    FINAL_ROUND = auto()    # One card drawn
