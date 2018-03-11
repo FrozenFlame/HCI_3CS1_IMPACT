@@ -74,7 +74,11 @@ class Engine(object):
         self.hand = None
         self.opponent_deck = None
         self.opponent_hand = None
-        self.boardField = None
+        self.boardFieldOpp2 = None  # bottom row, opponent
+        self.boardFieldOpp = None  # top row, opponent
+        self.boardField = None   # top row, player
+        self.boardField2 = None  # bottom row, player
+
         self.boardCardList = list()
 
         self.allCardsList = list()
@@ -111,6 +115,7 @@ class Engine(object):
 # | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
 #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
+
 
 
 
@@ -172,6 +177,8 @@ class Engine(object):
         #if self.board.hasPreviewCard:
          #   print("Previewing card.")
         #card is being moused
+        self.phasemgr.get_event(event)
+
 
         # print("[Engine.py] - KEYDOWN: {0}".format(pygame.key.get_pressed()))
         if event.type == pygame.KEYDOWN:
@@ -219,22 +226,22 @@ class Engine(object):
                         self.clickedCard[0].resting = False
                         self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                         self.drawCardSound.play()
-
-        if event.type == pygame.MOUSEBUTTONUP:
-            click = pygame.mouse.get_pressed()
-            if click[0] == 0:
-                print("unheld")
-                self.holdingCard = False
-                self.board.hasPreviewCard = False
-                if not len(self.clickedCard) == 0:
-                    self.clickedCard[0].isHeld = False
-                    self.clickedCard[0].flip()
-                    if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
-                        self.boardCardList.append(self.clickedCard[0])
-                        self.clickedCard[0].onBoard = True
-
-                    if self.clickedCard[0].destination == None:
-                        self.clickedCard.pop()
+        #
+        # if event.type == pygame.MOUSEBUTTONUP:
+        #     click = pygame.mouse.get_pressed()
+        #     if click[0] == 0:
+        #         print("unheld")
+        #         self.holdingCard = False
+        #         self.board.hasPreviewCard = False
+        #         if not len(self.clickedCard) == 0:
+        #             self.clickedCard[0].isHeld = False
+        #             # self.clickedCard[0].flip()
+        #             if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
+        #                 self.boardCardList.append(self.clickedCard[0])
+        #                 self.clickedCard[0].onBoard = True
+        #
+        #             if self.clickedCard[0].destination == None:
+        #                 self.clickedCard.pop()
 
 
 
@@ -344,7 +351,11 @@ class Engine(object):
         setting of board objects and setting of first perspective
         '''
         self.board = Board()
-        self.boardField = BoardField(225,390,1010,470)
+        # self.boardField = BoardField(225,390,1010,470)
+        self.boardFieldOpp2 = None  # bottom row, opponent
+        self.boardFieldOpp = None  # top row, opponent
+        self.boardField = BoardField(225,390,1010,470)  # top row, player
+        self.boardField2 = BoardField(225,390,1010,470)  # bottom row, player
         self.deck = self.persist['playerB'].deck
         self.opponent_deck = self.persist['playerA'].deck
         self.hand = self.get_first_cards(self.deck)
@@ -366,7 +377,10 @@ class Engine(object):
 
     def cleanup(self):
         self.board = None
-        self.boardField = None
+        self.boardFieldOpp2 = None  # bottom row, opponent
+        self.boardFieldOpp = None  # top row, opponent
+        self.boardField = None  # top row, player
+        self.boardField2 = None  # bottom row, player
         self.deck = None
         self.opponent_deck = None
         self.hand = None
@@ -375,7 +389,6 @@ class Engine(object):
         self.done = False
         Globals.gameStart = False
         return self.persist
-
 
 #  _____                        _____ _
 # |_   _|                      /  __ \ |
@@ -391,7 +404,9 @@ class PhaseManager():
         self.phase = None
         self.waitTick = wait
         self.d = dictionary    # things which this class has been passed on in a dictionary. Might go unused? Since update will be provided a dictionary
-        pass
+        self.d['flip_hand_event'] = False
+        self.has_event = False
+
     def set_phase(self, phase):
         self.phase = phase
         pass
@@ -416,8 +431,12 @@ class PhaseManager():
                     self.d['opening_index'] += 1
                 if self.d['opening_index'] == 10:
                     self.d['opening'] = False
+                    self.d['flip_hand_event'] = True
+                    self.has_event = True
+                    self.flip_hand(self.d['hand'])
+                    self.set_phase(Phase.PLAY) # temporary, it should be more like button appears to click to reveal cards
 
-
+                    # flip cards
 
     def set_dictionary(self, dictionary):
         self.d = dictionary
@@ -428,11 +447,34 @@ class PhaseManager():
     def empty_dictionary(self):
         self.d = {}
 
-        pass
+    def get_event(self, event):
+
+        if self.phase == Phase.PLAY:
+            if event.type == pygame.MOUSEBUTTONUP:
+                click = pygame.mouse.get_pressed()
+                if click[0] == 0:
+                    print("unheld")
+                    self.holdingCard = False
+                    self.board.hasPreviewCard = False
+                    if not len(self.clickedCard) == 0:
+                        self.clickedCard[0].isHeld = False
+                        # self.clickedCard[0].flip()
+                        if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
+                            self.boardCardList.append(self.clickedCard[0])
+                            self.clickedCard[0].onBoard = True
+
+                        if self.clickedCard[0].destination == None:
+                            self.clickedCard.pop()
+
+    def flip_hand(self, hand):
+        for h in hand:
+            h.flip()
+
+
 # gives the cues to our Phase Manager
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
-    OPENING = auto()        # 10 cards drawn, coin flipped
+    OPENING = auto()        # 10 cards drawn, coin flips
     ROUND_TWO = auto()      # Two cards drawn
     FINAL_ROUND = auto()    # One card drawn
     SWAP = auto()           # Screen fades out, board flips
