@@ -357,7 +357,6 @@ class Engine(object):
             # have some fade animation play here, give flag to swap elements, and prep someone to play >mostly flags in get_evt
             # pseudo flag fade out
             # pseudo flag delay, allow update to spin the board
-            self.flip_hand(self.hand)
             self.may_flip_board = True
             # pseudo flag fade in
             # pseudo flag cue prep phase
@@ -479,6 +478,7 @@ class Engine(object):
             # fade value changes fading in
             # FLIPPING BOARD #
             # print()
+            self.flip_hand(self.hand)
             tempHand = self.hand
             tempDeck = self.deck
             tempBackRow = self.boardField2
