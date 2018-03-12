@@ -114,6 +114,14 @@ class Engine(object):
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
+        self.showEndTurnButton = False
+        self.endTurnImg = pygame.image.load("assets\\buttons\\end_turn.bmp").convert_alpha()
+        self.mouseOnEndTurnButton = False
+        self.endTurnImgX = 1070
+        self.endTurnImgY = 335
+        self.endTurnImgDimensionX = 110
+        self.endTurnImgDimensionY = 53
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -183,10 +191,15 @@ class Engine(object):
 
     def play_card(self):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
+<<<<<<< HEAD
 
     def end_turn(self):
         self.done_turn = True
 
+=======
+        # self.done_turn = True
+        self.showEndTurnButton = True
+>>>>>>> HandSwap
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
@@ -226,6 +239,8 @@ class Engine(object):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
 
+
+
         '''
          ____  _  _   __   ____  ____  ____ 
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
@@ -237,7 +252,14 @@ class Engine(object):
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
+<<<<<<< HEAD
                     # print("unheld")
+=======
+                    if self.mouseOnEndTurnButton and self.showEndTurnButton:
+                        self.done_turn = True
+                        self.showEndTurnButton = False
+                    print("unheld")
+>>>>>>> HandSwap
                     self.holdingCard = False
                     if self.cardMousedOver(pygame.mouse.get_pos()):
                         self.board.hasPreviewCard = False
@@ -406,6 +428,7 @@ class Engine(object):
             else:
                 self.phase = Phase.SWAP
                 self.done_turn = False
+                self.showEndTurnButton = False  #this is not working
         elif self.phase == Phase.SWAP:
             for bF in self.boardFieldList:
                 bF.swap()
@@ -539,6 +562,16 @@ class Engine(object):
 
         self.draw(screen) # last function of update. execute draw
 
+
+        if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > pygame.mouse.get_pos()[1] > self.endTurnImgY:
+            self.mouseOnEndTurnButton = True
+            print("Mouse on end turn button")
+        elif self.showEndTurnButton:
+            self.mouseOnEndTurnButton = False
+            print("Mouse NOT on end turn button")
+
+
+
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
         self.board.draw(screen)
@@ -561,6 +594,11 @@ class Engine(object):
         self.deckImgHolder1.draw(screen)
         self.deckImgHolder2.draw(screen)
         self.deckImgHolder3.draw(screen)
+
+        if self.showEndTurnButton:
+            screen.blit(self.endTurnImg, (1070, 335))
+
+
 
 
     def startup(self, currentTime, persistent):
