@@ -45,11 +45,12 @@ class Coordinator(object):
         self.state = self.state_dictionary[self.state_name]
         tempState = self.state_dictionary[previous]
 
+        print("[tools] Current state found in globals: {0}".format(Globals.state))
+        print("[tools] STATE FLIPPING! Previous State: {0}, Next state: {1}".format(previous, self.state.next))
         self.state.startup(self.currentTime, persist)
 
         item = {previous, tempState}
-        print("[tools] Current state found in globals: {0}".format(Globals.state))
-        print("[tools] STATE FLIPPING! Previous State: {0}, Next state: {1}".format(previous,self.state.next))
+
         # self.state_dictionary.pop()
         # self.state_dictionary.append(item)
         # self.state.startup(self.currentTime, persist)

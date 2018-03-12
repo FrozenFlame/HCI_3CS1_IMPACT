@@ -183,7 +183,10 @@ class Engine(object):
 
     def play_card(self):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
+
+    def end_turn(self):
         self.done_turn = True
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
@@ -234,9 +237,10 @@ class Engine(object):
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
-                    print("unheld")
+                    # print("unheld")
                     self.holdingCard = False
-                    self.board.hasPreviewCard = False
+                    if self.cardMousedOver(pygame.mouse.get_pos()):
+                        self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
                         self.clickedCard[0].isHeld = False
                         # self.clickedCard[0].flip()
@@ -245,14 +249,29 @@ class Engine(object):
                         # if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                         #     self.boardCardList.append(self.clickedCard[0])
                         #     self.clickedCard[0].onBoard = True
-                        for bF in self.boardFieldList:
-                            if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                                bF.take_card(self.clickedCard[0])
 
-                                # bF.cardList.append(self.clickedCard[0])
-                                self.clickedCard[0].onBoard = True
-                                print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
-                                self.play_card()
+                        if self.player == self.first_player:  #
+                            for bF in self.boardFieldList:
+                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
+                                    bF.take_card(self.clickedCard[0])
+
+                                    # bF.cardList.append(self.clickedCard[0])
+                                    self.clickedCard[0].onBoard = True
+                                    print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
+                                    print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
+                                    self.play_card()
+                                    self.end_turn()
+                        elif self.player2 == self.first_player:
+                            for bF in self.boardFieldListOpp:
+                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
+                                    bF.take_card(self.clickedCard[0])
+
+                                    # bF.cardList.append(self.clickedCard[0])
+                                    self.clickedCard[0].onBoard = True
+                                    print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
+                                    print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
+                                    self.play_card()
+                                    self.end_turn()
 
                         # if self.clickedCard[0].collide_rect(*self.boardField.get_dimensions()) and not self.clickedCard[0].onBoard:
                         #     self.boardField.take_card(self.clickedCard[0])
@@ -262,24 +281,25 @@ class Engine(object):
                         #     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], self.boardField))
                         #     self.play_card()
 
-                        # OPPONENT Board placement/collision logic
-                        for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
-                            if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                                bF.take_card(self.clickedCard[0])
-
-                                # bF.cardList.append(self.clickedCard[0])
-                                self.clickedCard[0].onBoard = True
-                                print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
-                                self.play_card()
-
-                        if self.clickedCard[0].destination == None:
-                            self.clickedCard.pop()
+                        # # OPPONENT Board placement/collision logic
+                        # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
+                        #     if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                        #         bF.take_card(self.clickedCard[0])
+                        #
+                        #         # bF.cardList.append(self.clickedCard[0])
+                        #         self.clickedCard[0].onBoard = True
+                        #         print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
+                        #         self.play_card()
+                        #         self.end_turn()
+                        #
+                        # if self.clickedCard[0].destination == None:
+                        #     self.clickedCard.pop()
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
                 # print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
 
-                print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
+                # print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
                 click = pygame.mouse.get_pressed()
                 # print("Clicked: {0}".format(click))
 
@@ -312,6 +332,7 @@ class Engine(object):
         elif self.phase == Phase.PREP:
             # accept click stroke onto "Show" Button
             # clicking this will set phase to Play
+            print("Player {0}, it's your turn.".format(self.player.user.username))
             self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
 
         if self.done_turn:
@@ -324,10 +345,11 @@ class Engine(object):
         # print("BOARD FIELDOpp LEN: ", len(self.boardFieldOpp.cardList))
         # print("BOARD FIELD LEN: ", len(self.boardField.cardList))
         # print("BOARD FIELD2 LEN: ", len(self.boardField2.cardList))
+
         '''
-         ____  _  _   __   ____  ____  ____ 
+         ____  _  _   __   ____  ____  ____
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
-         ) __/) __ (/    \\___ \ ) _) \___ \ 
+         ) __/) __ (/    \\___ \ ) _) \___ \
         (__)  \_)(_/\_/\_/(____/(____)(____/
         
         '''
@@ -382,9 +404,15 @@ class Engine(object):
             if not self.done_turn:
                 pass
             else:
-                self.phase == Phase.SWAP
+                self.phase = Phase.SWAP
                 self.done_turn = False
         elif self.phase == Phase.SWAP:
+            for bF in self.boardFieldList:
+                bF.swap()
+                bF.rearrange()
+            for bF in self.boardFieldListOpp:
+                bF.swap()
+                bF.rearrange()
             # fade value changes fading in
             # FLIPPING BOARD #
             # print()
@@ -424,10 +452,7 @@ class Engine(object):
 
             self.swap_player(self.player)
 
-            # for bF in self.boardFieldList:
-            #     bF.rearrange()
-            # for bF in self.boardFieldListOpp:
-            #     bF.rearrange()
+
             self.phase = Phase.PREP
         elif self.phase == Phase.PREP:
             # more on animations updates
@@ -549,7 +574,6 @@ class Engine(object):
         print("[Engine] ########################### ")
         print("[Engine] {0}({1}) vs {2}({3})".format(self.persist['playerA'].user.username, self.persist['playerA'].hero.name, self.persist['playerB'].user.username, self.persist['playerB'].hero.name))
         print("[Engine] THE BATTLE BEGINS")
-        print("[Engine] gameStart: ", Globals.gameStart)
         '''
         setting of board objects and setting of first perspective
         '''
