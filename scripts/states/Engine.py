@@ -61,6 +61,8 @@ class Engine(object):
         self.player2 = None
         self.first_player = None # does not change after coin toss
         self.opponent = None
+        self.passed = None  # a player has passed their turn
+        self.cards_played = 0  # counter to determine how many cards you've played that turn
         self.phase = Phase.COIN_TOSS
 
         # logic booleans
@@ -69,6 +71,7 @@ class Engine(object):
         self.done_turn = False
         self.may_flip_board = False
         self.may_count_turn = False
+        self.may_drag = False
         # self.opening = True
 
         # objects
@@ -188,7 +191,7 @@ class Engine(object):
 
 
     def cardMousedOver(self, xy) -> bool:
-        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
+        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]  # not actually clicked, but moused over
         return True if len(self.clickedCard) == 1 else False
 
     # def cardMousedOver2(self, xy):
@@ -205,12 +208,16 @@ class Engine(object):
         print("PLAYED BY: ", self.player.user.username)
         self.showPassTurnButton = False
         self.showEndTurnButton = True
+        self.cards_played += 1
+        print(self.cards_played)
+        if self.cards_played == 3 and not self.passed:
+            self.may_drag = False
 
     def end_turn(self):
         # self.done_turn = True
-        # self.showPassTurnButton = False
-        # self.showEndTurnButton = True
-        pass
+        self.showPassTurnButton = False
+        self.showEndTurnButton = False
+        self.cards_played = 0
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
@@ -244,16 +251,14 @@ class Engine(object):
         #     pass
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
-
-            self.board.hasPreviewCard = True
-            self.board.previewCard = self.clickedCard[0] # this actually must be the card that's being moused over.
+            if self.clickedCard[0].front:
+                self.board.hasPreviewCard = True
+                self.board.previewCard = self.clickedCard[0] # this actually must be the card that's being moused over.
         elif not self.cardMousedOver(pygame.mouse.get_pos()):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
 
-
-
-        '''
+        ''' GET EVENT
          ____  _  _   __   ____  ____  ____ 
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
          ) __/) __ (/    \\___ \ ) _) \___ \
@@ -268,12 +273,12 @@ class Engine(object):
                     if self.mouseOnEndTurnButton and self.showEndTurnButton:
                         self.done_turn = True
                         self.showEndTurnButton = False
-                        self.showPassTurnButton = True
                     if self.mouseOnPassTurnButton and self.showPassTurnButton:
                         print("TURN PASSED")
                         self.done_turn = True
                         self.showEndTurnButton = False
                         self.showPassTurnButton = False
+                        self.passed = True
 
                     print("unheld")
                     self.holdingCard = False
@@ -298,7 +303,7 @@ class Engine(object):
                                     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
                                     print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card()
-                                    self.end_turn()
+                                    # self.end_turn()
                         elif self.player2 == self.first_player:
                             for bF in self.boardFieldListOpp:
                                 if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
@@ -309,7 +314,7 @@ class Engine(object):
                                     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
                                     print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card()
-                                    self.end_turn()
+                                    # self.end_turn()
 
 
 
@@ -345,7 +350,7 @@ class Engine(object):
                             self.allCardsList.append(s)
 
                     if len(self.clickedCard) > 0:
-                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False:
+                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False and self.may_drag:
                             print("handcard clicked")
                             self.clickedCard[0].isHeld = True
                             self.holdingCard = True
@@ -366,6 +371,7 @@ class Engine(object):
             # print("Player {0}, it's your turn.".format(self.player.user.username))
             if self.showHandButton and (self.showHandImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.showHandImgX and (self.showHandImgY + self.endTurnImgDimensionY) > pygame.mouse.get_pos()[1] > self.showHandImgY:
                 self.mouseOnShowHandButton = True
+                self.may_drag = True
                 pass
             elif self.showHandButton:
                 self.mouseOnShowHandButton = False
@@ -384,6 +390,7 @@ class Engine(object):
             # self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
 
         if self.done_turn:
+            self.end_turn()
             self.phase = Phase.SWAP
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
@@ -393,7 +400,7 @@ class Engine(object):
         # print("BOARD FIELD LEN: ", len(self.boardField.cardList))
         # print("BOARD FIELD2 LEN: ", len(self.boardField2.cardList))
 
-        '''
+        ''' UPDATE
          ____  _  _   __   ____  ____  ____
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
          ) __/) __ (/    \\___ \ ) _) \___ \
@@ -478,7 +485,8 @@ class Engine(object):
             # fade value changes fading in
             # FLIPPING BOARD #
             # print()
-            self.flip_hand(self.hand)
+            self.flip_hand(self.hand)  # TODO somehow this line makes the cards swapping less consistently
+
             tempHand = self.hand
             tempDeck = self.deck
             tempBackRow = self.boardField2
@@ -671,6 +679,8 @@ class Engine(object):
         self.first_player = None  # does not change after coin toss
         self.opponent = None
         self.phase = Phase.COIN_TOSS
+        self.cards_played = 0
+
 
         # #temp
         # self.deck = self.persist['playerB'].deck
@@ -698,7 +708,7 @@ class Engine(object):
         Globals.gameStart = False
         return self.persist
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _____ _
 # |_   _|                      /  __ \ |
 #   | | _ __  _ __   ___ _ __  | /  \/ | __ _ ___ ___  ___  ___
@@ -706,7 +716,7 @@ class Engine(object):
 #  _| || | | | | | |  __/ |    | \__/\ | (_| \__ \__ \  __/\__ \
 #  \___/_| |_|_| |_|\___|_|     \____/_|\__,_|___/___/\___||___/
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
@@ -718,7 +728,7 @@ class Phase(Enum):
     PLAY = auto()           # Player controls are enabled, can click around etc.
 
     # currently not yet used
-    END_ROUND = auto()      # Round won by a player / ended in draw
+    END_ROUND = auto()      # both players have now selected PASS
     ROUND_DRAW = auto()     # Two cards drawn
     ROUND_TWO = auto()      # Two cards drawn
     FINAL_ROUND = auto()    # One card drawn
