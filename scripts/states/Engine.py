@@ -102,7 +102,7 @@ class Engine(object):
 
         self.opening = True
         # self.drawCardWait = 250
-        self.drawCardWait = 25
+        self.drawCardWait = 50
         self.openingIndex = 0
         self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
         self.openingY = 600
@@ -114,11 +114,23 @@ class Engine(object):
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
+
+        '''
+        UI things (initial state)
+        '''
         self.showEndTurnButton = False
+        self.showPassTurnButton = False
+        self.showHandButton = False
         self.endTurnImg = pygame.image.load("assets\\buttons\\end_turn.bmp").convert_alpha()
+        self.passTurnImg = pygame.image.load("assets\\buttons\\pass_turn.bmp").convert_alpha()
+        self.showHandImg = pygame.image.load("assets\\buttons\\show_hand.bmp").convert_alpha()
         self.mouseOnEndTurnButton = False
-        self.endTurnImgX = 1070
+        self.mouseOnPassTurnButton = False
+        self.mouseOnShowHandButton = False
+        self.endTurnImgX = 50
         self.endTurnImgY = 335
+        self.showHandImgX = Globals.RESOLUTION_X * 0.44
+        self.showHandImgY = Globals.RESOLUTION_Y * 0.90
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
@@ -191,10 +203,15 @@ class Engine(object):
 
     def play_card(self):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
+        self.showPassTurnButton = False
+        self.showEndTurnButton = True
 
     def end_turn(self):
         # self.done_turn = True
-        self.showEndTurnButton = True
+        # self.showPassTurnButton = False
+        # self.showEndTurnButton = True
+        pass
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
@@ -251,6 +268,13 @@ class Engine(object):
                     if self.mouseOnEndTurnButton and self.showEndTurnButton:
                         self.done_turn = True
                         self.showEndTurnButton = False
+                        self.showPassTurnButton = True
+                    if self.mouseOnPassTurnButton and self.showPassTurnButton:
+                        print("TURN PASSED")
+                        self.done_turn = True
+                        self.showEndTurnButton = False
+                        self.showPassTurnButton = False
+
                     print("unheld")
                     self.holdingCard = False
                     if self.cardMousedOver(pygame.mouse.get_pos()):
@@ -287,13 +311,7 @@ class Engine(object):
                                     self.play_card()
                                     self.end_turn()
 
-                        # if self.clickedCard[0].collide_rect(*self.boardField.get_dimensions()) and not self.clickedCard[0].onBoard:
-                        #     self.boardField.take_card(self.clickedCard[0])
-                        #
-                        #     # bF.cardList.append(self.clickedCard[0])
-                        #     self.clickedCard[0].onBoard = True
-                        #     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], self.boardField))
-                        #     self.play_card()
+
 
                         # # OPPONENT Board placement/collision logic
                         # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
@@ -339,19 +357,35 @@ class Engine(object):
             # have some fade animation play here, give flag to swap elements, and prep someone to play >mostly flags in get_evt
             # pseudo flag fade out
             # pseudo flag delay, allow update to spin the board
+            self.flip_hand(self.hand)
             self.may_flip_board = True
             # pseudo flag fade in
             # pseudo flag cue prep phase
             pass
         elif self.phase == Phase.PREP:
             # accept click stroke onto "Show" Button
+            # print("Player {0}, it's your turn.".format(self.player.user.username))
+            if self.showHandButton and (self.showHandImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.showHandImgX and (self.showHandImgY + self.endTurnImgDimensionY) > pygame.mouse.get_pos()[1] > self.showHandImgY:
+                self.mouseOnShowHandButton = True
+                pass
+            elif self.showHandButton:
+                self.mouseOnShowHandButton = False
+                pass
+            if event.type == pygame.MOUSEBUTTONUP:
+                click = pygame.mouse.get_pressed()
+                if click[0] == 0:
+                    if self.mouseOnShowHandButton and self.showHandButton:
+                        print("Showing cards")
+                        self.flip_hand(self.hand)
+                        self.phase = Phase.PLAY
+                        self.showHandButton = False
+                        self.showPassTurnButton = True
             # clicking this will set phase to Play
-            print("Player {0}, it's your turn.".format(self.player.user.username))
-            self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
+
+            # self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
 
         if self.done_turn:
             self.phase = Phase.SWAP
-            self.done_turn = False
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
@@ -416,6 +450,20 @@ class Engine(object):
 
         if self.phase == Phase.PLAY:
             if not self.done_turn:
+                if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > \
+                        pygame.mouse.get_pos()[1] > self.endTurnImgY:
+                    self.mouseOnEndTurnButton = True
+                    # print("Mouse on end turn button")
+                elif self.showEndTurnButton:
+                    self.mouseOnEndTurnButton = False
+                    # print("Mouse NOT on end turn button")
+                elif self.showPassTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > \
+                        pygame.mouse.get_pos()[1] > self.endTurnImgY:
+                    self.mouseOnPassTurnButton = True
+                    # print("Mouse on pass turn button")
+                elif self.showPassTurnButton:
+                    self.mouseOnPassTurnButton = False
+                    # print("Mouse NOT on pass turn button")
                 pass
             else:
                 self.phase = Phase.SWAP
@@ -466,11 +514,13 @@ class Engine(object):
                 self.may_count_turn = True
 
             self.swap_player(self.player)
-
-
             self.phase = Phase.PREP
+            self.done_turn = False
+
         elif self.phase == Phase.PREP:
             # more on animations updates
+            self.showHandButton = True
+
             pass
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
@@ -539,8 +589,7 @@ class Engine(object):
                 if self.openingIndex == 10:
 
                     self.opening = False
-                    self.flip_hand(self.hand)
-                    self.phase = Phase.PLAY
+                    self.phase = Phase.PREP
         elif self.phase == Phase.COIN_TOSS:
             # additional animation updates
             self.toss_coin()
@@ -555,12 +604,8 @@ class Engine(object):
         self.draw(screen) # last function of update. execute draw
 
 
-        if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > pygame.mouse.get_pos()[1] > self.endTurnImgY:
-            self.mouseOnEndTurnButton = True
-            print("Mouse on end turn button")
-        elif self.showEndTurnButton:
-            self.mouseOnEndTurnButton = False
-            print("Mouse NOT on end turn button")
+
+
 
 
 
@@ -588,8 +633,11 @@ class Engine(object):
         self.deckImgHolder3.draw(screen)
 
         if self.showEndTurnButton:
-            screen.blit(self.endTurnImg, (1070, 335))
-
+            screen.blit(self.endTurnImg, (self.endTurnImgX, self.endTurnImgY))
+        elif self.showPassTurnButton:
+            screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
+        if self.showHandButton:
+            screen.blit(self.showHandImg, (self.showHandImgX, self.showHandImgY))
 
 
 
