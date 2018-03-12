@@ -104,8 +104,11 @@ class Engine(object):
         # self.drawCardWait = 250
         self.drawCardWait = 25
         self.openingIndex = 0
-        self.openingX = 220                # hand coordinate is from 220 to 1020
+        self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
         self.openingY = 600
+        self.openingXOpp = 220  # hand coordinate is from 220 to 1020 (OPP)
+        self.openingYOpp = -20
+
 
         self.deckImgHolder1 = Card()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
@@ -125,7 +128,8 @@ class Engine(object):
         for h in hand:
             h.flip()
 
-    def get_first_cards(self, deck):
+    def get_first_cards(self, deck, username):
+        print("Giving first cards of: ", username )
         random.shuffle(deck)
         first_ten = []
         for i in range(0, 10):  # self minus due to simultaneous pop will offset this
@@ -178,6 +182,7 @@ class Engine(object):
         self.finished = True
 
     def play_card(self):  # initial concept, listener type thing.
+        print("PLAYED BY: ", self.player.user.username)
         self.done_turn = True
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
@@ -249,14 +254,23 @@ class Engine(object):
                                 print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
                                 self.play_card()
 
-                        # OPPONENT Board placement/collision logic
-                        # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
-                        #     if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                        #         bF.take_card(self.clickedCard[0])
+                        # if self.clickedCard[0].collide_rect(*self.boardField.get_dimensions()) and not self.clickedCard[0].onBoard:
+                        #     self.boardField.take_card(self.clickedCard[0])
                         #
-                        #         # bF.cardList.append(self.clickedCard[0])
-                        #         self.clickedCard[0].onBoard = True
-                        #         print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
+                        #     # bF.cardList.append(self.clickedCard[0])
+                        #     self.clickedCard[0].onBoard = True
+                        #     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], self.boardField))
+                        #     self.play_card()
+
+                        # OPPONENT Board placement/collision logic
+                        for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
+                            if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                                bF.take_card(self.clickedCard[0])
+
+                                # bF.cardList.append(self.clickedCard[0])
+                                self.clickedCard[0].onBoard = True
+                                print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0], bF))
+                                self.play_card()
 
                         if self.clickedCard[0].destination == None:
                             self.clickedCard.pop()
@@ -306,8 +320,10 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-
-
+        # print("BOARD FIELDOpp2 LEN: ", len(self.boardFieldOpp2.cardList))
+        # print("BOARD FIELDOpp LEN: ", len(self.boardFieldOpp.cardList))
+        # print("BOARD FIELD LEN: ", len(self.boardField.cardList))
+        # print("BOARD FIELD2 LEN: ", len(self.boardField2.cardList))
         '''
          ____  _  _   __   ____  ____  ____ 
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
@@ -315,6 +331,53 @@ class Engine(object):
         (__)  \_)(_/\_/\_/(____/(____)(____/
         
         '''
+        if not self.opening:
+            # print(self.player.user.username)
+            # print(self.turn_no)
+            # print(self.boardField.yStart)
+            # print(self.hand[0].name)
+            pass
+
+        for a in self.allCardsList:  # updates all existing cards
+            if not a.resting:
+                if a.isHeld:
+                    a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                else:
+                    a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
+            if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
+                a.flipAnim(self.waitTick)
+        if self.first_player_set:
+            for h in self.hand:
+                initialHandlength = len(self.hand)
+                if h.onBoard:
+                    self.hand.pop(self.hand.index(h))
+                if len(self.hand) < initialHandlength:
+                    initialHandlength = len(self.hand)
+                    newX = 620 - (40 * len(self.hand))
+                    for h2 in self.hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+
+                        # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingY)
+                        newX += 80
+            for h in self.opponent_hand:
+                initialHandlength = len(self.opponent_hand)
+                if h.onBoard:
+                    self.opponent_hand.pop(self.opponent_hand.index(h))
+                if len(self.opponent_hand) < initialHandlength:
+                    initialHandlength = len(self.opponent_hand)
+                    newX = 620 - (40 * len(self.opponent_hand))
+                    for h2 in self.opponent_hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+
+                        # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                        h2.defaultPos = (newX, self.openingYOpp)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingYOpp)
+                        newX += 80
+
         if self.phase == Phase.PLAY:
             if not self.done_turn:
                 pass
@@ -324,6 +387,7 @@ class Engine(object):
         elif self.phase == Phase.SWAP:
             # fade value changes fading in
             # FLIPPING BOARD #
+            # print()
             tempHand = self.hand
             tempDeck = self.deck
             tempBackRow = self.boardField2
@@ -342,11 +406,13 @@ class Engine(object):
             self.boardFieldOpp2 = tempBackRow
             self.boardFieldList = tempBoardFieldList
 
-            del tempHand
-            del tempDeck
-            del tempBackRow
-            del tempFrontRow
-            del tempBoardFieldList
+            '''
+            a = b
+            b = c
+            c += 1
+            print a
+            '''
+
             # END OF FLIPPING BOARD #
             # fade value changes fading out
 
@@ -358,6 +424,10 @@ class Engine(object):
 
             self.swap_player(self.player)
 
+            # for bF in self.boardFieldList:
+            #     bF.rearrange()
+            # for bF in self.boardFieldListOpp:
+            #     bF.rearrange()
             self.phase = Phase.PREP
         elif self.phase == Phase.PREP:
             # more on animations updates
@@ -371,25 +441,40 @@ class Engine(object):
                     print("LANDED HEADS")
                     self.deck = self.persist['playerA'].deck
                     self.opponent_deck = self.persist['playerB'].deck
-                    self.hand = self.get_first_cards(self.deck)
-                    self.opponent_hand = self.get_first_cards(self.opponent_deck)
+                    self.hand = self.get_first_cards(self.deck,self.persist['playerA'].user.username)
+                    self.opponent_hand = self.get_first_cards(self.opponent_deck,self.persist['playerB'].user.username)
 
                     self.player = self.persist['playerA']
                     self.first_player = self.persist['playerA']
                     self.player2 = self.persist['playerB']
+
+                    self.boardField.owner = self.persist['playerA'].user.username
+                    self.boardField2.owner = self.persist['playerA'].user.username
+
+                    self.boardFieldOpp.owner = self.persist['playerB'].user.username
+                    self.boardFieldOpp2.owner = self.persist['playerB'].user.username
+
                     self.first_player_set = True
                 else:
                     print("LANDED TAILS")
                     self.deck = self.persist['playerB'].deck
                     self.opponent_deck = self.persist['playerA'].deck
-                    self.hand = self.get_first_cards(self.deck)
-                    self.opponent_hand = self.get_first_cards(self.opponent_deck)
+                    self.hand = self.get_first_cards(self.deck, self.persist['playerB'].user.username)
+                    self.opponent_hand = self.get_first_cards(self.opponent_deck, self.persist['playerA'].user.username)
 
                     self.player = self.persist['playerB']
                     self.first_player = self.persist['playerB']
                     self.player2 = self.persist['playerA']
+
+                    self.boardField.owner = self.persist['playerB'].user.username
+                    self.boardField2.owner = self.persist['playerB'].user.username
+
+                    self.boardFieldOpp.owner = self.persist['playerA'].user.username
+                    self.boardFieldOpp2.owner = self.persist['playerA'].user.username
+
                     self.first_player_set = True
 
+            # graphical representation of card giving (hands are already pre determined by get_first_cards)
             if currentTick - self.waitTick >= self.drawCardWait:
                 if self.openingIndex < 10:
                     self.waitTick = currentTick
@@ -399,8 +484,17 @@ class Engine(object):
                     self.hand[self.openingIndex].set_destination(1180, 563)
                     self.hand[self.openingIndex].defaultPos = (self.openingX, self.openingY)
                     self.hand[self.openingIndex].update(deltaTime, self.openingX, self.openingY)
+
+                    self.opponent_hand[self.openingIndex].resting = False
+                    self.opponent_hand[self.openingIndex].set_destination(1180, 100)
+                    self.opponent_hand[self.openingIndex].posY = 100
+                    self.opponent_hand[self.openingIndex].defaultPos = (self.openingXOpp, self.openingYOpp)
+                    self.opponent_hand[self.openingIndex].update(deltaTime, self.openingXOpp, self.openingYOpp)
+
                     self.allCardsList.append(self.hand[self.openingIndex])
+                    self.allCardsList.append(self.opponent_hand[self.openingIndex])
                     self.openingX += 80
+                    self.openingXOpp += 80
                     self.openingIndex += 1
                 if self.openingIndex == 10:
 
@@ -412,36 +506,7 @@ class Engine(object):
             self.toss_coin()
             self.phase = Phase.OPENING
 
-        if not self.opening:
-            print(self.player.user.username)
-            print(self.turn_no)
-            print(self.boardField.yStart)
-            print(self.hand[0].name)
 
-        for a in self.allCardsList:  # updates all existing cards
-            if not a.resting:
-                if a.isHeld:
-                    a.update(deltaTime, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                else:
-                    a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
-            if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
-                a.flipAnim(self.waitTick)
-
-        for h in self.hand:
-            initialHandlength = len(self.hand)
-            if h.onBoard:
-                self.hand.pop(self.hand.index(h))
-            if len(self.hand) < initialHandlength:
-                initialHandlength = len(self.hand)
-                newX = 620 - (40 * len(self.hand))
-                for h2 in self.hand:
-                    h2.resting = False
-                    h2.set_destination(h.posX, h.posY)
-
-                    # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-                    h2.defaultPos = (newX, 600)  # 600 = self.openingY
-                    h2.update(deltaTime, newX, 600)
-                    newX += 80
         #
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
@@ -496,6 +561,14 @@ class Engine(object):
         self.boardField2 = BoardField(225,525,1010,605)  # player back row
         self.boardFieldList = [self.boardField, self.boardField2]
         self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
+
+        # Game trackers
+        self.turn_no = 0
+        self.player = None
+        self.player2 = None
+        self.first_player = None  # does not change after coin toss
+        self.opponent = None
+        self.phase = Phase.COIN_TOSS
 
         # #temp
         # self.deck = self.persist['playerB'].deck
