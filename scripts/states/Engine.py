@@ -191,15 +191,10 @@ class Engine(object):
 
     def play_card(self):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
-<<<<<<< HEAD
 
     def end_turn(self):
-        self.done_turn = True
-
-=======
         # self.done_turn = True
         self.showEndTurnButton = True
->>>>>>> HandSwap
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
 # /  ___| |      | |       |  ___|              | | (_)
@@ -252,14 +247,11 @@ class Engine(object):
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
-<<<<<<< HEAD
-                    # print("unheld")
-=======
+
                     if self.mouseOnEndTurnButton and self.showEndTurnButton:
                         self.done_turn = True
                         self.showEndTurnButton = False
                     print("unheld")
->>>>>>> HandSwap
                     self.holdingCard = False
                     if self.cardMousedOver(pygame.mouse.get_pos()):
                         self.board.hasPreviewCard = False
