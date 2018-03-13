@@ -61,6 +61,7 @@ class Engine(object):
         self.player2 = None
         self.first_player = None  # does not change after coin toss
         self.opponent = None
+        self.winning_player = None
         self.cards_played = 0  # counter to determine how many cards you've played that turn
         self.phase = Phase.COIN_TOSS
 
@@ -107,7 +108,7 @@ class Engine(object):
 
         self.opening = True
         # self.drawCardWait = 250
-        self.drawCardWait = 50
+        self.drawCardWait = 100
         self.openingIndex = 0
         self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
         self.openingY = 610
@@ -158,6 +159,10 @@ class Engine(object):
     def flip_hand(self, hand):
         for h in hand:
             h.flip()
+    def flip_hand_down(self, hand):
+        for h in hand:
+            if h.front:
+                h.flip()
 
     def get_first_cards(self, deck, username):
         print("Giving first cards of: ", username)
@@ -194,7 +199,7 @@ class Engine(object):
         graveYardList.extend(boardField.cardList)
 
         if boardField.owner == self.player.user.username:
-            print("My boardfield")
+            # print("My boardfield")
             for c in boardField.cardList:
                 c.defaultPos = self.graveYardX, self.graveYardY
                 c.flip()
@@ -212,14 +217,15 @@ class Engine(object):
                 c.set_destination(*c.defaultPos)
 
         boardField.cardList = []
+        boardField.rearrange()
 
 
     def send_to_grave_fromboard(self, card, boardField, graveYardList):  # lite version? no cardstack difference though
-        print("Index to be tossed to grave: ",boardField.cardList.index(card))
+        # print("Index to be tossed to grave: ",boardField.cardList.index(card))
         boardField.cardList.pop(boardField.cardList.index(card))
         graveYardList.append(card)
         if boardField.owner == self.player.user.username:
-            print("My boardfield")
+            # print("My boardfield")
             card.defaultPos = self.graveYardX, self.graveYardY
         else:
             card.defaultPos = self.graveYardOppX, self.graveYardOppY
@@ -234,7 +240,6 @@ class Engine(object):
         # NOTE: changed placement of /5. Due to it raising an error that a list cannot be divided by an int
         # from: 5*(int(len((self.graveYardList)/5)))
         # to:   5*(int(len((self.graveYardList))/5))
-        print(5*(int(len((self.graveYardList))/5)))
         '''
         self.graveYardX += 5*(int(len((self.graveYardList))/5))
         self.graveYardY -= 1*(int(len((self.graveYardList))/5))
@@ -333,7 +338,7 @@ class Engine(object):
         self.showPassTurnButton = False
         self.showEndTurnButton = True
         self.cards_played += 1
-        print(self.cards_played)
+        # print(self.cards_played)
         self.recalculate_score(boardfieldlist)
 
         if self.cards_played == 3 and not self.passed:
@@ -435,8 +440,8 @@ class Engine(object):
 
                                     # bF.cardList.append(self.clickedCard[0])
                                     self.clickedCard[0].onBoard = True
-                                    print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
-                                    print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
+                                    # print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
+                                    # print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card(self.clickedCard[0], self.boardFieldList)
                                     # self.end_turn()
                         elif self.player2 == self.first_player:
@@ -446,8 +451,8 @@ class Engine(object):
 
                                     # bF.cardList.append(self.clickedCard[0])
                                     self.clickedCard[0].onBoard = True
-                                    print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
-                                    print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
+                                    # print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
+                                    # print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card(self.clickedCard[0], self.boardFieldListOpp)
 
                                     # self.end_turn()
@@ -573,13 +578,10 @@ class Engine(object):
                 initialHandlength = len(self.hand)
                 if h.onBoard:
                     self.hand.pop(self.hand.index(h))
-                    print("Dropping you dog")
                 if len(self.hand) < initialHandlength:
                     initialHandlength = len(self.hand)
                     newX = 620 - (40 * len(self.hand))
-                    print("lenning it up")
                     for h2 in self.hand:
-                        print("deciding fate ")
                         h2.resting = False
                         h2.set_destination(h.posX, h.posY)
 
@@ -627,6 +629,10 @@ class Engine(object):
                 self.showEndTurnButton = False  #this is not working
         elif self.phase == Phase.PREP:
             # more on animations updates
+            if not len(self.hand) == 0:
+                if self.hand[0].front:
+                    self.flip_hand(self.hand)
+
             self.showHandButton = True
 
         elif self.phase == Phase.SWAP:
@@ -740,87 +746,183 @@ class Engine(object):
             print("[Engine] Entering Round Two!")
             num_of_cards = 2
             if not self.done_drawing:
+                # please burn cards in future patch (w/ animations muhaha)
                 self.draw_cards(num_of_cards, self.deck, self.hand)
                 self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
                 print("Player Hand Size: ", len(self.hand))
+                if len(self.hand) > 10:
+                    print("Player {0} hand overload!".format(self.player.user.username))
                 print("Player opponent hand Size: ", len(self.opponent_hand))
-
-
-
+                if len(self.opponent_hand) > 10:
+                    print("Player {0} hand overload!".format(self.player2.user.username))
+                self.flip_hand_down(self.hand)
+                self.flip_hand_down(self.opponent_hand)
                 self.done_drawing = True
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.drawCardWait:
 
-            self.phase = Phase.SWAP
+                if self.openingIndex < num_of_cards:
+                    self.waitTick = currentTick
+                    self.drawCardSound.play()
+                    newX = 620 - (40 * (len(self.hand)-(num_of_cards-(self.openingIndex+1))))
+                    for h2 in self.hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingY)
+                        newX += 80
+                    newXOpp = 620 - (40 * (len(self.opponent_hand)-(num_of_cards-(self.openingIndex+1))))
+                    for h2 in self.opponent_hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
+                        h2.update(deltaTime, newXOpp, self.openingYOpp)
+                        newXOpp += 80
 
-            # currentTick = currentTime
-            # if currentTick - self.waitTick >= self.drawCardWait:
-            #     self.drawCardSound.play()
-            #     if self.openingIndex < num_of_cards:
-            #         self.waitTick = currentTick
-            #         # self.drawCardSound.stop()
-            #         self.drawCardSound.play()
-            #         self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].resting = False
-            #         self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].set_destination(1180, 563)
-            #
-            #         self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].resting = False
-            #         self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].set_destination(1180, 100)
-            #
-            #         for h in self.hand:
-            #             initialHandlength = len(self.hand)
-            #             if h.onBoard:
-            #                 self.hand.pop(self.hand.index(h))
-            #                 print("Dropping you dog")
-            #             if len(self.hand) < initialHandlength:
-            #                 initialHandlength = len(self.hand)
-            #                 newX = 620 - (40 * len(self.hand))
-            #                 print("lenning it up")
-            #                 for h2 in self.hand:
-            #                     print("deciding fate ")
-            #                     h2.resting = False
-            #                     h2.set_destination(h.posX, h.posY)
-            #
-            #                     # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-            #                     h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-            #                     h2.update(deltaTime, newX, self.openingY)
-            #                     newX += 80
-            #
-            #         for h in self.opponent_hand:
-            #             initialHandlength = len(self.opponent_hand)
-            #             if h.onBoard:
-            #                 self.opponent_hand.pop(self.opponent_hand.index(h))
-            #             if len(self.opponent_hand) < initialHandlength:
-            #                 initialHandlength = len(self.opponent_hand)
-            #                 newX = 620 - (40 * len(self.opponent_hand))
-            #                 for h2 in self.opponent_hand:
-            #                     h2.resting = False
-            #                     h2.set_destination(h.posX, h.posY)
-            #
-            #                     # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-            #                     h2.defaultPos = (newX, self.openingYOpp)  # 600 = self.openingY
-            #                     h2.update(deltaTime, newX, self.openingYOpp)
-            #                     newX += 80
-            #
-            #         self.openingIndex += 1
-            # else:
-            #     self.opening = False
-            #     self.done_drawing = False
-            #     self.openingIndex = 0
-            #     self.phase = Phase.PREP
+                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
+                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
+                    self.hand[handex].resting = False
+                    self.hand[handex].set_destination(1180, 563)
 
-            # self.phase = Phase.SWAP
+                    self.opponent_hand[handexopp].resting = False
+                    self.opponent_hand[handexopp].set_destination(1180, 100)
+                    self.opponent_hand[handexopp].posY = 100
+
+                    self.allCardsList.append(self.hand[handex])
+                    self.allCardsList.append(self.opponent_hand[handexopp])
+
+                    self.openingIndex += 1
+                else:
+                    self.opening = False
+                    self.done_drawing = False
+                    self.openingIndex = 0
+                    self.phase = Phase.PREP
+
+
 
         elif self.phase == Phase.MATCH_COMPLETE:
             print("[Engine] Match Complete!")
-            pass
+            self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
+            print("{0} wins!".format(self.winning_player.user.username))
+            self.backToMain()
+
+
 
 
         elif self.phase == Phase.FINAL_ROUND:
             print("[Engine] Entering Final Round!")
 
-            pass
+            num_of_cards = 1
+            if not self.done_drawing:
+                # please burn cards in future patch (w/ animations muhaha)
+                self.draw_cards(num_of_cards, self.deck, self.hand)
+                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+                print("Player Hand Size: ", len(self.hand))
+                if len(self.hand) > 10:
+                    print("Player {0} hand overload!".format(self.player.user.username))
+                print("Player opponent hand Size: ", len(self.opponent_hand))
+                if len(self.opponent_hand) > 10:
+                    print("Player {0} hand overload!".format(self.player2.user.username))
+                self.flip_hand_down(self.hand)
+                self.flip_hand_down(self.opponent_hand)
+                self.done_drawing = True
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.drawCardWait:
+
+                if self.openingIndex < num_of_cards:
+                    self.waitTick = currentTick
+                    self.drawCardSound.play()
+                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingY)
+                        newX += 80
+                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.opponent_hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
+                        h2.update(deltaTime, newXOpp, self.openingYOpp)
+                        newXOpp += 80
+
+                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
+                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
+                    self.hand[handex].resting = False
+                    self.hand[handex].set_destination(1180, 563)
+
+                    self.opponent_hand[handexopp].resting = False
+                    self.opponent_hand[handexopp].set_destination(1180, 100)
+                    self.opponent_hand[handexopp].posY = 100
+
+                    self.allCardsList.append(self.hand[handex])
+                    self.allCardsList.append(self.opponent_hand[handexopp])
+
+                    self.openingIndex += 1
+                else:
+                    self.opening = False
+                    self.done_drawing = False
+                    self.openingIndex = 0
+                    self.phase = Phase.PREP
+
         elif self.phase == Phase.ROUND_DRAW:
             print("[Engine] Round Draw!")
+            num_of_cards = 3
+            if not self.done_drawing:
+                # please burn cards in future patch (w/ animations muhaha)
+                self.draw_cards(num_of_cards, self.deck, self.hand)
+                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+                print("Player Hand Size: ", len(self.hand))
+                if len(self.hand) > 10:
+                    print("Player {0} hand overload!".format(self.player.user.username))
+                print("Player opponent hand Size: ", len(self.opponent_hand))
+                if len(self.opponent_hand) > 10:
+                    print("Player {0} hand overload!".format(self.player2.user.username))
+                self.flip_hand_down(self.hand)
+                self.flip_hand_down(self.opponent_hand)
+                self.done_drawing = True
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.drawCardWait:
 
-            pass
+                if self.openingIndex < num_of_cards:
+                    self.waitTick = currentTick
+                    self.drawCardSound.play()
+                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingY)
+                        newX += 80
+                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.opponent_hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
+                        h2.update(deltaTime, newXOpp, self.openingYOpp)
+                        newXOpp += 80
+
+                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
+                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
+                    self.hand[handex].resting = False
+                    self.hand[handex].set_destination(1180, 563)
+
+                    self.opponent_hand[handexopp].resting = False
+                    self.opponent_hand[handexopp].set_destination(1180, 100)
+                    self.opponent_hand[handexopp].posY = 100
+
+                    self.allCardsList.append(self.hand[handex])
+                    self.allCardsList.append(self.opponent_hand[handexopp])
+
+                    self.openingIndex += 1
+                else:
+                    self.opening = False
+                    self.done_drawing = False
+                    self.openingIndex = 0
+                    self.phase = Phase.PREP
+
+
 
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
@@ -890,6 +992,7 @@ class Engine(object):
                 if self.openingIndex == 10:
                     self.openingIndex = 0
                     self.opening = False
+                    self.drawCardWait = 1000
                     self.phase = Phase.PREP
 
         elif self.phase == Phase.COIN_TOSS:
@@ -970,6 +1073,7 @@ class Engine(object):
         self.player2 = None
         self.first_player = None  # does not change after coin toss
         self.opponent = None
+        self.winning_player = None
         self.phase = Phase.COIN_TOSS
         self.cards_played = 0
 
@@ -1025,6 +1129,9 @@ class Phase(Enum):
 
     # currently not yet used
     END_ROUND = auto()      # both players have now selected PASS
+
+
+    # NOTE: we might need intermediary phases here. To give space for proper animation maybe?
 
     # tracks how round ended #
     ROUND_DRAW = auto()     # Three cards drawn

@@ -33,11 +33,11 @@ class BoardField(object):
         self.cardList.append(card)
         # this is the TEMP WAY. We need to calculate based on num of cards in list.
         self.boardx += 80
-        print("[BoardField] I, {0} Owned by: {2} TOOK IN A CARD: {1}".format(self.boardy, card.name, self.owner))
-        print("I now have: {0} cards in my cardList who are:".format(len(self.cardList)))
+        # print("[BoardField] I, {0} Owned by: {2} TOOK IN A CARD: {1}".format(self.boardy, card.name, self.owner))
+        # print("I now have: {0} cards in my cardList who are:".format(len(self.cardList)))
 
-        for c in self.cardList:
-            print(c.name)
+        # for c in self.cardList:
+        #     print("[BoardField] card.name, ",c.name)
 
     # quick n dirty
     def swap(self):
