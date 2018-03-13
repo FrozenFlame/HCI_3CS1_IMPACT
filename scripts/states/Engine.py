@@ -614,6 +614,14 @@ class Engine(object):
             self.done_turn = False
         elif self.phase == Phase.END_ROUND:
             # here we compare scores, decide which hero to damage, and give score.
+            for boardCard in self.boardField.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardField2.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardFieldOpp.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardFieldOpp2.cardList:
+                self.sendToGraveyard(boardCard)
 
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
@@ -625,7 +633,7 @@ class Engine(object):
                     # self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
                     pass
             elif self.player.cash == self.player2.cash:
-                print("DRAW REACHED")
+                print("Both players have equal amount of cash!")
                 # self.phase = Phase.ROUND_DRAW
                 pass
             else:
@@ -638,14 +646,7 @@ class Engine(object):
                     # self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
                     pass
 
-            for boardCard in self.boardField.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardField2.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardFieldOpp.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardFieldOpp2.cardList:
-                self.sendToGraveyard(boardCard)
+
 
             # play appropriate animations
             # check if it was the winning blow
@@ -658,73 +659,70 @@ class Engine(object):
             if not self.done_drawing:
                 self.draw_cards(num_of_cards, self.deck, self.hand)
                 self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+                print("Player Hand Size: ", len(self.hand))
+                print("Player opponent hand Size: ", len(self.opponent_hand))
+
+
+
                 self.done_drawing = True
 
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-                self.drawCardSound.play()
-                if self.openingIndex < num_of_cards:
-                    self.waitTick = currentTick
-                    # self.drawCardSound.stop()
-                    self.drawCardSound.play()
-                    self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].resting = False
-                    self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].set_destination(1180, 563)
 
-                    self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].resting = False
-                    self.opponent_hand[(len(self.opponent_hand) - num_of_cards)].set_destination(1180, 100)
+            # currentTick = currentTime
+            # if currentTick - self.waitTick >= self.drawCardWait:
+            #     self.drawCardSound.play()
+            #     if self.openingIndex < num_of_cards:
+            #         self.waitTick = currentTick
+            #         # self.drawCardSound.stop()
+            #         self.drawCardSound.play()
+            #         self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].resting = False
+            #         self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].set_destination(1180, 563)
+            #
+            #         self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].resting = False
+            #         self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].set_destination(1180, 100)
+            #
+            #         for h in self.hand:
+            #             initialHandlength = len(self.hand)
+            #             if h.onBoard:
+            #                 self.hand.pop(self.hand.index(h))
+            #                 print("Dropping you dog")
+            #             if len(self.hand) < initialHandlength:
+            #                 initialHandlength = len(self.hand)
+            #                 newX = 620 - (40 * len(self.hand))
+            #                 print("lenning it up")
+            #                 for h2 in self.hand:
+            #                     print("deciding fate ")
+            #                     h2.resting = False
+            #                     h2.set_destination(h.posX, h.posY)
+            #
+            #                     # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+            #                     h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+            #                     h2.update(deltaTime, newX, self.openingY)
+            #                     newX += 80
+            #
+            #         for h in self.opponent_hand:
+            #             initialHandlength = len(self.opponent_hand)
+            #             if h.onBoard:
+            #                 self.opponent_hand.pop(self.opponent_hand.index(h))
+            #             if len(self.opponent_hand) < initialHandlength:
+            #                 initialHandlength = len(self.opponent_hand)
+            #                 newX = 620 - (40 * len(self.opponent_hand))
+            #                 for h2 in self.opponent_hand:
+            #                     h2.resting = False
+            #                     h2.set_destination(h.posX, h.posY)
+            #
+            #                     # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+            #                     h2.defaultPos = (newX, self.openingYOpp)  # 600 = self.openingY
+            #                     h2.update(deltaTime, newX, self.openingYOpp)
+            #                     newX += 80
+            #
+            #         self.openingIndex += 1
+            # else:
+            #     self.opening = False
+            #     self.done_drawing = False
+            #     self.openingIndex = 0
+            #     self.phase = Phase.PREP
 
-                    for h in self.hand:
-                        initialHandlength = len(self.hand)
-                        if h.onBoard:
-                            self.hand.pop(self.hand.index(h))
-                            print("Dropping you dog")
-                        if len(self.hand) < initialHandlength:
-                            initialHandlength = len(self.hand)
-                            newX = 620 - (40 * len(self.hand))
-                            print("lenning it up")
-                            for h2 in self.hand:
-                                print("deciding fate ")
-                                h2.resting = False
-                                h2.set_destination(h.posX, h.posY)
-
-                                # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-                                h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                                h2.update(deltaTime, newX, self.openingY)
-                                newX += 80
-
-                    for h in self.opponent_hand:
-                        initialHandlength = len(self.opponent_hand)
-                        if h.onBoard:
-                            self.opponent_hand.pop(self.opponent_hand.index(h))
-                        if len(self.opponent_hand) < initialHandlength:
-                            initialHandlength = len(self.opponent_hand)
-                            newX = 620 - (40 * len(self.opponent_hand))
-                            for h2 in self.opponent_hand:
-                                h2.resting = False
-                                h2.set_destination(h.posX, h.posY)
-
-                                # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
-                                h2.defaultPos = (newX, self.openingYOpp)  # 600 = self.openingY
-                                h2.update(deltaTime, newX, self.openingYOpp)
-                                newX += 80
-
-                    self.openingIndex += 1
-                else:
-                    self.opening = False
-                    self.done_drawing = False
-                    self.openingIndex = 0
-                    self.phase = Phase.PREP
-
-            self.phase = Phase.PREP
-
-
-
-
-
-
-
-
-
+            # self.phase = Phase.SWAP
 
         elif self.phase == Phase.FINAL_ROUND:
 
