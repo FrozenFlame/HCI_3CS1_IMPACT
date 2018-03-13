@@ -201,10 +201,10 @@ class Card(object):
         # self.boardFieldOpp = BoardField(225, 240, 1010, 320)  # opponent front row
         # self.boardField = BoardField(225, 390, 1010, 470)  # player front row
         # self.boardField2 = BoardField(225, 525, 1010, 605)  # player back row
-        if self.defaultPos[1] == -20:
-            self.defaultPos = self.defaultPos[0], 600
-        elif self.defaultPos[1] == 600:
-            self.defaultPos = self.defaultPos[0], -20
+        if self.defaultPos[1] == -30:
+            self.defaultPos = self.defaultPos[0], 610
+        elif self.defaultPos[1] == 610:
+            self.defaultPos = self.defaultPos[0], -30
 
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])

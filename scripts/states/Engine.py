@@ -68,6 +68,7 @@ class Engine(object):
         self.first_player_set = False  # becomes true after coin toss, and hands/decks set
         self.holdingCard = False
         self.done_turn = False
+        self.done_drawing = False
         self.may_flip_board = False
         self.may_count_turn = False
         self.may_drag = False
@@ -155,10 +156,15 @@ class Engine(object):
         random.shuffle(deck)
         first_ten = []
         for i in range(0, 10):  # self minus due to simultaneous pop will offset this
-            print("GETFIRST ", i)
             first_ten.append(deck[i-i])
             deck.pop(i-i)
         return first_ten
+
+    def draw_cards(self, amt, from_deck, to_hand):
+        # print("Drawing {0} cards to {1}'s hand from {2}'s deck".format(amt, ))
+        for i in range (0, amt):
+            to_hand.append(from_deck[0])
+            from_deck.pop(0)
 
     def flip_coin(self):
         self.board.flipCoin()
@@ -361,7 +367,7 @@ class Engine(object):
                             self.allCardsList.append(s)
 
                     if len(self.clickedCard) > 0:
-                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False and self.may_drag:
+                        if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False and self.clickedCard[0].front and self.may_drag:
                             print("handcard clicked")
                             self.clickedCard[0].isHeld = True
                             self.holdingCard = True
@@ -448,10 +454,13 @@ class Engine(object):
                 initialHandlength = len(self.hand)
                 if h.onBoard:
                     self.hand.pop(self.hand.index(h))
+                    print("Dropping you dog")
                 if len(self.hand) < initialHandlength:
                     initialHandlength = len(self.hand)
                     newX = 620 - (40 * len(self.hand))
+                    print("lenning it up")
                     for h2 in self.hand:
+                        print("deciding fate ")
                         h2.resting = False
                         h2.set_destination(h.posX, h.posY)
 
@@ -459,6 +468,7 @@ class Engine(object):
                         h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
                         h2.update(deltaTime, newX, self.openingY)
                         newX += 80
+
             for h in self.opponent_hand:
                 initialHandlength = len(self.opponent_hand)
                 if h.onBoard:
@@ -500,7 +510,6 @@ class Engine(object):
             # more on animations updates
             self.showHandButton = True
 
-            pass
         elif self.phase == Phase.SWAP:
             for hC in self.hand:
                 hC.swap()
@@ -515,7 +524,7 @@ class Engine(object):
             # fade value changes fading in
             # FLIPPING BOARD #
             # print()
-            self.flip_hand(self.hand)  # TODO somehow this line makes the cards swapping less consistently
+            self.flip_hand(self.hand)
 
             tempHand = self.hand
             tempDeck = self.deck
@@ -560,18 +569,106 @@ class Engine(object):
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
+                if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
+                    self.phase = Phase.FINAL_ROUND
+                else:
+                    self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
             elif self.player.cash == self.player2.cash:
                 print("DRAW REACHED")
-            else:   # this never triggers because the last person to end the game will be from the player's perspective. However this doesn't cause any issues regardless.
-                    # this is more of a multiplayer construct if anything
+                self.phase = Phase.ROUND_DRAW
+            else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
+                if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
+                    self.phase = Phase.FINAL_ROUND
+                else:
+                    self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
 
             # play appropriate animations
             # check if it was the winning blow
                 #2 play animations if a player is found victorious
 
             # else enter next round, draw appropriate num of cards
+        elif self.phase == Phase.ROUND_TWO:
+            print("[Engine] Entering Round Two!")
+            num_of_cards = 2
+            if not self.done_drawing:
+                self.draw_cards(num_of_cards, self.deck, self.hand)
+                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+                self.done_drawing = True
+
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.drawCardWait:
+                self.drawCardSound.play()
+                if self.openingIndex < num_of_cards:
+                    self.waitTick = currentTick
+                    # self.drawCardSound.stop()
+                    self.drawCardSound.play()
+                    self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].resting = False
+                    self.hand[(len(self.hand) - num_of_cards) + self.openingIndex].set_destination(1180, 563)
+
+                    self.opponent_hand[(len(self.opponent_hand) - num_of_cards) + self.openingIndex].resting = False
+                    self.opponent_hand[(len(self.opponent_hand) - num_of_cards)].set_destination(1180, 100)
+
+                    for h in self.hand:
+                        initialHandlength = len(self.hand)
+                        if h.onBoard:
+                            self.hand.pop(self.hand.index(h))
+                            print("Dropping you dog")
+                        if len(self.hand) < initialHandlength:
+                            initialHandlength = len(self.hand)
+                            newX = 620 - (40 * len(self.hand))
+                            print("lenning it up")
+                            for h2 in self.hand:
+                                print("deciding fate ")
+                                h2.resting = False
+                                h2.set_destination(h.posX, h.posY)
+
+                                # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                                h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                                h2.update(deltaTime, newX, self.openingY)
+                                newX += 80
+
+                    for h in self.opponent_hand:
+                        initialHandlength = len(self.opponent_hand)
+                        if h.onBoard:
+                            self.opponent_hand.pop(self.opponent_hand.index(h))
+                        if len(self.opponent_hand) < initialHandlength:
+                            initialHandlength = len(self.opponent_hand)
+                            newX = 620 - (40 * len(self.opponent_hand))
+                            for h2 in self.opponent_hand:
+                                h2.resting = False
+                                h2.set_destination(h.posX, h.posY)
+
+                                # xRange of hand Cards is 220 to 1020 . 800 distance . middle point is 620 . starting handLength is 10 . formula? 620 - (40*handLength)
+                                h2.defaultPos = (newX, self.openingYOpp)  # 600 = self.openingY
+                                h2.update(deltaTime, newX, self.openingYOpp)
+                                newX += 80
+
+                    self.openingIndex += 1
+                else:
+                    self.opening = False
+                    self.done_drawing = False
+                    self.openingIndex = 0
+                    self.phase = Phase.PREP
+
+            self.phase = Phase.PREP
+
+
+
+
+
+
+
+
+
+
+        elif self.phase == Phase.FINAL_ROUND:
+
+            pass
+        elif self.phase == Phase.ROUND_DRAW:
+
+            pass
 
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
@@ -639,9 +736,10 @@ class Engine(object):
                     self.openingXOpp += 80
                     self.openingIndex += 1
                 if self.openingIndex == 10:
-
+                    self.openingIndex = 0
                     self.opening = False
                     self.phase = Phase.PREP
+
         elif self.phase == Phase.COIN_TOSS:
             # additional animation updates
             self.toss_coin()
@@ -651,13 +749,6 @@ class Engine(object):
             #     self.phase = Phase.OPENING
             # else:
             #     self.phase = Phase.SWAP
-
-        elif self.phase == Phase.FINAL_ROUND:
-            pass
-        elif self.phase == Phase.ROUND_TWO:
-            pass
-        elif self.phase == Phase.ROUND_DRAW:
-            pass
 
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
@@ -733,7 +824,7 @@ class Engine(object):
         self.done_turn = False
         self.may_end_round = False
         self.passed = False
-
+        self.done_drawing = False
         # #temp
         # self.deck = self.persist['playerB'].deck
         # self.opponent_deck = self.persist['playerA'].deck
@@ -786,6 +877,5 @@ class Phase(Enum):
     ROUND_DRAW = auto()     # Three cards drawn
     ROUND_TWO = auto()      # Two cards drawn
     FINAL_ROUND = auto()    # One card drawn
-    # these three might not be needed END #
-
+    MATCH_COMPLETE = auto()
 
