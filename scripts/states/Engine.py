@@ -657,23 +657,23 @@ class Engine(object):
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
-                    # self.phase = Phase.FINAL_ROUND
+                    self.phase = Phase.FINAL_ROUND
                     pass
                 else:
-                    # self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
+                    self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
                     pass
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
-                # self.phase = Phase.ROUND_DRAW
+                self.phase = Phase.ROUND_DRAW
                 pass
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
-                    # self.phase = Phase.FINAL_ROUND
+                    self.phase = Phase.FINAL_ROUND
                     pass
                 else:
-                    # self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
+                    self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
                     pass
 
 
@@ -696,6 +696,7 @@ class Engine(object):
 
                 self.done_drawing = True
 
+            self.phase = Phase.SWAP
 
             # currentTick = currentTime
             # if currentTick - self.waitTick >= self.drawCardWait:
@@ -754,10 +755,17 @@ class Engine(object):
 
             # self.phase = Phase.SWAP
 
+        elif self.phase == Phase.MATCH_COMPLETE:
+            print("[Engine] Match Complete!")
+            pass
+
+
         elif self.phase == Phase.FINAL_ROUND:
+            print("[Engine] Entering Final Round!")
 
             pass
         elif self.phase == Phase.ROUND_DRAW:
+            print("[Engine] Round Draw!")
 
             pass
 
