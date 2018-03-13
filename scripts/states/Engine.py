@@ -137,6 +137,10 @@ class Engine(object):
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
+        self.graveYardCoorddinateX = Globals.RESOLUTION_X * 0.80
+        self.graveYardCoorddinateY = Globals.RESOLUTION_Y * 0.80
+        self.graveYardList = list()
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -175,6 +179,18 @@ class Engine(object):
         temp = player
         self.player = self.player2
         self.player2 = temp
+
+    def sendToGraveyard(self, card):
+        self.graveYardList.append(card)
+        if len(self.graveYardList) > 5:
+            self.graveYardCoorddinateX += 5
+        card.defaultPos = self.graveYardCoorddinateX, self.graveYardCoorddinateY
+        card.resting = False
+        card.set_destination(card.defaultPos)
+
+        for boardCard in self.boardField.cardList:
+            if card == boardCard:
+                self.boardField.cardList.pop(self.boardField.cardList.index(boardCard))
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
