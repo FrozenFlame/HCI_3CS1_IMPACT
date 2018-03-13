@@ -1,6 +1,13 @@
 import pygame, math
 class Card(object):
-    def __init__(self, name="Generic"):
+    def __init__(self, name="Generic", base_val=0):
+
+        # Game related
+        self.base_val = base_val
+        self.current_val = base_val  # this is what is processed
+        self.buffs = []
+        self.debuffs = []
+
         self.name = name
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
@@ -46,10 +53,15 @@ class Card(object):
         self.vector = None
         self.flipDisplace = 0
 
+
+
     # rename method soon
     # def decider(self):
     #     if not self.resting:
     #         pass
+
+
+
 
     # change of position on screen (calculation)
     def update(self, dTime, mouseX, mouseY):
@@ -189,10 +201,10 @@ class Card(object):
         # self.boardFieldOpp = BoardField(225, 240, 1010, 320)  # opponent front row
         # self.boardField = BoardField(225, 390, 1010, 470)  # player front row
         # self.boardField2 = BoardField(225, 525, 1010, 605)  # player back row
-        if self.defaultPos[1] == -20:
-            self.defaultPos = self.defaultPos[0], 600
-        elif self.defaultPos[1] == 600:
-            self.defaultPos = self.defaultPos[0], -20
+        if self.defaultPos[1] == -30:
+            self.defaultPos = self.defaultPos[0], 610
+        elif self.defaultPos[1] == 610:
+            self.defaultPos = self.defaultPos[0], -30
 
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])

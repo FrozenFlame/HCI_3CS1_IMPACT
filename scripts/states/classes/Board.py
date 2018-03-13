@@ -16,14 +16,14 @@ class Board(object):
         self.phaseImg = None # image that flies by when a player is about to take a turn (accompanied with some text)
         self.previewCard = None # big card to the right, duplicates appearance of card being moused over.
         self.hasPreviewCard = False
-        # game related
+        # game related, update Lol this is all located in the Engine class directly
         self.player1 = None # player class
         self.player2 = None # player class
         self.hand1 = None
         self.hand2 = None
         self.deck1 = None
         self.deck2 = None
-        self.grave1 = None
+        self.grave1 = None  # forgot about these though
         self.grave2 = None
 
         # Row Lists for fields (from the bottom)
