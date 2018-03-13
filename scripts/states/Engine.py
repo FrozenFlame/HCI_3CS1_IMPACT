@@ -45,7 +45,7 @@ Rough code estimate would be like:
 <victory animation> - a player gets crowned victorious
 '''
 # class which holds the game flow
-class Engine():
+class Engine(object):
     # def __init__(self): we're gonna create
     def __init__(self):
         tools.State.__init__(self)  # inheriting from State class.
