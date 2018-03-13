@@ -7,6 +7,7 @@ class Card(object):
         self.current_val = base_val  # this is what is processed
         self.buffs = []
         self.debuffs = []
+        self.constants = []
 
         self.name = name
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
@@ -208,3 +209,27 @@ class Card(object):
 
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#  _____               _  ______                _   _
+# /  __ \             | | |  ___|              | | (_)
+# | /  \/ __ _ _ __ __| | | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+# | |    / _` | '__/ _` | |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+# | \__/\ (_| | | | (_| | | | | |_| | | | | (__| |_| | (_) | | | \__ \
+#  \____/\__,_|_|  \__,_| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # note: rearrange order at some point
+    # unused functions for now
+    def receive_buff(self, buff):
+        self.buffs.append(buff)
+    def remove_all_buffs(self):
+        self.buffs = []
+    def receive_debuff(self, debuff):
+        self.debuffs.append(debuff)
+
+    def recalculate(self):
+        # consider computation order
+        # affect and renew current_val 
+        pass
