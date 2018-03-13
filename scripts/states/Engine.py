@@ -45,7 +45,7 @@ Rough code estimate would be like:
 <victory animation> - a player gets crowned victorious
 '''
 # class which holds the game flow
-class Engine(object):
+class Engine():
     # def __init__(self): we're gonna create
     def __init__(self):
         tools.State.__init__(self)  # inheriting from State class.
@@ -59,9 +59,8 @@ class Engine(object):
         self.turn_no = 0
         self.player = None
         self.player2 = None
-        self.first_player = None # does not change after coin toss
+        self.first_player = None  # does not change after coin toss
         self.opponent = None
-        self.passed = None  # a player has passed their turn
         self.cards_played = 0  # counter to determine how many cards you've played that turn
         self.phase = Phase.COIN_TOSS
 
@@ -72,6 +71,8 @@ class Engine(object):
         self.may_flip_board = False
         self.may_count_turn = False
         self.may_drag = False
+        self.passed = False  # a player has passed their turn
+        self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
         # self.opening = True
 
         # objects
@@ -83,6 +84,7 @@ class Engine(object):
 
         self.boardFieldOpp2 = None  # opponent back row
         self.boardFieldOpp = None   # opponent front row
+        self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
         self.boardField = None      # player front row
         self.boardField2 = None     # player back row
         # self.boardFieldList = [self.boardField, self.boardField2, self.boardFieldOpp, self.boardFieldOpp2]
@@ -102,24 +104,21 @@ class Engine(object):
         '''
         self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
 
-
         self.opening = True
         # self.drawCardWait = 250
         self.drawCardWait = 50
         self.openingIndex = 0
         self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
-        self.openingY = 600
+        self.openingY = 610
         self.openingXOpp = 220  # hand coordinate is from 220 to 1020 (OPP)
-        self.openingYOpp = -20
+        self.openingYOpp = -30
 
-
-        self.deckImgHolder1 = Card()     #add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
+        self.deckImgHolder1 = Card()     # add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
-
         '''
-        UI things (initial state)
+        UI things (initial state) we're gonna have to put some of these things in classes so that the game would be more scalable
         '''
         self.showEndTurnButton = False
         self.showPassTurnButton = False
@@ -137,7 +136,7 @@ class Engine(object):
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
 # | |  \/ __ _ _ __ ___   ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
@@ -145,14 +144,14 @@ class Engine(object):
 # | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
 #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def flip_hand(self, hand):
         for h in hand:
             h.flip()
 
     def get_first_cards(self, deck, username):
-        print("Giving first cards of: ", username )
+        print("Giving first cards of: ", username)
         random.shuffle(deck)
         first_ten = []
         for i in range(0, 10):  # self minus due to simultaneous pop will offset this
@@ -204,12 +203,14 @@ class Engine(object):
         self.next = Globals.state
         self.finished = True
 
-    def play_card(self):  # initial concept, listener type thing.
+    def play_card(self, card, boardfieldlist):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
         self.showPassTurnButton = False
         self.showEndTurnButton = True
         self.cards_played += 1
         print(self.cards_played)
+        self.recalculate_score(boardfieldlist)
+
         if self.cards_played == 3 and not self.passed:
             self.may_drag = False
 
@@ -218,6 +219,15 @@ class Engine(object):
         self.showPassTurnButton = False
         self.showEndTurnButton = False
         self.cards_played = 0
+
+    def recalculate_score(self, bFList):
+        print("[Engine] recalculate score Previous cash: ", self.player.cash)
+        self.player.cash = 0
+        for bF in bFList:
+            for c in bF.cardList:
+                self.player.cash += c.current_val
+        print("[Engine] After recalculation cash: ", self.player.cash)
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
@@ -302,7 +312,7 @@ class Engine(object):
                                     self.clickedCard[0].onBoard = True
                                     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
                                     print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
-                                    self.play_card()
+                                    self.play_card(self.clickedCard[0], self.boardFieldList)
                                     # self.end_turn()
                         elif self.player2 == self.first_player:
                             for bF in self.boardFieldListOpp:
@@ -313,7 +323,8 @@ class Engine(object):
                                     self.clickedCard[0].onBoard = True
                                     print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
                                     print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
-                                    self.play_card()
+                                    self.play_card(self.clickedCard[0], self.boardFieldListOpp)
+
                                     # self.end_turn()
 
 
@@ -380,33 +391,34 @@ class Engine(object):
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
                     if self.mouseOnShowHandButton and self.showHandButton:
-                        print("Showing cards")
+                        print("[Engine]Showing cards")
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
                         self.showHandButton = False
-                        self.showPassTurnButton = True
-            # clicking this will set phase to Play
+                        if not self.passed:
+                            self.showPassTurnButton = True
+                        else:
+                            self.showEndTurnButton = True
 
-            # self.phase = Phase.PLAY  # TODO temporarily going to make it auto accept
+            # clicking this will set phase to Play
 
         if self.done_turn:
             self.end_turn()
-            self.phase = Phase.SWAP
+            if self.may_end_round:
+                # giving a point to a player/ draw
+                self.passed = False
+                self.may_end_round = False
+                self.phase = Phase.END_ROUND
+                self.done_turn = False
+            elif not self.passed:
+                self.phase = Phase.SWAP
+            else:
+                self.may_end_round = True
+                self.phase = Phase.SWAP
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-        # print("BOARD FIELDOpp2 LEN: ", len(self.boardFieldOpp2.cardList))
-        # print("BOARD FIELDOpp LEN: ", len(self.boardFieldOpp.cardList))
-        # print("BOARD FIELD LEN: ", len(self.boardField.cardList))
-        # print("BOARD FIELD2 LEN: ", len(self.boardField2.cardList))
 
-        ''' UPDATE
-         ____  _  _   __   ____  ____  ____
-        (  _ \/ )( \ / _\ / ___)(  __)/ ___)
-         ) __/) __ (/    \\___ \ ) _) \___ \
-        (__)  \_)(_/\_/\_/(____/(____)(____/
-        
-        '''
         if not self.opening:
             # print(self.player.user.username)
             # print(self.turn_no)
@@ -422,6 +434,15 @@ class Engine(object):
                     a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
             if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
                 a.flipAnim(self.waitTick)
+
+        ''' UPDATE
+         ____  _  _   __   ____  ____  ____
+        (  _ \/ )( \ / _\ / ___)(  __)/ ___)
+         ) __/) __ (/    \\___ \ ) _) \___ \
+        (__)  \_)(_/\_/\_/(____/(____)(____/
+        
+        '''
+
         if self.first_player_set:
             for h in self.hand:
                 initialHandlength = len(self.hand)
@@ -475,6 +496,11 @@ class Engine(object):
                 self.phase = Phase.SWAP
                 self.done_turn = False
                 self.showEndTurnButton = False  #this is not working
+        elif self.phase == Phase.PREP:
+            # more on animations updates
+            self.showHandButton = True
+
+            pass
         elif self.phase == Phase.SWAP:
             for bF in self.boardFieldList:
                 bF.swap()
@@ -524,12 +550,25 @@ class Engine(object):
             self.swap_player(self.player)
             self.phase = Phase.PREP
             self.done_turn = False
+        elif self.phase == Phase.END_ROUND:
+            # here we compare scores, decide which hero to damage, and give score.
 
-        elif self.phase == Phase.PREP:
-            # more on animations updates
-            self.showHandButton = True
+            if self.player.cash > self.player2.cash:
+                print("Player {0} has more cash".format(self.player.user.username))
+                self.player2.hitpoints -= 1
+            elif self.player.cash == self.player2.cash:
+                print("DRAW REACHED")
+            else:   # this never triggers because the last person to end the game will be from the player's perspective. However this doesn't cause any issues regardless.
+                    # this is more of a multiplayer construct if anything
+                print("Opponent {0} has more cash".format(self.player2.user.username))
+                self.player.hitpoints -= 1
 
-            pass
+            # play appropriate animations
+            # check if it was the winning blow
+                #2 play animations if a player is found victorious
+
+            # else enter next round, draw appropriate num of cards
+
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
 
@@ -545,6 +584,7 @@ class Engine(object):
                     self.player = self.persist['playerA']
                     self.first_player = self.persist['playerA']
                     self.player2 = self.persist['playerB']
+                    self.opponent = self.persist['playerB']
 
                     self.boardField.owner = self.persist['playerA'].user.username
                     self.boardField2.owner = self.persist['playerA'].user.username
@@ -602,26 +642,30 @@ class Engine(object):
             # additional animation updates
             self.toss_coin()
             self.phase = Phase.OPENING
+            # block down below
+            # if self.opening:
+            #     self.phase = Phase.OPENING
+            # else:
+            #     self.phase = Phase.SWAP
 
+        elif self.phase == Phase.FINAL_ROUND:
+            pass
+        elif self.phase == Phase.ROUND_TWO:
+            pass
+        elif self.phase == Phase.ROUND_DRAW:
+            pass
 
-        #
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
 
-        self.draw(screen) # last function of update. execute draw
-
-
-
-
-
-
+        self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
         self.board.draw(screen)
         # self.screen.fill((100,100,100))
-        # if not self.card.blitted:               #another way of instantiating, compared to elif h.resting and not h.blitted in update method
+        # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
         # self.card.draw(screen)
@@ -681,6 +725,10 @@ class Engine(object):
         self.phase = Phase.COIN_TOSS
         self.cards_played = 0
 
+        self.opening = True
+        self.done_turn = False
+        self.may_end_round = False
+        self.passed = False
 
         # #temp
         # self.deck = self.persist['playerB'].deck
@@ -692,8 +740,7 @@ class Engine(object):
         # self.player2 = self.persist['playerA']
         # #endtemp
 
-        self.opening = True
-        self.done_turn = False
+
 
 
     def cleanup(self):
@@ -707,6 +754,7 @@ class Engine(object):
         self.done = False
         Globals.gameStart = False
         return self.persist
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _____ _
@@ -729,6 +777,11 @@ class Phase(Enum):
 
     # currently not yet used
     END_ROUND = auto()      # both players have now selected PASS
-    ROUND_DRAW = auto()     # Two cards drawn
+
+    # tracks how round ended #
+    ROUND_DRAW = auto()     # Three cards drawn
     ROUND_TWO = auto()      # Two cards drawn
     FINAL_ROUND = auto()    # One card drawn
+    # these three might not be needed END #
+
+

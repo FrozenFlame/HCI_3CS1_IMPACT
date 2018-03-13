@@ -1,6 +1,13 @@
 import pygame, math
 class Card(object):
-    def __init__(self, name="Generic"):
+    def __init__(self, name="Generic", base_val=0):
+
+        # Game related
+        self.base_val = base_val
+        self.current_val = base_val  # this is what is processed
+        self.buffs = []
+        self.debuffs = []
+
         self.name = name
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
@@ -46,10 +53,15 @@ class Card(object):
         self.vector = None
         self.flipDisplace = 0
 
+
+
     # rename method soon
     # def decider(self):
     #     if not self.resting:
     #         pass
+
+
+
 
     # change of position on screen (calculation)
     def update(self, dTime, mouseX, mouseY):
