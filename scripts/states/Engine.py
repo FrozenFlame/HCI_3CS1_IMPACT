@@ -623,6 +623,7 @@ class Engine(object):
                     pass
                 else:
                     # self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
+                    pass
             elif self.player.cash == self.player2.cash:
                 print("DRAW REACHED")
                 # self.phase = Phase.ROUND_DRAW
