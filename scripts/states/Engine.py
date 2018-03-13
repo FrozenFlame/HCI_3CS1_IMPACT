@@ -194,11 +194,36 @@ class Engine(object):
         # from: 5*(int(len((self.graveYardList)/5)))
         # to:   5*(int(len((self.graveYardList))/5))
         print(5*(int(len((self.graveYardList))/5)))
+        '''
         self.graveYardX += 5*(int(len((self.graveYardList))/5))
         self.graveYardY -= 1*(int(len((self.graveYardList))/5))
 
         self.graveYardOppX += 5*(int(len((self.graveYardListOpp))/5))
         self.graveYardOppY -= 1*(int(len((self.graveYardList))/5))
+        '''
+        if len(self.graveYardList) == 5:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardList) == 10:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardList) == 15:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardListOpp) == 5:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
+
+        if len(self.graveYardListOpp) == 10:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
+
+        if len(self.graveYardListOpp) == 15:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
 
 
 
