@@ -137,9 +137,13 @@ class Engine(object):
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
-        self.graveYardCoorddinateX = Globals.RESOLUTION_X * 0.80
-        self.graveYardCoorddinateY = Globals.RESOLUTION_Y * 0.80
+        self.graveYardX = Globals.RESOLUTION_X * 0.80
+        self.graveYardY = Globals.RESOLUTION_Y * 0.80
         self.graveYardList = list()
+
+        self.graveYardOppX = Globals.RESOLUTION_X * 0.80
+        self.graveYardOppY = Globals.RESOLUTION_Y * 0.25
+        self.graveYardListOpp = list()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
@@ -181,16 +185,39 @@ class Engine(object):
         self.player2 = temp
 
     def sendToGraveyard(self, card):
-        self.graveYardList.append(card)
-        if len(self.graveYardList) > 5:
-            self.graveYardCoorddinateX += 5
-        card.defaultPos = self.graveYardCoorddinateX, self.graveYardCoorddinateY
-        card.resting = False
-        card.set_destination(card.defaultPos)
+        self.graveYardX += 5*(int(len((self.graveYardList)/5)))
+        self.graveYardOppX += 5*(int(len((self.graveYardListOpp)/5)))
+
 
         for boardCard in self.boardField.cardList:
             if card == boardCard:
                 self.boardField.cardList.pop(self.boardField.cardList.index(boardCard))
+                self.graveYardList.append(card)
+                card.defaultPos = self.graveYardX, self.graveYardY
+
+        for boardCard in self.boardField2.cardList:
+            if card == boardCard:
+                self.boardField2.cardList.pop(self.boardField2.cardList.index(boardCard))
+                self.graveYardList.append(card)
+                card.defaultPos = self.graveYardX, self.graveYardY
+
+
+        for boardCard in self.boardFieldOpp.cardList:
+            if card == boardCard:
+                self.boardFieldOpp.cardList.pop(self.boardFieldOpp.cardList.index(boardCard))
+                self.graveYardListOpp.append(card)
+                card.defaultPos = self.graveYardOppX, self.graveYardY
+
+        for boardCard in self.boardFieldOpp2.cardList:
+            if card == boardCard:
+                self.boardFieldOpp2.cardList.pop(self.boardFieldOpp2.cardList.index(boardCard))
+                self.graveYardListOpp.append(card)
+                card.defaultPos = self.graveYardOppX, self.graveYardY
+
+
+        card.resting = False
+        card.set_destination(card.defaultPos)
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
