@@ -189,6 +189,47 @@ class Engine(object):
         self.player = self.player2
         self.player2 = temp
 
+    def empty_field_to_grave(self, boardField, graveYardList):
+        # boardField.cardList.pop(boardField.cardList.index(card))
+        graveYardList.extend(boardField.cardList)
+
+        if boardField.owner == self.player.user.username:
+            print("My boardfield")
+            for c in boardField.cardList:
+                c.defaultPos = self.graveYardX, self.graveYardY
+                c.flip()
+                c.onBoard = False
+                c.disabled = True
+                c.resting = False
+                c.set_destination(*c.defaultPos)
+        else:
+            for c in boardField.cardList:
+                c.defaultPos = self.graveYardOppX, self.graveYardOppY
+                c.flip()
+                c.onBoard = False
+                c.disabled = True
+                c.resting = False
+                c.set_destination(*c.defaultPos)
+
+        boardField.cardList = []
+
+
+    def send_to_grave_fromboard(self, card, boardField, graveYardList):  # lite version? no cardstack difference though
+        print("Index to be tossed to grave: ",boardField.cardList.index(card))
+        boardField.cardList.pop(boardField.cardList.index(card))
+        graveYardList.append(card)
+        if boardField.owner == self.player.user.username:
+            print("My boardfield")
+            card.defaultPos = self.graveYardX, self.graveYardY
+        else:
+            card.defaultPos = self.graveYardOppX, self.graveYardOppY
+
+        # card.flip()
+        # card.onBoard = False
+        # card.disabled = True
+        # card.resting = False
+        # card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
+
     def sendToGraveyard(self, card):
         # NOTE: changed placement of /5. Due to it raising an error that a list cannot be divided by an int
         # from: 5*(int(len((self.graveYardList)/5)))
@@ -281,7 +322,6 @@ class Engine(object):
     # def cardMousedOver2(self, xy):
     #     self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]
     #     return self.clickedCard
-
 
     def backToMain(self):
         Globals.state = "MAIN_MENU"
@@ -644,14 +684,27 @@ class Engine(object):
             self.done_turn = False
         elif self.phase == Phase.END_ROUND:
             # here we compare scores, decide which hero to damage, and give score.
-            for boardCard in self.boardField.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardField2.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardFieldOpp.cardList:
-                self.sendToGraveyard(boardCard)
-            for boardCard in self.boardFieldOpp2.cardList:
-                self.sendToGraveyard(boardCard)
+            self.empty_field_to_grave(self.boardField, self.graveYardList)
+            self.empty_field_to_grave(self.boardField2, self.graveYardList)
+            self.empty_field_to_grave(self.boardFieldOpp, self.graveYardList)
+            self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardList)
+            # for boardCard in self.boardField.cardList:
+            #     # self.sendToGraveyard(boardCard)
+            #     print("Trashing some dogs1")
+            #     self.empty_field_to_grave(self.boardField, self.graveYardList)
+            # for boardCard in self.boardField2.cardList:
+            #     # self.sendToGraveyard(boardCard)
+            #     print("Trashing some dogs2")
+            #     self.send_to_grave_fromboard(boardCard, self.boardField2, self.graveYardList)
+            #     self.empty_field_to_grave(self.boardField2, self.graveYardList)
+            # for boardCard in self.boardFieldOpp.cardList:
+            #     print("Trashing some dogs3")
+            #     # self.sendToGraveyard(boardCard)
+            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp, self.graveYardListOpp)
+            # for boardCard in self.boardFieldOpp2.cardList:
+            #     print("Trashing some dogs4")
+            #     # self.sendToGraveyard(boardCard)
+            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp2, self.graveYardListOpp)
 
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
