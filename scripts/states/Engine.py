@@ -502,6 +502,10 @@ class Engine():
 
             pass
         elif self.phase == Phase.SWAP:
+            for hC in self.hand:
+                hC.swap()
+            for hC in self.opponent_hand:
+                hC.swap()
             for bF in self.boardFieldList:
                 bF.swap()
                 bF.rearrange()
