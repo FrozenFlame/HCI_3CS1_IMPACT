@@ -183,4 +183,16 @@ class Card(object):
         self.width = self.img.get_rect().size[0]  # img's initial width
         self.height = self.img.get_rect().size[1]  # img's initial height
 
+    def swap(self):
+        # def __init__(self, x1=0, y1=0, x2=0, y2=0, owner="Nobody"):
+        # self.boardFieldOpp2 = BoardField(225, 105, 1010, 185)  # opponent back row
+        # self.boardFieldOpp = BoardField(225, 240, 1010, 320)  # opponent front row
+        # self.boardField = BoardField(225, 390, 1010, 470)  # player front row
+        # self.boardField2 = BoardField(225, 525, 1010, 605)  # player back row
+        if self.defaultPos[1] == -20:
+            self.defaultPos = self.defaultPos[0], 600
+        elif self.defaultPos[1] == 600:
+            self.defaultPos = self.defaultPos[0], -20
 
+        self.resting = False
+        self.set_destination(self.defaultPos[0],self.defaultPos[1])

@@ -476,6 +476,10 @@ class Engine(object):
                 self.done_turn = False
                 self.showEndTurnButton = False  #this is not working
         elif self.phase == Phase.SWAP:
+            for hC in self.hand:
+                hC.swap()
+            for hC in self.opponent_hand:
+                hC.swap()
             for bF in self.boardFieldList:
                 bF.swap()
                 bF.rearrange()
