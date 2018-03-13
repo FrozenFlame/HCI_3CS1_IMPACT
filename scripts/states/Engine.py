@@ -118,6 +118,10 @@ class Engine(object):
         self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
+        self.deckImgHolderOpp1 = Card()
+        self.deckImgHolderOpp2 = Card()
+        self.deckImgHolderOpp3 = Card()
+
         '''
         UI things (initial state) we're gonna have to put some of these things in classes so that the game would be more scalable
         '''
@@ -137,11 +141,11 @@ class Engine(object):
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
-        self.graveYardX = Globals.RESOLUTION_X * 0.826
+        self.graveYardX = Globals.RESOLUTION_X * 0.828
         self.graveYardY = Globals.RESOLUTION_Y * 0.785
         self.graveYardList = list()
 
-        self.graveYardOppX = Globals.RESOLUTION_X * 0.826
+        self.graveYardOppX = Globals.RESOLUTION_X * 0.828
         self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
@@ -223,6 +227,12 @@ class Engine(object):
             card.defaultPos = self.graveYardX, self.graveYardY
         else:
             card.defaultPos = self.graveYardOppX, self.graveYardOppY
+
+        card.flip()
+        card.onBoard = False
+        card.disabled = True
+        card.resting = False
+        card.set_destination(*card.defaultPos)
 
         # card.flip()
         # card.onBoard = False
@@ -907,6 +917,10 @@ class Engine(object):
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
 
+        self.deckImgHolderOpp1.update(deltaTime, 1170, 50)
+        self.deckImgHolderOpp2.update(deltaTime, 1175, 49)
+        self.deckImgHolderOpp3.update(deltaTime, 1180, 48)
+
         self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
@@ -931,6 +945,10 @@ class Engine(object):
         self.deckImgHolder1.draw(screen)
         self.deckImgHolder2.draw(screen)
         self.deckImgHolder3.draw(screen)
+
+        self.deckImgHolderOpp1.draw(screen)
+        self.deckImgHolderOpp2.draw(screen)
+        self.deckImgHolderOpp3.draw(screen)
 
         if self.showEndTurnButton:
             screen.blit(self.endTurnImg, (self.endTurnImgX, self.endTurnImgY))
