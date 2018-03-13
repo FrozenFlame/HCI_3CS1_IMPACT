@@ -215,6 +215,9 @@ class Engine(object):
                 card.defaultPos = self.graveYardOppX, self.graveYardY
 
 
+        card.flip()
+        card.onBoard = False
+        card.disabled = True
         card.resting = False
         card.set_destination(card.defaultPos)
 
@@ -649,6 +652,16 @@ class Engine(object):
             # additional animation updates
             self.toss_coin()
             self.phase = Phase.OPENING
+
+        elif self.phase == Phase.END_ROUND:
+            for boardCard in self.boardField.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardField2.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardFieldOpp.cardList:
+                self.sendToGraveyard(boardCard)
+            for boardCard in self.boardFieldOpp2.cardList:
+                self.sendToGraveyard(boardCard)
 
 
         #
