@@ -137,12 +137,12 @@ class Engine(object):
         self.endTurnImgDimensionX = 110
         self.endTurnImgDimensionY = 53
 
-        self.graveYardX = Globals.RESOLUTION_X * 0.80
-        self.graveYardY = Globals.RESOLUTION_Y * 0.80
+        self.graveYardX = Globals.RESOLUTION_X * 0.826
+        self.graveYardY = Globals.RESOLUTION_Y * 0.785
         self.graveYardList = list()
 
-        self.graveYardOppX = Globals.RESOLUTION_X * 0.80
-        self.graveYardOppY = Globals.RESOLUTION_Y * 0.25
+        self.graveYardOppX = Globals.RESOLUTION_X * 0.826
+        self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -193,8 +193,38 @@ class Engine(object):
         # NOTE: changed placement of /5. Due to it raising an error that a list cannot be divided by an int
         # from: 5*(int(len((self.graveYardList)/5)))
         # to:   5*(int(len((self.graveYardList))/5))
+        print(5*(int(len((self.graveYardList))/5)))
+        '''
         self.graveYardX += 5*(int(len((self.graveYardList))/5))
+        self.graveYardY -= 1*(int(len((self.graveYardList))/5))
+
         self.graveYardOppX += 5*(int(len((self.graveYardListOpp))/5))
+        self.graveYardOppY -= 1*(int(len((self.graveYardList))/5))
+        '''
+        if len(self.graveYardList) == 5:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardList) == 10:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardList) == 15:
+            self.graveYardX += 5
+            self.graveYardY -= 1
+
+        if len(self.graveYardListOpp) == 5:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
+
+        if len(self.graveYardListOpp) == 10:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
+
+        if len(self.graveYardListOpp) == 15:
+            self.graveYardOppX += 5
+            self.graveYardOppY -= 1
+
 
 
         for boardCard in self.boardField.cardList:
@@ -214,13 +244,13 @@ class Engine(object):
             if card == boardCard:
                 self.boardFieldOpp.cardList.pop(self.boardFieldOpp.cardList.index(boardCard))
                 self.graveYardListOpp.append(card)
-                card.defaultPos = self.graveYardOppX, self.graveYardY
+                card.defaultPos = self.graveYardOppX, self.graveYardOppY
 
         for boardCard in self.boardFieldOpp2.cardList:
             if card == boardCard:
                 self.boardFieldOpp2.cardList.pop(self.boardFieldOpp2.cardList.index(boardCard))
                 self.graveYardListOpp.append(card)
-                card.defaultPos = self.graveYardOppX, self.graveYardY
+                card.defaultPos = self.graveYardOppX, self.graveYardOppY
 
 
         card.flip()
