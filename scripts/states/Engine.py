@@ -808,8 +808,6 @@ class Engine(object):
                     self.openingIndex = 0
                     self.phase = Phase.PREP
 
-
-
         elif self.phase == Phase.MATCH_COMPLETE:
             print("[Engine] Match Complete!")
             self.winning_player = self.player if self.player.hitpoints > 0 else self.player2

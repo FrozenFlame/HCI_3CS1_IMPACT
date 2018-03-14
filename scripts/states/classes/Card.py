@@ -1,6 +1,6 @@
 import pygame, math
 class Card(object):
-    def __init__(self, name="Generic", base_val=0):
+    def __init__(self, name="Generic", base_val = 0, effect=None):
 
         # Game related
         self.name = name
@@ -10,6 +10,7 @@ class Card(object):
         self.buffs = []
         self.debuffs = []
         self.constants = []
+        self.effect = effect
 
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
