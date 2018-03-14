@@ -27,6 +27,12 @@ startButtonClicked = character
 
 khaki = (121, 150, 79)
 brown = (122, 104, 58)
+bronze = (161, 116, 25)
+silver = (183, 183, 183)
+gold = (213, 165, 0)
+parachute_raid = (255,252,194)
+pistachio003 = (242,239,170)
+
 class MainMenu(object):
     def __init__(self):
         tools.State.__init__(self)
@@ -48,7 +54,7 @@ class MainMenu(object):
 
 
     def draw(self, screen):
-        pygame.draw.rect(screen, brown, (000,000,1280,720))  # background
+        pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
         self.buttons.draw(screen)
         screen.blit(self.logo, self.logo_pos)
