@@ -331,7 +331,7 @@ class Engine(object):
 
 
     def cardMousedOver(self, xy) -> bool:
-        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1]) and not s.onBoard and not s.disabled]  # not actually clicked, but moused over
+        self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]  # not actually clicked, but moused over
         return True if len(self.clickedCard) == 1 else False
 
     # def cardMousedOver2(self, xy):

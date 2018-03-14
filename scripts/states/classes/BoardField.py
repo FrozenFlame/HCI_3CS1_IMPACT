@@ -31,7 +31,6 @@ class BoardField(object):
 
         card.defaultPos = self.boardx, self.boardy
         self.cardList.append(card)
-        card.onBoard = True
         # this is the TEMP WAY. We need to calculate based on num of cards in list.
         self.boardx += 80
         # print("[BoardField] I, {0} Owned by: {2} TOOK IN A CARD: {1}".format(self.boardy, card.name, self.owner))
