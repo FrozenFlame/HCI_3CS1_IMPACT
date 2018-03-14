@@ -26,7 +26,7 @@ class MainMenu(object):
     def __init__(self):
         tools.State.__init__(self)
         self.next = None
-        self.buttons = Buttons()
+        self.buttons = Buttons(Globals.RESOLUTION_X*0.80, Globals.RESOLUTION_Y *0.50)
         self.buttonHovered = False
         self.hover = False
         self.startPrime = False  # start button has been held down
