@@ -4,19 +4,21 @@ from ...Globals import Globals
 
 spritesheet = pygame.image.load("assets/buttons/button-start.png")
 
+resizer = 1.2
+
 character = pygame.Surface((203, 74),pygame.SRCALPHA)   # first line is dimension of the button
 character.blit(spritesheet,(0,0))                       # second line is the DISPLACEMENT on the sprite sheet
-# character = pygame.transform.scale(character, (203*3,73*3))
+character = pygame.transform.smoothscale(character, (round(203*resizer),round(74*resizer)))
 startButtonNormal = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-74))
-# character = pygame.transform.scale(character, (203*3,147*3))
+character = pygame.transform.smoothscale(character, (round(203*resizer),round(74*resizer)))
 startButtonHover = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-148))
-# character = pygame.transform.scale(character, (203*3,222*3))
+character = pygame.transform.smoothscale(character, (round(203*resizer),round(74*resizer)))
 startButtonClicked = character
 
 #203, 73, rect of first button
@@ -29,8 +31,8 @@ class Buttons(object):
 
         self.posX = x
         self.posY = y
-        self.width = 200
-        self.height = 75
+        self.width = 200 *resizer
+        self.height = 75 *resizer
         self.rect = Rect(self.posX, self.posY, self.width, self.height)
         self.rect.center = self.posX, self.posY
         self.blitted = False
@@ -38,6 +40,10 @@ class Buttons(object):
         self.has_message = False # wants to return something to where it has been instantiated
 
         self.finished = False  # context specific for changing state
+
+
+
+
 
     def draw(self, screen):
         screen.blit(self.startButton, (self.posX, self.posY))

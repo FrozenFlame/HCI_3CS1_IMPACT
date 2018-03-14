@@ -1,4 +1,6 @@
-import pygame
+import pygame, math, time, random
+from enum import Enum, auto
+
 from scripts import tools
 from .classes.Buttons import Buttons
 from .classes.Player import Player
@@ -12,17 +14,17 @@ spritesheet = pygame.image.load("assets\\buttons\\button-start.png")
 
 character = pygame.Surface((203, 74),pygame.SRCALPHA)   # first line is dimension of the button
 character.blit(spritesheet,(0,0))                       # second line is the DISPLACEMENT on the sprite sheet
-# character = pygame.transform.scale(character, (203*3,73*3))
+character = pygame.transform.scale(character, (203*3,73*3))
 startButtonNormal = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-74))
-# character = pygame.transform.scale(character, (203*3,147*3))
+character = pygame.transform.scale(character, (203*3,74*3))
 startButtonHover = character
 
 character = pygame.Surface((203,74),pygame.SRCALPHA)
 character.blit(spritesheet,(0,-148))
-# character = pygame.transform.scale(character, (203*3,222*3))
+character = pygame.transform.scale(character, (203*3,74*3))
 startButtonClicked = character
 
 khaki = (121, 150, 79)
@@ -34,22 +36,36 @@ class MainMenu(object):
         self.buttons = Buttons(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.80)
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
+
         self.buttonHovered = False
         self.hover = False
         self.startPrime = False  # start button has been held down
         self.globals = Globals()
 
         # logo
-        self.logo = pygame.image.load("assets/logo/Avarice-Logov2.png").convert_alpha()
+        self.logo = pygame.image.load("assets/logo/Avarice-Logo-final.png").convert_alpha()
         self.logo_pos = 0,0
 
         #background
         self.backdrop = pygame.image.load("assets/logo/backdrop.jpg").convert_alpha()
 
+        self.phase = Phase.MAIN
+
+    def display_text(self, text, screen):
+        largeText = pygame.font.Font('freesansbold.ttf', 115)
+        textSurf, textRect = self.text_objects(text, largeText)  # Text Surface and Text Rect
+        textRect.center = (Globals.RESOLUTION_X * 0.2, Globals.RESOLUTION_Y * 0.2)
+        screen.blit(textSurf, textRect)
+
+
+    def text_objects(self, text, font):
+        textSurface = font.render(text, True, (255,255,255))
+        return textSurface, textSurface.get_rect()
 
     def draw(self, screen):
         pygame.draw.rect(screen, brown, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
+        self.display_text("good day",screen)
         self.buttons.draw(screen)
         screen.blit(self.logo, self.logo_pos)
 
@@ -66,10 +82,12 @@ class MainMenu(object):
 
 
         self.buttons.get_evt(click, event, mouse)
-
         if self.buttons.has_message:
+            self.buttons.has_message = False
             self.finished = self.buttons.get_message()["finished"]
             self.next = self.buttons.get_message()["next"]
+
+
         #
         # # mouse over
         # if (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
@@ -107,7 +125,6 @@ class MainMenu(object):
     def update(self, screen, keys, currentTime, dt):
         self.draw(screen)
 
-        pass
 
     def startup(self, currentTime, persistent):
         '''
@@ -137,7 +154,14 @@ class MainMenu(object):
             self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
             Globals.gameStart = True
 
-
         return self.persist
 
+
+
+class Phase(Enum):
+
+    MAIN = auto()
+    TO_MAIN = auto()
+    TO_HERO = auto()
+    HERO_SELECT = auto()
 
