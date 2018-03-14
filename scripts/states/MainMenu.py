@@ -4,6 +4,7 @@ from .classes.Buttons import Buttons
 from .classes.Player import Player
 from .classes.Hero import Hero
 from .classes.User import User
+from .classes.DeckBuilder import DeckBuilder
 
 from ..Globals import Globals
 
@@ -109,8 +110,8 @@ class MainMenu(object):
             userb = User("Challenger", 0, 0)
             heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
             herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
-            playera = Player(usera, heroa)
-            playerb = Player(userb, herob)
+            playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+            playerb = Player(userb, herob, DeckBuilder.build_deck(""))
 
             self.persist['playerA'] = playera
             self.persist['playerB'] = playerb

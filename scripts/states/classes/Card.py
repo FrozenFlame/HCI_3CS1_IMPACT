@@ -3,13 +3,14 @@ class Card(object):
     def __init__(self, name="Generic", base_val=0):
 
         # Game related
+        self.name = name
         self.base_val = base_val
         self.current_val = base_val  # this is what is processed
+        self.effect = None           # this is the buff/debuff/constant this particular card applies
         self.buffs = []
         self.debuffs = []
         self.constants = []
 
-        self.name = name
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
@@ -231,5 +232,8 @@ class Card(object):
 
     def recalculate(self):
         # consider computation order
-        # affect and renew current_val 
+        # affect and renew current_val
         pass
+
+    def apply_buff(self, target):
+        target.receive_buff(self.effect)
