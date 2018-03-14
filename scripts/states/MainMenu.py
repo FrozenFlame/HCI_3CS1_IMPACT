@@ -7,6 +7,8 @@ from .classes.Player import Player
 from .classes.Hero import Hero
 from .classes.User import User
 from .classes.DeckBuilder import DeckBuilder
+from .classes.FontObj import FontObj
+from .classes.Movable import Movable
 
 from ..Globals import Globals
 
@@ -54,44 +56,36 @@ class MainMenu(object):
 
         #background
         self.backdrop = pygame.image.load("assets/logo/backdrop.jpg").convert_alpha()
+        self.backdropMovable = Movable(self.logo,1000,5,"distance", self.logo_pos)
 
         self.phase = Phase.MAIN
 
-    def display_text(self, text, screen):
-        largeText = pygame.font.Font('freesansbold.ttf', 115)
-        textSurf, textRect = self.text_objects(text, largeText)  # Text Surface and Text Rect
-        textRect.center = (Globals.RESOLUTION_X * 0.2, Globals.RESOLUTION_Y * 0.2)
-        screen.blit(textSurf, textRect)
-
-
-    def text_objects(self, text, font):
-        textSurface = font.render(text, True, (255,255,255))
-        return textSurface, textSurface.get_rect()
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
-        # screen.blit(self.backdrop, (0,0))
-        self.display_text("good day",screen)
-        self.buttons.draw(screen)
-        screen.blit(self.logo, self.logo_pos)
+        self.font = FontObj.factory("Team IMPACT",Globals.RESOLUTION_X/2,Globals.RESOLUTION_Y/2,'POORICH.ttf',115,silver)
+        self.font.is_visible = False
 
     def get_evt(self,event):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
-
         if event.type == pygame.QUIT:
             self.done = True
         #animation for the button
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_o:
                 print ("[MainMenu(STATE)] O button pressed")
+                # self.font.posX += 5
+                # self.font.rect.center = self.font.rect.center[0]+5, self.font.rect.center[1]
+                self.font.set_destination(0,0)
+                self.backdropMovable.set_destination(-500, self.backdropMovable.rect.center[1])
 
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            self.font.set_destination(*mouse)
 
         self.buttons.get_evt(click, event, mouse)
-        if self.buttons.has_message:
-            self.buttons.has_message = False
-            self.finished = self.buttons.get_message()["finished"]
-            self.next = self.buttons.get_message()["next"]
+        # if self.buttons.has_message: # backup of old start button
+        #     self.buttons.has_message = False
+        #     self.finished = self.buttons.get_message()["finished"]
+        #     self.next = self.buttons.get_message()["next"]
+
 
 
         #
@@ -130,8 +124,17 @@ class MainMenu(object):
 
     def update(self, screen, keys, currentTime, dt):
         self.draw(screen)
+        self.font.update(dt)
+        self.backdropMovable.update(dt)
 
 
+    def draw(self, screen):
+        pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
+        # screen.blit(self.backdrop, (0,0))
+        self.font.draw(screen)
+        self.buttons.draw(screen)
+        # screen.blit(self.logo, self.logo_pos)
+        self.backdropMovable.draw(screen)
     def startup(self, currentTime, persistent):
         '''
         Add variables passed in persistent to the proper attributes and
@@ -167,7 +170,7 @@ class MainMenu(object):
 class Phase(Enum):
 
     MAIN = auto()
-    TO_MAIN = auto()
-    TO_HERO = auto()
+    TO_MAIN = auto()    # transition animation
+    TO_HERO = auto()    # transition animation
     HERO_SELECT = auto()
 

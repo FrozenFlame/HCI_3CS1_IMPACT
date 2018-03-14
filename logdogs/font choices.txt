@@ -2,5 +2,5 @@ Copperplate Gothic Bold - Decent For card names
 
 Character Specific:
 Victoria - Chalk-hand-lettering-shaded_dem
-King of Beggars - Old English Text MT / Poor Richard
+King of Beggars - Old English Text MT / Poor Richard  # we're going with Poor Richard
 Uncle Billy - Poor Richard / Onyx

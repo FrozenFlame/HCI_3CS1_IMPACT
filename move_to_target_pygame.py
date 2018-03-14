@@ -18,6 +18,7 @@ class Block(pg.sprite.Sprite):
         if self.target:
             travelled = math.hypot(self.vec[0]*dt, self.vec[1]*dt)
             self.distance -= travelled
+            print("Distance, ", self.distance)
             if self.distance <= 0:
                 self.rect.center = self.exact_position = self.target
                 self.target = None
@@ -56,7 +57,9 @@ class Control(object):
         self.player = Block(self.screen_rect.center, 500)
 
     def event_loop(self):
+
         for event in pg.event.get():
+            self.player.get_new_instruction(event.pos)
             if event.type == pg.QUIT:
                 self.done = True
             elif event.type == pg.MOUSEBUTTONDOWN:
