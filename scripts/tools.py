@@ -1,6 +1,7 @@
 import pygame
 from scripts.Globals import Globals
 from .states.Engine import Engine
+from .states.MainMenu import MainMenu
 #this class dictates which state the program is in
 print("[tools.py]Coordinator loaded")
 class Coordinator(object):
@@ -42,6 +43,8 @@ class Coordinator(object):
         if Globals.gameStart:  # gets a new Engine() object
             self.state_dictionary.pop("AVARICE")
             self.state_dictionary["AVARICE"] = Engine()
+            self.state_dictionary.pop("MAIN_MENU")
+            self.state_dictionary["MAIN_MENU"] = MainMenu()
         self.state = self.state_dictionary[self.state_name]
         tempState = self.state_dictionary[previous]
 

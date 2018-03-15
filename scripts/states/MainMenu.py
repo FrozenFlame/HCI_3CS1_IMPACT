@@ -497,7 +497,8 @@ class MainMenu(object):
         self.playerb = None
         # end for persists #
         self.finished = False
-        self.phase = Phase.TO_START
+        self.phase = Phase.START_SCREEN
+        self.buttons.set_image(self.buttons.startButtonNormal)
 
     def cleanup(self):  # state is finished
         self.done = False
