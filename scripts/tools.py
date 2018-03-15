@@ -6,6 +6,7 @@ from .states.MainMenu import MainMenu
 print("[tools.py]Coordinator loaded")
 class Coordinator(object):
     def __init__(self, title):
+        pygame.mixer.pre_init(44100, 16, 2, 4096)  # frequency, size, channels, buffersize
         pygame.init()
         pygame.display.set_caption(title)
         self.screen = pygame.display.set_mode((1280, 720))
