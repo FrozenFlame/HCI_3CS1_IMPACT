@@ -1037,7 +1037,7 @@ class Engine(object):
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
         self.board.draw(screen)
-        self.screen.fill((100,100,100))
+        screen.fill((100,100,100))
         # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
