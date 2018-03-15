@@ -1,5 +1,5 @@
+import pygame, math
 import pygame
-from pygame import *
 from ...Globals import Globals
 
 spritesheet = pygame.image.load("assets/buttons/button-start.png")
@@ -33,20 +33,34 @@ class Buttons(object):
         self.posY = y
         self.width = 200 *resizer
         self.height = 75 *resizer
-        self.rect = Rect(self.posX, self.posY, self.width, self.height)
-        self.rect.center = self.posX, self.posY
+        self.rect = pygame.Rect(self.posX, self.posY, self.width, self.height)
+        self.rect.center = self.posX , self.posY
         self.blitted = False
         self.startPrime = False  # button has been held down
         self.has_message = False # wants to return something to where it has been instantiated
 
+        # related to Movable (some things changed to fit button schema
+
+        self.defPosX = self.posX - self.width *0.5
+        self.defPosY = self.posY - self.height *0.5
+        self.defaultPos = self.defPosX, self.defPosY
+        self.exact_position = list(self.rect)
+        self.speed = 500
+        self.dspeed = 0
+        self.distance = None
+        self.destination = None
+        self.vector = None
+        self.move_type = "distance"
+
+
+        # end
+
+
+
         self.finished = False  # context specific for changing state
 
-
-
-
-
     def draw(self, screen):
-        screen.blit(self.startButton, (self.posX, self.posY))
+        screen.blit(self.startButton, self.rect)
         self.blitted = True
 
 
@@ -132,5 +146,75 @@ class Buttons(object):
 
 
 
+    # Movable related
+
+    def update(self, dTime):
+        if self.destination:
+            if self.move_type == "constant":
+                # self.set_destination(self.defaultPos[0], self.defaultPos[1])
+                travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
+                self.distance -= travelled
+                print("Distance, ", self.distance)
+                if self.distance <= 0:  # destination reached
+                    # self.posX = self.defaultPos[0]  # * dTime
+                    # self.posY = self.defaultPos[1]  # * dTime
+                    self.rect.center = self.exact_position = self.destination
+                    self.destination = None
+
+                else:  #this is for returning the card to your hand with animation
+                    # self.posX += self.vector[0] * dTime
+                    # self.posY += self.vector[1] * dTime
+                    self.exact_position[0] += self.vector[0] * dTime
+                    self.exact_position[1] += self.vector[1] * dTime
+                    self.rect.center = self.exact_position
+
+            elif self.move_type == "distance":
+                self.set_destination(self.destination[0], self.destination[1])
+                travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
+                self.distance -= travelled
+                if self.distance <= 0:  # destination reached
+                    # self.posX = self.defaultPos[0]  # * dTime
+                    # self.posY = self.defaultPos[1]  # * dTime
+                    self.rect.center = self.posX, self.posY
+                    self.exact_position = self.rect.center
+                    self.destination = None
+                else:  # this is for returning the card to your hand with animation
+                    self.posX += self.vector[0] * dTime
+                    self.posY += self.vector[1] * dTime
+                    self.rect = self.posX, self.posY
+                    self.exact_position = self.rect
 
 
+    def change_acceleration(self, newdistancespeed):
+        self.distancespeed = newdistancespeed
+
+    def update_rect_center(self, posx,posy):
+        self.rect.center = posx, posy
+
+    # setting of destination, or the relative vector to location
+    def set_destination(self, x,y):
+        if self.move_type == "constant":
+            xDistance = x - self.exact_position[0]
+            yDistance = y - self.exact_position[1]
+            self.distance = math.hypot(xDistance, yDistance)  # distance from default position
+            try:
+                # self.vector = (self.speed + (self.distance * 10)) * xDistance / self.distance, (
+                #         self.speed + (self.distance * 10)) * yDistance / self.distance
+                self.vector = (self.speed * xDistance / self.distance), (self.speed * yDistance / self.distance)
+                self.destination = list((x,y))
+            except ZeroDivisionError:
+                pass
+        elif self.move_type == "distance":
+            xDistance = x - self.posX
+            yDistance = y - self.posY
+            self.distance = math.hypot(xDistance, yDistance)  # distance from default position
+            try:
+                self.vector = ((self.distance * self.dspeed)) * xDistance / self.distance, (
+                       (self.distance * self.dspeed)) * yDistance / self.distance
+                self.destination = list((x, y))
+            except ZeroDivisionError:
+                pass
+
+
+    def back_to_default(self):
+        self.set_destination(*self.defaultPos)

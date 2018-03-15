@@ -94,6 +94,11 @@ class FontObj(object):
         Distance: 100 (random angle)
         posX 100 defX 0 posY 200 defY 0
         '''
+
+
+    def back_to_default(self):
+        self.set_destination(*self.defaultPos)
+
     # code from card
     # def update(self, dTime, mouseX, mouseY):
     #     if self.destination:

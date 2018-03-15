@@ -94,3 +94,6 @@ class Movable(object):
     def draw(self, screen):
         if self.is_visible:
             screen.blit(self.surface, self.rect)
+
+    def back_to_default(self):
+        self.set_destination(*self.defaultPos)

@@ -44,6 +44,9 @@ class MainMenu(object):
         self.buttons = Buttons(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.80)
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
+        self.buttons.dspeed = 5
+
+
 
         self.buttonHovered = False
         self.hover = False
@@ -57,6 +60,7 @@ class MainMenu(object):
         #background
         self.backdrop = pygame.image.load("assets/logo/backdrop.jpg").convert_alpha()
         self.backdropMovable = Movable(self.logo,1000,5,"distance", self.logo_pos)
+        self.backdropMovable.defaultPos = self.logo_pos[0]+self.backdropMovable.rect.width/2, self.logo_pos[1]+self.backdropMovable.rect.height/2  # this is a manual override due to the nature of the picture
 
         self.phase = Phase.MAIN
 
@@ -75,7 +79,13 @@ class MainMenu(object):
                 # self.font.posX += 5
                 # self.font.rect.center = self.font.rect.center[0]+5, self.font.rect.center[1]
                 self.font.set_destination(0,0)
-                self.backdropMovable.set_destination(-500, self.backdropMovable.rect.center[1])
+                self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-500, self.backdropMovable.rect.center[1])
+                self.buttons.set_destination(self.buttons.rect[0] -500, self.buttons.rect[1])
+                # self.backdropMovable.rect = 0,0
+            elif event.key == pygame.K_p:
+                self.font.back_to_default()
+                self.backdropMovable.back_to_default()
+                self.buttons.back_to_default()
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.font.set_destination(*mouse)
@@ -86,7 +96,10 @@ class MainMenu(object):
         #     self.finished = self.buttons.get_message()["finished"]
         #     self.next = self.buttons.get_message()["next"]
 
-
+        if self.buttons.has_message: # backup of old start button
+            self.buttons.has_message = False
+            self.finished = self.buttons.get_message()["finished"]
+            self.next = self.buttons.get_message()["next"]
 
         #
         # # mouse over
@@ -126,6 +139,7 @@ class MainMenu(object):
         self.draw(screen)
         self.font.update(dt)
         self.backdropMovable.update(dt)
+        self.buttons.update(dt)
 
 
     def draw(self, screen):
