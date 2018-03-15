@@ -3,6 +3,7 @@ from enum import Enum, auto
 
 from scripts import tools
 from .classes.Buttons import Buttons
+from .classes.ButtonCol.PlayButton import PlayButton
 from .classes.Player import Player
 from .classes.Hero import Hero
 from .classes.User import User
@@ -29,6 +30,11 @@ class MainMenu(object):
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
         self.buttons.dspeed = 5
+
+        self.play_button = PlayButton(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.90)
+        self.play_button.posX -= self.play_button.width *0.5
+        self.play_button.posY -= self.play_button.height *0.5
+        self.play_button.dspeed = 5
 
         self.heroPrime = False  # hero has been held down
         self.hero_hover = None  # name of hero being hovered
@@ -157,6 +163,7 @@ class MainMenu(object):
                         self.victoria.set_destination(self.victoria.posX -1280,self.billy.posY)
 
                         self.phase_start_time = pygame.time.get_ticks()
+                        self.play_button.set_image(self.play_button.startButtonNormal)
                         self.phase = Phase.TO_READY
 
 
@@ -172,7 +179,7 @@ class MainMenu(object):
                         self.buttons.back_to_default()
                         self.buttons.set_image(self.buttons.startButtonNormal)
                         self.select_text.distancespeed = 7
-                        self.player_text.distancespeed = 7
+                        self.player_text.distancespeed = 8
                         self.player2_text.distancespeed = 4
 
                         self.select_text.set_destination(self.select_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.10)
@@ -240,6 +247,8 @@ class MainMenu(object):
                     # allow coins to get moving
                     # reset wait timer
         elif self.phase == Phase.READY_UP:
+            self.play_button.get_evt(click,event,mouse)
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.billy.back_to_default()
@@ -250,11 +259,7 @@ class MainMenu(object):
                     self.phase_start_time = pygame.time.get_ticks()
                     self.phase = Phase.TO_HERO
 
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_ESCAPE:
-            #         self.billy
-        # elif self.phase == Phase.TO_HERO:
-        #     self.buttons.get_evt(click, event, mouse)
+
 
     def update(self, screen, keys, currentTime, dt):
 
@@ -279,7 +284,6 @@ class MainMenu(object):
             if currentTime - self.phase_start_time >= self.delay_to_hero:
                 print("Changing Phase to HERO_SELECT")
                 self.phase = Phase.HERO_SELECT
-
         elif self.phase == Phase.HERO_SELECT:  # backdrop and buttons no longer updated
             # player texts
             self.select_text.update(dt)
@@ -307,8 +311,11 @@ class MainMenu(object):
                 print("Changing Phase to START_SCREEN")
                 self.phase = Phase.START_SCREEN
         elif self.phase == Phase.READY_UP:
+
             self.select_text.update(dt)
             self.player2_text.update(dt)
+
+            self.play_button.update(dt)
 
             self.billy.update(dt)
             self.king.update(dt)
@@ -322,8 +329,10 @@ class MainMenu(object):
             #     self.heroa = Hero(self.hero_selected, self.victoria_img)
             # self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck(""))  # NOTE set hero name deck here
         elif self.phase == Phase.TO_READY:
-            self.backdropMovable.update(dt)
-            self.buttons.update(dt)
+            # self.backdropMovable.update(dt)
+            # self.buttons.update(dt)
+            self.play_button.update(dt)
+
             self.select_text.update(dt)
             self.player_text.update(dt)
             self.player2_text.update(dt)
@@ -345,6 +354,7 @@ class MainMenu(object):
         if self.phase == Phase.START_SCREEN:
             self.buttons.draw(screen)
             # screen.blit(self.logo, self.logo_pos)
+            # self.play_button.draw(screen)
             self.backdropMovable.draw(screen)
 
         elif self.phase == Phase.TO_HERO or self.phase == Phase.TO_START:
@@ -374,13 +384,15 @@ class MainMenu(object):
             self.player_text.draw(screen)
             self.player2_text.draw(screen)
 
+            self.play_button.draw(screen)
+
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
         elif self.phase == Phase.TO_READY:
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
-
+            self.play_button.draw(screen)
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
@@ -410,3 +422,4 @@ class Phase(Enum):
     HERO_SELECT = auto()
     TO_READY = auto()
     READY_UP = auto()
+    TO_GAME = auto()
