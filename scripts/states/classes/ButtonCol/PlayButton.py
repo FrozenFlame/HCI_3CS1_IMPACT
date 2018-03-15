@@ -102,7 +102,7 @@ class PlayButton(object):
                 # print("Start clicked state is now: ", Globals.state)
                 # self.finished = True
 
-                print("[Buttons.py (Start)] Start clicked, showing Hero select")
+                print("[PlayButton] Entering game...")
                 self.message = {
                     "phase": "TO_GAME"
                 }

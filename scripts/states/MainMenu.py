@@ -62,8 +62,8 @@ class MainMenu(object):
         # hero images and fonts and header
         self.select_text = FontObj.factory("Select a Hero",Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
         self.select_text_pos2 = Globals.RESOLUTION_X *0.65, Globals.RESOLUTION_Y *0.10
-        self.player_text = FontObj.factory("Player 1",Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.15, 'big_noodle_titling_oblique.ttf', 80, white)
-        self.player2_text = FontObj.factory("Player 2",Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.15, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player_text = FontObj.factory("Player 1",Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player2_text = FontObj.factory("Player 2",Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
 
         self.resizer = 1.35
         self.billy_img = pygame.image.load("assets/heroes/hero_billy.png").convert_alpha()
@@ -84,6 +84,9 @@ class MainMenu(object):
         self.billy.current_pos_as_default()
         self.king.current_pos_as_default()
         self.victoria.current_pos_as_default()
+
+        self.player_hero_movable = None
+        self.player2_hero_movable = None
 
         # timings
         self.phase_start_time = None
@@ -183,7 +186,7 @@ class MainMenu(object):
                         self.player2_text.distancespeed = 4
 
                         self.select_text.set_destination(self.select_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.10)
-                        self.player_text.set_destination(self.player_text.rect.center[0] + 1450, Globals.RESOLUTION_Y * 0.15)
+                        self.player_text.set_destination(self.player_text.rect.center[0] + 1450, Globals.RESOLUTION_Y * 0.14)
                         # self.player2_text.set_destination(self.player2_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.15)
 
                         self.billy.set_destination(self.hero_panel_pos[0] +900, self.hero_panel_pos[1])
@@ -195,7 +198,7 @@ class MainMenu(object):
                         self.player2_picking = False
                         self.select_text.back_to_default()
                         self.player_text.back_to_default()
-                        self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.15)
+                        self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.14)
 
         elif self.phase == Phase.START_SCREEN:
             self.buttons.get_evt(click, event, mouse)
@@ -228,8 +231,8 @@ class MainMenu(object):
 
                     # bring in Character select
                     self.select_text.defaultPos = Globals.RESOLUTION_X * 0.35, Globals.RESOLUTION_Y * 0.10
-                    self.player_text.defaultPos = Globals.RESOLUTION_X * 0.15, Globals.RESOLUTION_Y * 0.15
-                    self.player2_text.defaultPos = Globals.RESOLUTION_X * 0.85, Globals.RESOLUTION_Y * 0.15
+                    self.player_text.defaultPos = Globals.RESOLUTION_X * 0.15, Globals.RESOLUTION_Y * 0.14
+                    self.player2_text.defaultPos = Globals.RESOLUTION_X * 0.85, Globals.RESOLUTION_Y * 0.14
                     self.select_text.distancespeed = 7
                     self.player_text.distancespeed = 4
                     self.player2_text.distancespeed = 4
@@ -248,6 +251,23 @@ class MainMenu(object):
                     # reset wait timer
         elif self.phase == Phase.READY_UP:
             self.play_button.get_evt(click,event,mouse)
+            if self.play_button.has_message:
+                self.play_button.has_message = False
+
+                usera = User("Player", 99, 0)
+                userb = User("Challenger", 0, 0)
+
+
+                heroa = Hero(self.player_hero, "img")
+                herob = Hero(self.player2_hero, "img")
+                playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+                playerb = Player(userb, herob, DeckBuilder.build_deck(""))
+                self.persist['playerA'] = playera
+                self.persist['playerB'] = playerb
+                self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+                Globals.gameStart = True
+
+                self.phase = Phase.TO_GAME
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -342,6 +362,15 @@ class MainMenu(object):
             self.victoria.update(dt)
             if currentTime - self.phase_start_time >= self.delay_to_hero:
                 print("Changing Phase to START_SCREEN")
+                print("Player 1 has selected ", self.player_hero)
+                print("Player 2 has selected ", self.player2_hero)
+                if self.player_hero == "Billy":
+
+
+                elif self.player_hero == "King":
+                elif self.player_hero == "Victoria":
+
+                # self.billy.set_absolute()
                 self.phase = Phase.READY_UP
 
         self.draw(screen)
