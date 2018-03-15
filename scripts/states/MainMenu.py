@@ -44,7 +44,7 @@ class MainMenu(object):
 
         self.globals = Globals()
 
-        pygame.mixer.music.load("assets\\music\\game\\hero_select.mp3")
+        pygame.mixer.music.load("assets\\music\\game\\hero_select.ogg")
         pygame.mixer.music.set_volume(0.12)
 
         # logo
@@ -199,10 +199,12 @@ class MainMenu(object):
                             self.player2_img = self.victoria_img
 
                         self.player_imgmov = Movable(self.player_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
-                        self.player2_imgmov = Movable(self.player2_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
+                        self.player2_imgmov = Movable(self.player2_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5+1000, Globals.RESOLUTION_Y *0.5))
 
                         self.phase_start_time = pygame.time.get_ticks()
                         self.play_button.set_image(self.play_button.startButtonNormal)
+                        self.player_imgmov.set_destination(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5)
+                        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
                         self.phase = Phase.TO_READY
 
 
@@ -366,6 +368,8 @@ class MainMenu(object):
             self.billy.update(dt)
             self.king.update(dt)
             self.victoria.update(dt)
+            self.player_imgmov.update(dt)
+            self.player2_imgmov.update(dt)
 
 
         elif self.phase == Phase.TO_READY:
@@ -380,6 +384,8 @@ class MainMenu(object):
             self.billy.update(dt)
             self.king.update(dt)
             self.victoria.update(dt)
+            self.player_imgmov.update(dt)
+            self.player2_imgmov.update(dt)
             if currentTime - self.phase_start_time >= 500:
                 print("Changing Phase to START_SCREEN")
                 print("Player 1 has selected ", self.player_hero)
@@ -479,6 +485,8 @@ class MainMenu(object):
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
+            self.player_imgmov.draw(screen)
+            self.player2_imgmov.draw(screen)
         elif self.phase == Phase.TO_READY:
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
@@ -486,6 +494,8 @@ class MainMenu(object):
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
+            self.player_imgmov.draw(screen)
+            self.player2_imgmov.draw(screen)
         elif self.phase == Phase.TO_GAME:
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
