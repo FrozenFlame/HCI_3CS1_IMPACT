@@ -388,11 +388,12 @@ class MainMenu(object):
             self.billy.update(dt)
             self.king.update(dt)
             self.victoria.update(dt)
-            if currentTime - self.phase_start_time >= self.delay_to_hero:
+            if currentTime - self.phase_start_time >= 300:
+                self.setup_players("Vex", "Slasher399")
                 self.phase = Phase.GAME
 
         elif self.phase == Phase.GAME:
-            self.setup_players("Vex", "Slasher399")
+            print("POPPING THE SPEAR")
             self.next = "AVARICE"
             self.finished = True
 
@@ -408,7 +409,7 @@ class MainMenu(object):
             self.heroa = Hero(self.player_hero, self.king_img)
         else:
             self.heroa = Hero(self.player_hero, self.victoria_img)
-        self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck(""))  # NOTE set hero name deck here
+        self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck(self.player_hero))  # NOTE set hero name deck here
 
         self.userb = User(p2, 99, 0)
         if self.player2_hero == "Billy":
@@ -417,7 +418,7 @@ class MainMenu(object):
             self.herob = Hero(self.player2_hero, self.king_img)
         else:
             self.herob = Hero(self.player2_hero, self.victoria_img)
-        self.playerb= Player(self.userb, self.herob, DeckBuilder.build_deck(""))  # NOTE set hero name deck here
+        self.playerb = Player(self.userb, self.herob, DeckBuilder.build_deck(self.player2_hero))  # NOTE set hero name deck here
 
 
 
@@ -512,7 +513,15 @@ class MainMenu(object):
             self.persist['playerB'] = self.playerb
             self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
             Globals.gameStart = True
+            self.usera = None
+            self.userb = None
+            self.heroa = None
+            self.herob = None
+            self.playera = None
+            self.playerb = None
+
             self.finished = True
+
 
         return self.persist
 

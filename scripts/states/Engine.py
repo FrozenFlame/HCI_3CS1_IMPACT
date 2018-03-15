@@ -150,6 +150,10 @@ class Engine(object):
         self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
+        self.screen = pygame.display.set_mode((1280, 720))
+        self.fadeScreen = pygame.Surface((1280, 720))
+        self.fadeScreen.fill((0,0,0)) #black
+        self.faded = False
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -159,15 +163,27 @@ class Engine(object):
 #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    def fade(width, height):
-        fade = pygame.Surface((width, height))
-        fade.fill((0, 0, 0)) #0,0,0 for black
-        for alpha in range(0, 300):
-            fade.set_alpha(alpha)
-            self.draw(screen)
-            self.screen.blit(fade, (0, 0))
+    def fadeIn(self):
+        alpha = 0
+        while alpha <= 255:
+            self.fadeScreen.set_alpha(alpha)
+            self.draw(self.screen)
+            self.screen.blit(self.fadeScreen, (0, 0))
             pygame.display.update()
             pygame.time.delay(1)
+            alpha += 5
+        self.faded = True
+
+    def fadeOut(self):
+        alpha = 250
+        while alpha >= 0:
+            self.fadeScreen.set_alpha(alpha)
+            self.draw(self.screen)
+            self.screen.blit(self.fadeScreen, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(1)
+            alpha -= 5
+        self.faded = False
 
     def flip_hand(self, hand):
         for h in hand:
@@ -360,7 +376,7 @@ class Engine(object):
         # print(self.cards_played)
         self.recalculate_score(boardfieldlist)
 
-        if self.cards_played == 3 and not self.passed:
+        if self.cards_played == 2 and not self.passed:
             self.may_drag = False
 
     def end_turn(self):
@@ -541,6 +557,8 @@ class Engine(object):
                 if click[0] == 0:
                     if self.mouseOnShowHandButton and self.showHandButton:
                         print("[Engine]Showing cards")
+                        if self.faded:
+                            self.fadeOut()
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
                         self.showHandButton = False
@@ -655,7 +673,7 @@ class Engine(object):
             self.showHandButton = True
 
         elif self.phase == Phase.SWAP:
-            self.fade(1280,600)
+
             for hC in self.hand:
                 hC.swap()
             for hC in self.opponent_hand:
@@ -708,6 +726,8 @@ class Engine(object):
             self.swap_player(self.player)
             self.phase = Phase.PREP
             self.done_turn = False
+            self.fadeIn()
+
         elif self.phase == Phase.END_ROUND:
             # here we compare scores, decide which hero to damage, and give score.
             self.empty_field_to_grave(self.boardField, self.graveYardList)
@@ -1036,8 +1056,9 @@ class Engine(object):
 
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
+        screen.fill((255, 255, 255))
+
         self.board.draw(screen)
-        # screen.fill((100,100,100))
         # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
@@ -1065,8 +1086,13 @@ class Engine(object):
             screen.blit(self.endTurnImg, (self.endTurnImgX, self.endTurnImgY))
         elif self.showPassTurnButton:
             screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
+
+        if self.faded:
+            self.screen.blit(self.fadeScreen, (0, 0))
+
         if self.showHandButton:
             screen.blit(self.showHandImg, (self.showHandImgX, self.showHandImgY))
+
 
 
 
