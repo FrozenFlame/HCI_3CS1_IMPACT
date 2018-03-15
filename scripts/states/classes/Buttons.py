@@ -107,7 +107,6 @@ class Buttons(object):
                     "phase": "TO_HERO"
                 }
 
-
             if self.startPrime:
                 self.startPrime = False
 
