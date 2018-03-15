@@ -28,7 +28,7 @@ REMEMBER: "Special" cards which are made by other cards (ie. not in deck)
 
 4) Butler [10C]
 	- Effect: Adjacent cards increase in value by 5C
-5) Arsonist [0C] <Black>
+5) Arsonist [0C] <Black> <Person>
 	- Effect: Destroy Opposing Column's Structures
 6) Saboteur [Spell] <Black>
 	- Effect: 1 bomb card is placed into each player's deck. The first player that draws this card, discards one card from their hand.
