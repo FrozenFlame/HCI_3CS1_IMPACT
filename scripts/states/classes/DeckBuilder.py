@@ -28,6 +28,7 @@ class DeckCatalogue(object):
 
 
     def get_deck_king():
+
         blackMarket = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
         pickPocket = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
         strangeGravedigger = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
@@ -52,6 +53,7 @@ class DeckCatalogue(object):
 
         deck = [blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
                 blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
+        deck.extend(DeckCatalogue.get_deck_common())
         return deck
     get_deck_king = staticmethod(get_deck_king)
 
@@ -80,6 +82,7 @@ class DeckCatalogue(object):
 
         deck = [insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce,
                 insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2]
+        deck.extend(DeckCatalogue.get_deck_common())
         return deck
     get_deck_victoria = staticmethod(get_deck_victoria)
 
@@ -110,6 +113,7 @@ class DeckCatalogue(object):
 
         deck = [slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier,
                 slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2]
+        deck.extend(DeckCatalogue.get_deck_common())
         return deck
     get_deck_billy = staticmethod(get_deck_billy)
 

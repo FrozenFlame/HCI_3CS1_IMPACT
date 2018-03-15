@@ -159,6 +159,15 @@ class Engine(object):
 #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    def fade(width, height):
+        fade = pygame.Surface((width, height))
+        fade.fill((0, 0, 0)) #0,0,0 for black
+        for alpha in range(0, 300):
+            fade.set_alpha(alpha)
+            self.draw(screen)
+            self.screen.blit(fade, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(1)
 
     def flip_hand(self, hand):
         for h in hand:
@@ -646,6 +655,7 @@ class Engine(object):
             self.showHandButton = True
 
         elif self.phase == Phase.SWAP:
+            self.fade(1280,600)
             for hC in self.hand:
                 hC.swap()
             for hC in self.opponent_hand:
@@ -1027,7 +1037,7 @@ class Engine(object):
     # orders individual elements to draw themselves in the correct order (your blits)
     def draw(self, screen):
         self.board.draw(screen)
-        # self.screen.fill((100,100,100))
+        self.screen.fill((100,100,100))
         # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
