@@ -69,7 +69,7 @@ class MainMenu(object):
 
         self.hero_panel_pos = Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5
         
-        self.billy = Movable(self.billy_img,1000,5,"distance", self.hero_panel_pos
+        self.billy = Movable(self.billy_img,1000,5,"distance", self.hero_panel_pos)
         self.billy.set_absolute((self.hero_panel_pos[0]-self.billy.rect.width -15, self.hero_panel_pos[1]))
         self.king = Movable(self.king_img,1000,5,"distance", self.hero_panel_pos)
         self.victoria = Movable(self.victoria_img,1000,5,"distance", self.hero_panel_pos)
