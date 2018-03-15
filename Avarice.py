@@ -4,6 +4,7 @@ from scripts import tools
 from scripts.states import Engine #states imported
 from scripts.states import MainMenu, MainMenu2
 from scripts.Globals import Globals
+from scripts.states import Splash
 
 def main():
     coordinator = tools.Coordinator("Avarice - A Greed-Based Card Game")
@@ -11,7 +12,8 @@ def main():
     # avarice.main_loop()
 
     # okay, I'm guessing this is first preload. But eventually, you'll have to push and pop new instances here
-    states = {"MAIN_MENU": MainMenu.MainMenu(),
+    states = {"SPLASH": Splash.Splash(),
+              "MAIN_MENU": MainMenu.MainMenu(),
               "MAIN_MENU2": MainMenu2.MainMenu(),
               "AVARICE": Engine.Engine()
               #"OPTIONS": theoretical.Options()

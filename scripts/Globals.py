@@ -1,7 +1,7 @@
 class Globals:
     print("[Globals.py]Globals loaded")
     fps = 60.0
-    state = "MAIN_MENU" #default for now
+    state = "MAIN_MENU"
 
     RESOLUTION_X = 1280
     RESOLUTION_Y = 720
@@ -9,3 +9,5 @@ class Globals:
 
     # temp vals
     gameStart = False
+
+    mixer_volume = 0.5

@@ -30,12 +30,12 @@ class MainMenu(object):
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
         self.buttons.dspeed = 5
-        self.finished = False
         self.play_button = PlayButton(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.90)
         self.play_button.posX -= self.play_button.width *0.5
         self.play_button.posY -= self.play_button.height *0.5
         self.play_button.dspeed = 5
 
+        self.player2_picking = False
         self.heroPrime = False  # hero has been held down
         self.hero_hover = None  # name of hero being hovered
         self.hero_selected = None  # name of hero that has been clicked
@@ -44,7 +44,8 @@ class MainMenu(object):
 
         self.globals = Globals()
 
-        self.player2_picking = False
+        pygame.mixer.music.load("assets\\music\\game\\hero_select.mp3")
+        pygame.mixer.music.set_volume(0.12)
 
         # logo
         self.logo = pygame.image.load("assets/logo/Avarice-Logo-final.png").convert_alpha()
@@ -73,8 +74,14 @@ class MainMenu(object):
         self.victoria_img = pygame.image.load("assets/heroes/hero_victoria.png").convert_alpha()
         self.victoria_img = pygame.transform.smoothscale(self.victoria_img, (round(self.victoria_img.get_rect().width * self.resizer), round(self.victoria_img.get_rect().height * self.resizer)))
 
+
+        self.player_img = None
+        self.player2_img = None
+        self.player_imgmov = None
+        self.player2_imgmov = None
+
         self.hero_panel_pos = Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5
-        
+
         self.billy = Movable(self.billy_img,1000,5,"distance", self.hero_panel_pos)
         self.billy.set_absolute((self.hero_panel_pos[0]-self.billy.rect.width -15, self.hero_panel_pos[1]))
         self.king = Movable(self.king_img,1000,5,"distance", self.hero_panel_pos)
@@ -170,11 +177,29 @@ class MainMenu(object):
                     else:
                         print("Player 2 has chosen ", self.hero_selected)
                         self.player2_hero = self.hero_selected
-                        self.select_text.set_destination(self.player2_text.posX - 1400, self.select_text.posY)
-                        self.player2_text.set_destination(self.player2_text.posX - 1280, self.player2_text.posY)
-                        self.billy.set_destination(self.billy.posX -1280,self.billy.posY)
-                        self.king.set_destination(self.king.posX -1280,self.billy.posY)
-                        self.victoria.set_destination(self.victoria.posX -1280,self.billy.posY)
+                        self.select_text.set_destination(self.player2_text.posX, self.select_text.posY - 1000)
+                        self.player2_text.set_destination(self.player2_text.posX , self.player2_text.posY - 1000)
+                        self.billy.set_destination(self.billy.posX,self.billy.posY - 1000)
+                        self.king.set_destination(self.king.posX,self.king.posY - 1000)
+                        self.victoria.set_destination(self.victoria.posX,self.victoria.posY - 1000)
+
+                        if self.player_hero == "Billy":
+                            self.player_img = self.billy_img
+                        elif self.player_hero == "King":
+                            self.player_img = self.king_img
+                        else:
+                            self.player_img = self.victoria_img
+
+
+                        if self.player2_hero == "Billy":
+                            self.player2_img = self.billy_img
+                        elif self.player_hero == "King":
+                            self.player2_img = self.king_img
+                        else:
+                            self.player2_img = self.victoria_img
+
+                        self.player_imgmov = Movable(self.player_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
+                        self.player2_imgmov = Movable(self.player2_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
 
                         self.phase_start_time = pygame.time.get_ticks()
                         self.play_button.set_image(self.play_button.startButtonNormal)
@@ -184,6 +209,7 @@ class MainMenu(object):
             if event.type == pygame.KEYDOWN:
                 if not self.player2_picking:
                     if event.key == pygame.K_ESCAPE:
+                        pygame.mixer.music.fadeout(600)
                         self.phase = Phase.TO_START
                         self.phase_start_time = pygame.time.get_ticks()
                         print("[MainMenu(STATE)] Going back to StartScreen")
@@ -213,21 +239,7 @@ class MainMenu(object):
 
         elif self.phase == Phase.START_SCREEN:
             self.buttons.get_evt(click, event, mouse)
-            # if self.buttons.has_message: # backup of old start button (goes straight into game
-            #     self.buttons.has_message = False
-            #     self.finished = True
-            #     self.next = "AVARICE"
-            #     if not Globals.gameStart:  # game is the selected next state
-            #         usera = User("Champion", 99, 0)
-            #         userb = User("Challenger", 0, 0)
-            #         heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
-            #         herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
-            #         playera = Player(usera, heroa, DeckBuilder.build_deck(""))
-            #         playerb = Player(userb, herob, DeckBuilder.build_deck(""))
-            #         self.persist['playerA'] = playera
-            #         self.persist['playerB'] = playerb
-            #         self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
-            #         Globals.gameStart = True
+
 
             if self.buttons.has_message:  # start button
                 self.buttons.has_message = False
@@ -235,6 +247,7 @@ class MainMenu(object):
                 if message["phase"] == "TO_HERO":
                     self.phase = Phase.TO_HERO
                     # play hero select music
+                    pygame.mixer.music.play(-1)
                     # send MAIN elements flying to left (set destination x by -1100)
                     self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-1200, self.backdropMovable.rect.center[1])
                     self.buttons.set_destination(self.buttons.rect[0] -1200, self.buttons.rect[1])
@@ -321,10 +334,11 @@ class MainMenu(object):
             self.select_text.update(dt)
             self.player_text.update(dt)
             self.player2_text.update(dt)
+
             # heroes animation
-            # self.billy.update(dt)
-            # self.king.update(dt)
-            # self.victoria.update(dt)
+            self.billy.update(dt)
+            self.king.update(dt)
+            self.victoria.update(dt)
 
             # buttons animation
             # hero fonts
@@ -405,7 +419,7 @@ class MainMenu(object):
         self.usera = User(p, 99, 0)
         if self.player_hero == "Billy":
             self.heroa = Hero(self.player_hero, self.billy_img)
-        elif self.hero_selected == "King":
+        elif self.player_hero == "King":
             self.heroa = Hero(self.player_hero, self.king_img)
         else:
             self.heroa = Hero(self.player_hero, self.victoria_img)
@@ -497,7 +511,6 @@ class MainMenu(object):
         self.playera = None
         self.playerb = None
         # end for persists #
-        self.finished = False
         self.phase = Phase.START_SCREEN
         self.buttons.set_image(self.buttons.startButtonNormal)
 
@@ -535,3 +548,25 @@ class Phase(Enum):
     READY_UP = auto()
     TO_GAME = auto()
     GAME = auto()
+
+
+
+'''
+archived code
+
+'''
+# if self.buttons.has_message: # backup of old start button (goes straight into game
+            #     self.buttons.has_message = False
+            #     self.finished = True
+            #     self.next = "AVARICE"
+            #     if not Globals.gameStart:  # game is the selected next state
+            #         usera = User("Champion", 99, 0)
+            #         userb = User("Challenger", 0, 0)
+            #         heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
+            #         herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
+            #         playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+            #         playerb = Player(userb, herob, DeckBuilder.build_deck(""))
+            #         self.persist['playerA'] = playera
+            #         self.persist['playerB'] = playerb
+            #         self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            #         Globals.gameStart = True
