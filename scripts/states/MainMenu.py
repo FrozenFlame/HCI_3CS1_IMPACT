@@ -12,30 +12,14 @@ from .classes.Movable import Movable
 
 from ..Globals import Globals
 
-spritesheet = pygame.image.load("assets\\buttons\\button-start.png")
-
-character = pygame.Surface((203, 74),pygame.SRCALPHA)   # first line is dimension of the button
-character.blit(spritesheet,(0,0))                       # second line is the DISPLACEMENT on the sprite sheet
-character = pygame.transform.scale(character, (203*3,73*3))
-startButtonNormal = character
-
-character = pygame.Surface((203,74),pygame.SRCALPHA)
-character.blit(spritesheet,(0,-74))
-character = pygame.transform.scale(character, (203*3,74*3))
-startButtonHover = character
-
-character = pygame.Surface((203,74),pygame.SRCALPHA)
-character.blit(spritesheet,(0,-148))
-character = pygame.transform.scale(character, (203*3,74*3))
-startButtonClicked = character
-
-khaki = (121, 150, 79)
 brown = (122, 104, 58)
 bronze = (161, 116, 25)
 silver = (183, 183, 183)
+lightgrey = (150, 150, 150)
 gold = (213, 165, 0)
 parachute_raid = (255,252,194)
 pistachio003 = (242,239,170)
+white = (255,255,255)
 
 class MainMenu(object):
     def __init__(self):
@@ -57,15 +41,28 @@ class MainMenu(object):
         self.logo = pygame.image.load("assets/logo/Avarice-Logo-final.png").convert_alpha()
         self.logo_pos = 0,0
 
-        #background
+        # background
         self.backdrop = pygame.image.load("assets/logo/backdrop.jpg").convert_alpha()
         self.backdropMovable = Movable(self.logo,1000,5,"distance", self.logo_pos)
         self.backdropMovable.defaultPos = self.logo_pos[0]+self.backdropMovable.rect.width/2, self.logo_pos[1]+self.backdropMovable.rect.height/2  # this is a manual override due to the nature of the picture
 
-        self.phase = Phase.MAIN
+        self.phase = Phase.START_SCREEN
 
-        self.font = FontObj.factory("Team IMPACT",Globals.RESOLUTION_X/2,Globals.RESOLUTION_Y/2,'POORICH.ttf',115,silver)
+        self.font = FontObj.factory("Team IMPACT", Globals.RESOLUTION_X/2,Globals.RESOLUTION_Y/2,'POORICH.ttf',115,silver)
         self.font.is_visible = False
+
+        # hero images and fonts and header
+        self.select_text = FontObj.factory("Select a Hero",Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
+        self.select_text.distancespeed = 7
+        self.player_text = FontObj.factory("Player 1",Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.15, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player_text.distancespeed = 4
+        self.player2_text = FontObj.factory("Player 2",Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.15, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player2_text.distancespeed = 4
+
+        # timings
+        self.phase_start_time = None
+        self.delay_to_hero = 800
+
 
     def get_evt(self,event):
         mouse = pygame.mouse.get_pos()
@@ -79,76 +76,143 @@ class MainMenu(object):
                 # self.font.posX += 5
                 # self.font.rect.center = self.font.rect.center[0]+5, self.font.rect.center[1]
                 self.font.set_destination(0,0)
-                self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-500, self.backdropMovable.rect.center[1])
-                self.buttons.set_destination(self.buttons.rect[0] -500, self.buttons.rect[1])
+                # self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-1100, self.backdropMovable.rect.center[1])
+                # self.buttons.set_destination(self.buttons.rect[0] -1100, self.buttons.rect[1])
                 # self.backdropMovable.rect = 0,0
             elif event.key == pygame.K_p:
                 self.font.back_to_default()
-                self.backdropMovable.back_to_default()
-                self.buttons.back_to_default()
-
+                # self.backdropMovable.back_to_default()
+                # self.buttons.back_to_default()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.font.set_destination(*mouse)
+        if self.phase == Phase.START_SCREEN:
+            self.buttons.get_evt(click, event, mouse)
+            # if self.buttons.has_message: # backup of old start button (goes straight into game
+            #     self.buttons.has_message = False
+            #     self.finished = self.buttons.get_message()["finished"]
+            #     self.next = self.buttons.get_message()["next"]
+            #     if not Globals.gameStart:  # game is the selected next state
+            #         usera = User("Champion", 99, 0)
+            #         userb = User("Challenger", 0, 0)
+            #         heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
+            #         herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
+            #         playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+            #         playerb = Player(userb, herob, DeckBuilder.build_deck(""))
+            #         self.persist['playerA'] = playera
+            #         self.persist['playerB'] = playerb
+            #         self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            #         Globals.gameStart = True
 
-        self.buttons.get_evt(click, event, mouse)
-        # if self.buttons.has_message: # backup of old start button
-        #     self.buttons.has_message = False
-        #     self.finished = self.buttons.get_message()["finished"]
-        #     self.next = self.buttons.get_message()["next"]
+            if self.buttons.has_message:  # start button
+                self.buttons.has_message = False
+                message = self.buttons.get_message()
+                if message["phase"] == "TO_HERO":
+                    self.phase = Phase.TO_HERO
+                    # play hero select music
+                    self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-1200, self.backdropMovable.rect.center[1])
+                    self.buttons.set_destination(self.buttons.rect[0] -1200, self.buttons.rect[1])
+                    self.phase_start_time = pygame.time.get_ticks()
 
-        if self.buttons.has_message: # backup of old start button
-            self.buttons.has_message = False
-            self.finished = self.buttons.get_message()["finished"]
-            self.next = self.buttons.get_message()["next"]
+                    self.select_text.defaultPos = Globals.RESOLUTION_X * 0.35, Globals.RESOLUTION_Y * 0.10
+                    self.player_text.defaultPos = Globals.RESOLUTION_X * 0.15, Globals.RESOLUTION_Y * 0.15
+                    self.player2_text.defaultPos = Globals.RESOLUTION_X * 0.80, Globals.RESOLUTION_Y * 0.15
+                    self.select_text.distancespeed = 7
+                    self.player_text.distancespeed = 4
+                    self.player2_text.distancespeed = 4
+                    self.select_text.back_to_default()
+                    self.player_text.back_to_default()
+                    self.player2_text.back_to_default()
 
-        #
-        # # mouse over
-        # if (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY and not self.startPrime:
-        #     self.buttons.image = startButtonHover
-        #     self.buttons.startButton = self.buttons.image.convert_alpha()
-        #
-        # # mouse back on while held start button
-        # elif self.startPrime and (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
-        #     self.buttons.image = startButtonClicked
-        #     self.buttons.startButton = self.buttons.image.convert_alpha()
-        #     self.buttons.startButton.convert()
-        #
-        # # mouse off
-        # elif not (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX or not (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
-        #     self.buttons.image = startButtonNormal
-        #     self.buttons.startButton = self.buttons.image.convert_alpha()
-        #
-        # #for changing states button
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #     if click[0] == 1 and (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
-        #         self.buttons.image = startButtonClicked
-        #         self.buttons.startButton = self.buttons.image.convert_alpha()
-        #         self.startPrime = True
-        #     elif click[2] == 1:
-        #         print("[MainMenu(STATE)] Rightclick pressed, state revealed as: {0}".format(Globals.state))
-        #
-        # if event.type == pygame.MOUSEBUTTONUP:
-        #     if click[0] == 0 and self.startPrime and (self.buttons.posX + self.buttons.width) >= mouse[0] >= self.buttons.posX and (self.buttons.posY + self.buttons.height) >= mouse[1] >= self.buttons.posY:
-        #         Globals.state = "AVARICE"
-        #         self.next = Globals.state
-        #         self.finished = True
-        #     if self.startPrime:
-        #         self.startPrime = False
+                    # send MAIN elements flying to left (set destination x by -1100)
+                    # allow coins to get moving
+                    # reset wait timer
+        # elif self.phase == Phase.TO_HERO:
+        #     self.buttons.get_evt(click, event, mouse)
+        elif self.phase == Phase.HERO_SELECT:
+            # button clicks for hero selection, Next, and back.
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.phase = Phase.TO_START
+                    self.phase_start_time = pygame.time.get_ticks()
+                    print("[MainMenu(STATE)] Going back to StartScreen")
+
+                    self.font.set_destination(0, 0)
+                    self.backdropMovable.back_to_default()
+                    self.buttons.back_to_default()
+                    self.buttons.set_image(self.buttons.startButtonNormal)
+                    self.select_text.distancespeed = 7
+                    self.player_text.distancespeed = 7
+                    self.player2_text.distancespeed = 4
+
+                    self.select_text.set_destination(self.select_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.10)
+                    self.player_text.set_destination(self.player_text.rect.center[0] + 1250, Globals.RESOLUTION_Y * 0.15)
+                    self.player2_text.set_destination(self.player2_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.15)
 
     def update(self, screen, keys, currentTime, dt):
-        self.draw(screen)
         self.font.update(dt)
-        self.backdropMovable.update(dt)
-        self.buttons.update(dt)
+        if self.phase == Phase.START_SCREEN:
+
+            pass
+        elif self.phase == Phase.TO_HERO:
+            self.backdropMovable.update(dt)
+            self.buttons.update(dt)
+
+            # player texts
+            self.select_text.update(dt)
+            self.player_text.update(dt)
+            self.player2_text.update(dt)
+            # heroes animation
+            # buttons animation
+            # hero fonts
+            if currentTime - self.phase_start_time >= self.delay_to_hero:
+                print("Changing Phase to HERO_SELECT")
+                self.phase = Phase.HERO_SELECT
+
+        elif self.phase == Phase.HERO_SELECT:  # backdrop and buttons no longer updated
+            # player texts
+            self.select_text.update(dt)
+            self.player_text.update(dt)
+            self.player2_text.update(dt)
+            # heroes animation
+            # buttons animation
+            # hero fonts
+        elif self.phase == Phase.TO_START:
+            self.backdropMovable.update(dt)
+            self.buttons.update(dt)
+            self.select_text.update(dt)
+            self.player_text.update(dt)
+            self.player2_text.update(dt)
+            if currentTime - self.phase_start_time >= self.delay_to_hero:
+                print("Changing Phase to START_SCREEN")
+                self.phase = Phase.START_SCREEN
+
+        self.draw(screen)
 
 
     def draw(self, screen):
         pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
         self.font.draw(screen)
-        self.buttons.draw(screen)
-        # screen.blit(self.logo, self.logo_pos)
-        self.backdropMovable.draw(screen)
+
+        if self.phase == Phase.START_SCREEN:
+            self.buttons.draw(screen)
+            # screen.blit(self.logo, self.logo_pos)
+            self.backdropMovable.draw(screen)
+        elif self.phase == Phase.TO_HERO or self.phase == Phase.TO_START:
+            self.buttons.draw(screen)
+            self.backdropMovable.draw(screen)
+
+            self.select_text.draw(screen)
+            self.player_text.draw(screen)
+            self.player2_text.draw(screen)
+        elif self.phase == Phase.HERO_SELECT:
+            # draw back and next buttons
+            # draw heroes
+            # draw heroes text
+            self.select_text.draw(screen)
+            self.player_text.draw(screen)
+            self.player2_text.draw(screen)
+
     def startup(self, currentTime, persistent):
         '''
         Add variables passed in persistent to the proper attributes and
@@ -164,18 +228,7 @@ class MainMenu(object):
         '''
             TEST ONLY STATIC PERSIST
         '''
-        if not Globals.gameStart:  # game is the selected next state
-            usera = User("Champion", 99, 0)
-            userb = User("Challenger", 0, 0)
-            heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
-            herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
-            playera = Player(usera, heroa, DeckBuilder.build_deck(""))
-            playerb = Player(userb, herob, DeckBuilder.build_deck(""))
 
-            self.persist['playerA'] = playera
-            self.persist['playerB'] = playerb
-            self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
-            Globals.gameStart = True
 
         return self.persist
 
@@ -183,8 +236,8 @@ class MainMenu(object):
 
 class Phase(Enum):
 
-    MAIN = auto()
-    TO_MAIN = auto()    # transition animation
+    START_SCREEN = auto()
+    TO_START = auto()    # transition animation
     TO_HERO = auto()    # transition animation
     HERO_SELECT = auto()
-
+    HERO_SELECT_OPP = auto()

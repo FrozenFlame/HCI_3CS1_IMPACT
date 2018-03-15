@@ -14,7 +14,7 @@ class FontObj(object):
         self.is_visible = True
 
         # animation related
-        self.defaultPos = (0,0)
+        self.defaultPos = posx, posy
         self.exact_position = list(self.rect.center)
         self.speed = 1000
         self.distancespeed = 10
