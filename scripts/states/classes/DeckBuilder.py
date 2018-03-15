@@ -1,4 +1,4 @@
-from .Card import Card
+from .Card import Card, Type
 
 class DeckBuilder(object):
 
@@ -28,16 +28,129 @@ class DeckCatalogue(object):
 
 
     def get_deck_king():
-        pass
+        blackMarket = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
+        pickPocket = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
+        strangeGravedigger = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
+        robinHood = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
+        slums = Card("Slums", 0, None, [Type.STRUCTURE])
+        kingpin = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
+        bodyDouble = Card("Body Double", 15, None, [Type.PERSON])
+        junker = Card("Junker", 7, None, [Type.VEHICLE])
+        beg = Card("Beg", 0, None, [Type.SPELL])
+        scam = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
+
+        blackMarket2 = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
+        pickPocket2 = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
+        strangeGravedigger2 = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
+        robinHood2 = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
+        slums2 = Card("Slums", 0, None, [Type.STRUCTURE])
+        kingpin2 = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
+        bodyDouble2 = Card("Body Double", 15, None, [Type.PERSON])
+        junker2 = Card("Junker", 7, None, [Type.VEHICLE])
+        beg2 = Card("Beg", 0, None, [Type.SPELL])
+        scam2 = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
+
+        deck = [blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
+                blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
+        return deck
     get_deck_king = staticmethod(get_deck_king)
 
     def get_deck_victoria():
-        pass
+        insurance = Card("Insurance", 0, None, [Type.OBJECT])
+        shareHolder = Card("Share Holder", 10, None, [Type.PERSON])
+        superstar = Card("Superstar", 15, None, [Type.PERSON])
+        hacker = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
+        university = Card("University", 15, None, [Type.STRUCTURE])
+        skyscraper = Card("Skyscraper", 3, None, [Type.STRUCTURE])
+        supplyTruck = Card("Supply Truck", 8, None, [Type.VEHICLE])
+        riotResponseVehicle = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
+        innovate = Card("Innovate", 0, None, [Type.SPELL])
+        solidWorkforce = Card("Solid Workforce", 0, None, [Type.SPELL])
+
+        insurance2 = Card("Insurance", 0, None, [Type.OBJECT])
+        shareHolder2 = Card("Share Holder", 10, None, [Type.PERSON])
+        superstar2 = Card("Superstar", 15, None, [Type.PERSON])
+        hacker2 = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
+        university2 = Card("University", 15, None, [Type.STRUCTURE])
+        skyscraper2 = Card("Skyscraper", 3, None, [Type.STRUCTURE])
+        supplyTruck2 = Card("Supply Truck", 8, None, [Type.VEHICLE])
+        riotResponseVehicle2 = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
+        innovate2 = Card("Innovate", 0, None, [Type.SPELL])
+        solidWorkforce2 = Card("Solid Workforce", 0, None, [Type.SPELL])
+
+        deck = [insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce,
+                insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2]
+        return deck
     get_deck_victoria = staticmethod(get_deck_victoria)
 
     def get_deck_billy():
-        pass
+        slaughterHouse = Card("Slaughter House", 0, None, [Type.STRUCTURE])
+        cropDuster = Card("Crop Duster", 10, None, [Type.VEHICLE])
+        farm = Card("Farm", 15, None, [Type.STRUCTURE])
+        farmBoy = Card("Farm Boy", 5, None, [Type.PERSON])
+        barn = Card("Barn", 0, None, [Type.STRUCTURE])
+        cow = Card("Cow", 7, None, [Type.ANIMAL])
+        chicken = Card("Chicken", 5, None, [Type.ANIMAL])
+        farmDog = Card("Farm Dog", 3, None, [Type.ANIMAL])
+        reap = Card("Reap", 0, None, [Type.SPELL])
+        drought = Card("Drought", 0, None, [Type.SPELL])
+        waterPurifier = Card("Water Purifier", 5, None, [Type.OBJECT])
+
+        slaughterHouse2 = Card("Slaughter House", 0, None, [Type.STRUCTURE])
+        cropDuster2 = Card("Crop Duster", 10, None, [Type.VEHICLE])
+        farm2 = Card("Farm", 15, None, [Type.STRUCTURE])
+        farmBoy2 = Card("Farm Boy", 5, None, [Type.PERSON])
+        barn2 = Card("Barn", 0, None, [Type.STRUCTURE])
+        cow2 = Card("Cow", 7, None, [Type.ANIMAL])
+        chicken2 = Card("Chicken", 5, None, [Type.ANIMAL])
+        farmDog2 = Card("Farm Dog", 3, None, [Type.ANIMAL])
+        reap2 = Card("Reap", 0, None, [Type.SPELL])
+        drought2 = Card("Drought", 0, None, [Type.SPELL])
+        waterPurifier2 = Card("Water Purifier", 5, None, [Type.OBJECT])
+
+        deck = [slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier,
+                slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2]
+        return deck
     get_deck_billy = staticmethod(get_deck_billy)
+
+    def get_deck_common():
+        bagOfCash = Card("Bag of Cash", 10, None, [Type.OBJECT])
+        bigBagOfCash = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
+        deed = Card("Deed", 25, None, [Type.OBJECT])
+        dollaDollaBills = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
+        mansion = Card("Mansion", 30, None, [Type.STRUCTURE])
+        student = Card("Student", 5, None, [Type.PERSON])
+        car = Card("Car", 15, None, [Type.VEHICLE])
+
+        bagOfCash2 = Card("Bag of Cash", 10, None, [Type.OBJECT])
+        bigBagOfCash2 = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
+        deed2 = Card("Deed", 25, None, [Type.OBJECT])
+        dollaDollaBills2 = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
+        mansion2 = Card("Mansion", 30, None, [Type.STRUCTURE])
+        student2 = Card("Student", 5, None, [Type.PERSON])
+        car2 = Card("Car", 15, None, [Type.VEHICLE])
+
+        #### COMMON WITH EFFECTS ###
+        butler = Card("Butler", 10, None, [Type.PERSON])
+        maid = Card("Maid", 5, None, [Type.PERSON])
+        policeOfficer = Card("Police Officer", 15, None, [Type.PERSON])
+        gangsters = Card("Gangsters", 3, None, [Type.PERSON, Type.BLACK])
+        arsonist = Card("Arsonist", 0, None, [Type.PERSON, Type.BLACK])
+        lemonadeStand = Card("Lemonade Stand", 5, None, [Type.STRUCTURE])
+        parkingLot = Card("Parking Lot", 5, None, [Type.STRUCTURE])
+        impoundLot = Card("Impound Lot", 5, None, [Type.STRUCTURE])
+        junkyard = Card("Junkyard", 5, None, [Type.STRUCTURE])
+        loanSlip = Card("Loan Slip", 0, None, [Type.SPELL])
+        creditCard = Card("Credit Card", 0, None, [Type.SPELL])
+        resurrect = Card("Resurrect", 0, None, [Type.SPELL])
+        rebuild = Card("Rebuild", 0, None, [Type.SPELL])
+        saboteur = Card("Saboteur", 0, None, [Type.SPELL])
+
+        deck = [bagOfCash, bigBagOfCash, deed, dollaDollaBills, mansion, student, car, bagOfCash2, bigBagOfCash2, deed2, dollaDollaBills2, mansion2, student2, car2,
+                butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur]
+        return deck
+    get_deck_common = staticmethod(get_deck_common)
+
 
     '''
     REMEMBER: "Special" cards which are made by other cards (ie. not in deck)
