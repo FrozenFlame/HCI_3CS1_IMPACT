@@ -1,6 +1,6 @@
 import pygame, math
 from enum import Enum, auto
-from .Buff_Factory import BuffFactory
+from .FontObj import FontObj
 
 class Card(object):
     def __init__(self, name="Generic", base_val = 0, effect=None, type=None):
@@ -36,6 +36,24 @@ class Card(object):
         self.speed = 10  # movespeed on the screen
 
         self.owner = ""  # the owner of the card
+
+        self.fontDictionary = {"King": 'POORICH.TTF',
+                          "Uncle Billy": 'POORICH.TTF',
+                          "Victoria": 'big_noodle_titling.ttf',
+                          "": 'OLDENGL.TTF'}
+
+
+
+        # pygame.font.init()
+        # fontDictionary = {"King Of Beggars": 'POORICH.TTF',
+        #           "Uncle Billy": 'POORICH.TTF',
+        #           "Victoria": 'big_noodle_titling.ttf'}
+        # fontChoice = fontDictionary[self.owner]
+        # font = pygame.font.Font('assets/fonts/' + fontChoice, 8)
+        #
+        # self.textBaseVal = font.render(self.base_val, False, (0,0,0))
+        # self.textCurrVal = font.render(self.current_val, False, (0,0,0))
+        # self.textName = font.render(self.name, False, (0,0,0))
 
         #
         #  ____              _
@@ -220,6 +238,12 @@ class Card(object):
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
 
+    def addTexts(self, hero):
+        fontChoice = self.fontDictionary[hero]
+        self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
+        self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
+        self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____               _  ______                _   _
@@ -246,7 +270,7 @@ class Card(object):
 
     def apply_buff(self, target):
         target.receive_buff(self.effect)
-
+'''
     def createKingOfBeggarsCollection(self, deckCardList, allCardList):
         buffFactory = BuffFactory()
         #blackMarketEffect = buffFactory.factory(buffFactory.Kind.CONSTANT,buffFactory.Operation.ADD, "COUNT OBJECTS PLAYED IN YOUR FIELD")
@@ -385,7 +409,7 @@ class Card(object):
 
         deckCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
         allCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
-
+'''
 class Type(Enum):
     SPELL = auto()
     BLACK = auto()
