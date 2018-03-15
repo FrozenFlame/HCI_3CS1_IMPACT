@@ -1,6 +1,14 @@
 import pygame, math
+from enum import Enum, auto
+from .Buff_Factory import BuffFactory
+
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect=None):
+    def __init__(self, name="Generic", base_val = 0, effect=None, type=None):
+
+        if type is None:
+            self.type = []
+        else:
+            self.type = type
 
         # Game related
         self.name = name
@@ -238,3 +246,86 @@ class Card(object):
 
     def apply_buff(self, target):
         target.receive_buff(self.effect)
+
+    def createKingOfBeggarsCollection(self):
+        buffFactory = BuffFactory()
+        #blackMarketEffect = buffFactory.factory(buffFactory.Kind.CONSTANT,buffFactory.Operation.ADD, "COUNT OBJECTS PLAYED IN YOUR FIELD")
+
+        blackMarket = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
+        #blackMarket.receive_buff(blackMarketEffect)
+
+        pickPocket = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
+        strangeGravedigger = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
+        robinHood = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
+        slums = Card("Slums", 0, None, [Type.STRUCTURE])
+        kingpin = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
+        bodyDouble = Card("Body Double", 15, None, [Type.PERSON])
+        junker = Card("Junker", 7, None, [Type.VEHICLE])
+        beg = Card("Beg", 0, None, [Type.SPELL])
+        scam = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
+
+
+    def createUncleBillyCollection(self):
+        buffFactory = BuffFactory()
+
+        slaughterHouse = Card("Slaughter House", 0, None, [Type.STRUCTURE])
+        cropDuster = Card("Crop Duster", 10, None, [Type.VEHICLE])
+        farm = Card("Farm", 15, None, [Type.STRUCTURE])
+        farmBoy = Card("Farm Boy", 5, None, [Type.PERSON])
+        barn = Card("Barn", 0, None, [Type.STRUCTURE])
+        cow = Card("Cow", 7, None, [Type.ANIMAL])
+        chicken = Card("Chicken", 5, None, [Type.ANIMAL])
+        farmDog = Card("Farm Dog", 3, None, [Type.ANIMAL])
+        reap = Card("Reap", 0, None, [Type.SPELL])
+        drought = Card("Drought", 0, None, [Type.SPELL])
+        waterPurifier = Card("Water Purifier", 5, None, [Type.OBJECT])
+
+    def createVictoriaCollection(self):
+        buffFactory = BuffFactory()
+
+        insurance = Card("Insurance", 0, None, [Type.OBJECT])
+        shareHolder = Card("Share Holder", 10, None, [Type.PERSON])
+        superstar = Card("Superstar", 15, None, [Type.PERSON])
+        hacker = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
+        university = Card("University", 15, None, [Type.STRUCTURE])
+        skyscraper = Card("Skyscraper", 3, None, [Type.STRUCTURE])
+        supplyTruck = Card("Supply Truck", 8, None, [Type.VEHICLE])
+        riotResponseVehicle = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
+        innovate = Card("Innovate", 0, None, [Type.SPELL])
+        solidWorkforce = Card("Solid Workforce", 0, None, [Type.SPELL])
+
+    def createCommonCollection(self):
+        bagOfCash = Card("Bag of Cash", 10, None, [Type.OBJECT])
+        bigBagOfCash = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
+        deed = Card("Deed", 25, None, [Type.OBJECT])
+        dollaDollaBills = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
+        mansion = Card("Mansion", 30, None, [Type.STRUCTURE])
+        student = Card("Student", 5, None, [Type.PERSON])
+        car = Card("Car", 15, None, [Type.VEHICLE])
+
+        #### COMMON WITH EFFECTS ###
+
+        butler = Card("Butler", 10, None, [Type.PERSON])
+        maid = Card("Maid", 5, None, [Type.PERSON])
+        policeOfficer = Card("Police Officer", 15, None, [Type.PERSON])
+        gangsters = Card("Gangsters", 3, None, [Type.PERSON, Type.BLACK])
+        arsonist = Card("Arsonist", 0, None, [Type.PERSON, Type.BLACK])
+        lemonadeStand = Card("Lemonade Stand", 5, None, [Type.STRUCTURE])
+        parkingLot = Card("Parking Lot", 5, None, [Type.STRUCTURE])
+        impoundLot = Card("Impound Lot", 5, None, [Type.STRUCTURE])
+        junkyard = Card("Junkyard", 5, None, [Type.STRUCTURE])
+        loanSlip = Card("Loan Slip", 0, None, [Type.SPELL])
+        creditCard = Card("Credit Card", 0, None, [Type.SPELL])
+        resurrect = Card("Resurrect", 0, None, [Type.SPELL])
+        rebuild = Card("Rebuild", 0, None, [Type.SPELL])
+        saboteur = Card("Saboteur", 0, None, [Type.SPELL])
+
+
+class Type(Enum):
+    SPELL = auto()
+    BLACK = auto()
+    STRUCTURE = auto()
+    PERSON = auto()
+    OBJECT = auto()
+    VEHICLE = auto()
+    ANIMAL = auto()
