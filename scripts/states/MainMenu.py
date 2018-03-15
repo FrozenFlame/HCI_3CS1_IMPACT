@@ -30,7 +30,7 @@ class MainMenu(object):
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
         self.buttons.dspeed = 5
-
+        self.finished = False
         self.play_button = PlayButton(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.90)
         self.play_button.posX -= self.play_button.width *0.5
         self.play_button.posY -= self.play_button.height *0.5
@@ -213,21 +213,21 @@ class MainMenu(object):
 
         elif self.phase == Phase.START_SCREEN:
             self.buttons.get_evt(click, event, mouse)
-            if self.buttons.has_message: # backup of old start button (goes straight into game
-                self.buttons.has_message = False
-                self.finished = True
-                self.next = "AVARICE"
-                if not Globals.gameStart:  # game is the selected next state
-                    usera = User("Champion", 99, 0)
-                    userb = User("Challenger", 0, 0)
-                    heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
-                    herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
-                    playera = Player(usera, heroa, DeckBuilder.build_deck(""))
-                    playerb = Player(userb, herob, DeckBuilder.build_deck(""))
-                    self.persist['playerA'] = playera
-                    self.persist['playerB'] = playerb
-                    self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
-                    Globals.gameStart = True
+            # if self.buttons.has_message: # backup of old start button (goes straight into game
+            #     self.buttons.has_message = False
+            #     self.finished = True
+            #     self.next = "AVARICE"
+            #     if not Globals.gameStart:  # game is the selected next state
+            #         usera = User("Champion", 99, 0)
+            #         userb = User("Challenger", 0, 0)
+            #         heroa = Hero("Victoria", "this is supposed to be a surface, not a string")
+            #         herob = Hero("King of Beggars", "this is supposed to be a surface, not a string")
+            #         playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+            #         playerb = Player(userb, herob, DeckBuilder.build_deck(""))
+            #         self.persist['playerA'] = playera
+            #         self.persist['playerB'] = playerb
+            #         self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            #         Globals.gameStart = True
 
             if self.buttons.has_message:  # start button
                 self.buttons.has_message = False
@@ -265,20 +265,21 @@ class MainMenu(object):
             if self.play_button.has_message:
                 self.play_button.has_message = False
 
-                usera = User("Player", 99, 0)
-                userb = User("Challenger", 0, 0)
-
-
-                heroa = Hero(self.player_hero, "img")
-                herob = Hero(self.player2_hero, "img")
-                playera = Player(usera, heroa, DeckBuilder.build_deck(""))
-                playerb = Player(userb, herob, DeckBuilder.build_deck(""))
-                self.persist['playerA'] = playera
-                self.persist['playerB'] = playerb
-                self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
-                Globals.gameStart = True
-
+                # usera = User("Player", 99, 0)
+                # userb = User("Challenger", 0, 0)
+                #
+                #
+                # heroa = Hero(self.player_hero, "img")
+                # herob = Hero(self.player2_hero, "img")
+                # playera = Player(usera, heroa, DeckBuilder.build_deck(""))
+                # playerb = Player(userb, herob, DeckBuilder.build_deck(""))
+                # self.persist['playerA'] = playera
+                # self.persist['playerB'] = playerb
+                # self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+                # Globals.gameStart = True
                 self.phase = Phase.TO_GAME
+                self.delay_to_hero = pygame.time.get_ticks()
+
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -353,8 +354,6 @@ class MainMenu(object):
             self.victoria.update(dt)
 
 
-            self.setup_players()
-
         elif self.phase == Phase.TO_READY:
             # self.backdropMovable.update(dt)
             # self.buttons.update(dt)
@@ -367,10 +366,11 @@ class MainMenu(object):
             self.billy.update(dt)
             self.king.update(dt)
             self.victoria.update(dt)
-            if currentTime - self.phase_start_time >= self.delay_to_hero:
+            if currentTime - self.phase_start_time >= 500:
                 print("Changing Phase to START_SCREEN")
                 print("Player 1 has selected ", self.player_hero)
                 print("Player 2 has selected ", self.player2_hero)
+
                 # if self.player_hero == "Billy":
                 # elif self.player_hero == "King":
                 # elif self.player_hero == "Victoria":
@@ -378,18 +378,47 @@ class MainMenu(object):
                 # self.billy.set_absolute()
                 self.phase = Phase.READY_UP
 
+        elif self.phase == Phase.TO_GAME:
+            self.play_button.update(dt)
+
+            self.select_text.update(dt)
+            self.player_text.update(dt)
+            self.player2_text.update(dt)
+
+            self.billy.update(dt)
+            self.king.update(dt)
+            self.victoria.update(dt)
+            if currentTime - self.phase_start_time >= self.delay_to_hero:
+                self.phase = Phase.GAME
+
+        elif self.phase == Phase.GAME:
+            self.setup_players("Vex", "Slasher399")
+            self.next = "AVARICE"
+            self.finished = True
+
+
+
         self.draw(screen)
 
-    def setup_players(self, hero, hero2):
-        self.usera = User("Player 1", 99, 0)
-        if self.hero_selected == "Billy":
-            self.heroa = Hero(self.hero_selected, self.billy_img)
+    def setup_players(self,p,p2):
+        self.usera = User(p, 99, 0)
+        if self.player_hero == "Billy":
+            self.heroa = Hero(self.player_hero, self.billy_img)
         elif self.hero_selected == "King":
-            self.heroa = Hero(self.hero_selected, self.king_img)
+            self.heroa = Hero(self.player_hero, self.king_img)
         else:
-            self.heroa = Hero(self.hero_selected, self.victoria_img)
+            self.heroa = Hero(self.player_hero, self.victoria_img)
         self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck(""))  # NOTE set hero name deck here
-        pass
+
+        self.userb = User(p2, 99, 0)
+        if self.player2_hero == "Billy":
+            self.herob = Hero(self.player2_hero, self.billy_img)
+        elif self.player2_hero == "King":
+            self.herob = Hero(self.player2_hero, self.king_img)
+        else:
+            self.herob = Hero(self.player2_hero, self.victoria_img)
+        self.playerb= Player(self.userb, self.herob, DeckBuilder.build_deck(""))  # NOTE set hero name deck here
+
 
 
     def draw(self, screen):
@@ -442,6 +471,14 @@ class MainMenu(object):
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
+        elif self.phase == Phase.TO_GAME:
+            self.select_text.draw(screen)
+            self.player2_text.draw(screen)
+            self.play_button.draw(screen)
+            self.billy.draw(screen)
+            self.king.draw(screen)
+            self.victoria.draw(screen)
+
 
     def startup(self, currentTime, persistent):
         '''
@@ -459,6 +496,8 @@ class MainMenu(object):
         self.playera = None
         self.playerb = None
         # end for persists #
+        self.finished = False
+        self.phase = Phase.TO_START
 
     def cleanup(self):  # state is finished
         self.done = False
@@ -466,6 +505,13 @@ class MainMenu(object):
         '''
             TEST ONLY STATIC PERSIST
         '''
+
+        if not Globals.gameStart:
+            self.persist['playerA'] = self.playera
+            self.persist['playerB'] = self.playerb
+            self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
+            Globals.gameStart = True
+            self.finished = True
 
         return self.persist
 
@@ -478,3 +524,4 @@ class Phase(Enum):
     TO_READY = auto()
     READY_UP = auto()
     TO_GAME = auto()
+    GAME = auto()
