@@ -30,7 +30,7 @@ class MainMenu(object):
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
         self.buttons.dspeed = 5
-        self.play_button = PlayButton(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.90)
+        self.play_button = PlayButton(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y + 100)
         self.play_button.posX -= self.play_button.width *0.5
         self.play_button.posY -= self.play_button.height *0.5
         self.play_button.dspeed = 5
@@ -193,20 +193,20 @@ class MainMenu(object):
 
                         if self.player2_hero == "Billy":
                             self.player2_img = self.billy_img
-                        elif self.player_hero == "King":
+                        elif self.player2_hero == "King":
                             self.player2_img = self.king_img
                         else:
                             self.player2_img = self.victoria_img
 
-                        self.player_imgmov = Movable(self.player_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
-                        self.player2_imgmov = Movable(self.player2_img,1000, 3,"distance",(Globals.RESOLUTION_X*0.5+1000, Globals.RESOLUTION_Y *0.5))
+                        self.player_imgmov = Movable(self.player_img,1000, 4,"distance",(Globals.RESOLUTION_X*0.5-1000, Globals.RESOLUTION_Y *0.5))
+                        self.player2_imgmov = Movable(self.player2_img,1000, 5,"distance",(Globals.RESOLUTION_X*0.5+1000, Globals.RESOLUTION_Y *0.5))
 
                         self.phase_start_time = pygame.time.get_ticks()
                         self.play_button.set_image(self.play_button.startButtonNormal)
-                        self.player_imgmov.set_destination(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5)
-                        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
+                        self.player_imgmov.set_destination(Globals.RESOLUTION_X*0.5-300, Globals.RESOLUTION_Y*0.5)
+                        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5+300, Globals.RESOLUTION_Y * 0.5)
+                        self.play_button.set_destination(Globals.RESOLUTION_X*0.50-(self.play_button.width/2), Globals.RESOLUTION_Y *0.90-(self.play_button.height/2))
                         self.phase = Phase.TO_READY
-
 
             if event.type == pygame.KEYDOWN:
                 if not self.player2_picking:
@@ -304,6 +304,7 @@ class MainMenu(object):
                     self.select_text.set_destination(*self.select_text_pos2)
                     self.player2_text.back_to_default()
                     self.phase_start_time = pygame.time.get_ticks()
+                    self.play_button.back_to_default()
                     self.phase = Phase.TO_HERO
 
 
@@ -328,6 +329,7 @@ class MainMenu(object):
             self.victoria.update(dt)
             # buttons animation
             # hero fonts
+            self.play_button.update(dt)
             if currentTime - self.phase_start_time >= self.delay_to_hero:
                 print("Changing Phase to HERO_SELECT")
                 self.phase = Phase.HERO_SELECT
@@ -464,6 +466,7 @@ class MainMenu(object):
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
+            self.play_button.draw(screen)
         elif self.phase == Phase.HERO_SELECT:
             # draw back and next buttons
             # draw heroes
