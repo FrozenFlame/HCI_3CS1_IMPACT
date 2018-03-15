@@ -8,12 +8,16 @@ class Movable(object):
     def __init__(self, surface, speed, dspeed, move_type, defaultPos):
         self.surface = surface
         self.rect = surface.get_rect()
-        self.posX = self.rect.center[0]
-        self.posY = self.rect.center[1]
-
+        self.defaultPos = defaultPos
+        # self.posX = self.rect.center[0]
+        # self.posY = self.rect.center[1]
+        self.posX = self.defaultPos[0]
+        self.posY = self.defaultPos[1]
+        self.exact_position = self.posX, self.posY
+        self.rect.center = self.posX, self.posY
         self.is_visible = True
 
-        self.defaultPos = defaultPos
+
         self.exact_position = list(self.rect.center)
         self.speed = speed
         self.dspeed = dspeed
@@ -64,6 +68,14 @@ class Movable(object):
     def update_rect_center(self, posx,posy):
         self.rect.center = posx, posy
 
+    def current_pos_as_default(self):  # UNSTABLE for now
+        self.defaultPos = self.exact_position = self.rect.center
+    def set_absolute(self, absolutexy):
+        self.posX = absolutexy[0]
+        self.posY = absolutexy[1]
+        self.exact_position = list((absolutexy[0], absolutexy[1]))
+        self.rect.center = absolutexy[0], absolutexy[1]
+
     # setting of destination, or the relative vector to location
     def set_destination(self, x,y):
         if self.move_type == "constant":
@@ -97,3 +109,11 @@ class Movable(object):
 
     def back_to_default(self):
         self.set_destination(*self.defaultPos)
+
+    def is_pointed(self, x, y):
+        collide = False
+        # if (self.posX + self.rect.width) >= x >= self.posX and (self.posY + self.rect.height) >= y >= self.posY:
+        #     collide = True
+        collide = self.rect.collidepoint(x,y)
+        return collide
+
