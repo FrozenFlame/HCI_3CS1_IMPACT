@@ -23,6 +23,10 @@ class Card(object):
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
+
+
+
+
         self.width = self.img.get_rect().size[0]  # img's initial width
         self.height = self.img.get_rect().size[1]  # img's initial height
 
@@ -41,6 +45,10 @@ class Card(object):
                           "Uncle Billy": 'POORICH.TTF',
                           "Victoria": 'big_noodle_titling.ttf',
                           "": 'OLDENGL.TTF'}
+        fontChoice = self.fontDictionary["King"]
+        # self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
+        # self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
+        self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
 
 
 
@@ -132,6 +140,7 @@ class Card(object):
         '''
 
     def draw(self, screen):
+        self.img.blit(self.textName.surface, (0, 0))
         screen.blit(self.img, (self.posX, self.posY))
         self.blitted = True
 
@@ -239,11 +248,11 @@ class Card(object):
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
 
     def addTexts(self, hero):
-        fontChoice = self.fontDictionary[hero]
-        self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
-        self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
-        self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
-
+        # fontChoice = self.fontDictionary[hero]
+        # self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
+        # self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
+        # self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
+        pass
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____               _  ______                _   _

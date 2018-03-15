@@ -1073,10 +1073,10 @@ class Engine(object):
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-                if a.front:
-                    a.textBaseVal.draw(screen)
-                    a.textCurrVal.draw(screen)
-                    a.textName.draw(screen)
+                # if a.front:
+                    # a.textBaseVal.draw(screen)
+                    # a.textCurrVal.draw(screen)
+                    # a.textName.draw(screen)
             else:
                 onTopCard = a
         if onTopCard != None:
