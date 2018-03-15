@@ -247,7 +247,7 @@ class Card(object):
     def apply_buff(self, target):
         target.receive_buff(self.effect)
 
-    def createKingOfBeggarsCollection(self):
+    def createKingOfBeggarsCollection(self, deckCardList, allCardList):
         buffFactory = BuffFactory()
         #blackMarketEffect = buffFactory.factory(buffFactory.Kind.CONSTANT,buffFactory.Operation.ADD, "COUNT OBJECTS PLAYED IN YOUR FIELD")
 
@@ -264,8 +264,24 @@ class Card(object):
         beg = Card("Beg", 0, None, [Type.SPELL])
         scam = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
 
+        blackMarket2 = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
+        pickPocket2 = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
+        strangeGravedigger2 = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
+        robinHood2 = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
+        slums2 = Card("Slums", 0, None, [Type.STRUCTURE])
+        kingpin2 = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
+        bodyDouble2 = Card("Body Double", 15, None, [Type.PERSON])
+        junker2 = Card("Junker", 7, None, [Type.VEHICLE])
+        beg2 = Card("Beg", 0, None, [Type.SPELL])
+        scam2 = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
 
-    def createUncleBillyCollection(self):
+        deckCardList.extend([blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam])
+        deckCardList.extend([blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2])
+        allCardList.extend([blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam])
+        allCardList.extend([blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2])
+
+
+    def createUncleBillyCollection(self, deckCardList, allCardList):
         buffFactory = BuffFactory()
 
         slaughterHouse = Card("Slaughter House", 0, None, [Type.STRUCTURE])
@@ -280,7 +296,25 @@ class Card(object):
         drought = Card("Drought", 0, None, [Type.SPELL])
         waterPurifier = Card("Water Purifier", 5, None, [Type.OBJECT])
 
-    def createVictoriaCollection(self):
+        slaughterHouse2 = Card("Slaughter House", 0, None, [Type.STRUCTURE])
+        cropDuster2 = Card("Crop Duster", 10, None, [Type.VEHICLE])
+        farm2 = Card("Farm", 15, None, [Type.STRUCTURE])
+        farmBoy2 = Card("Farm Boy", 5, None, [Type.PERSON])
+        barn2 = Card("Barn", 0, None, [Type.STRUCTURE])
+        cow2 = Card("Cow", 7, None, [Type.ANIMAL])
+        chicken2 = Card("Chicken", 5, None, [Type.ANIMAL])
+        farmDog2 = Card("Farm Dog", 3, None, [Type.ANIMAL])
+        reap2 = Card("Reap", 0, None, [Type.SPELL])
+        drought2 = Card("Drought", 0, None, [Type.SPELL])
+        waterPurifier2 = Card("Water Purifier", 5, None, [Type.OBJECT])
+
+        deckCardList.extend([slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier])
+        deckCardList.extend([slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2])
+        allCardList.extend([slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier])
+        allCardList.extend([slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2])
+
+
+    def createVictoriaCollection(self, deckCardList, allCardList):
         buffFactory = BuffFactory()
 
         insurance = Card("Insurance", 0, None, [Type.OBJECT])
@@ -294,7 +328,23 @@ class Card(object):
         innovate = Card("Innovate", 0, None, [Type.SPELL])
         solidWorkforce = Card("Solid Workforce", 0, None, [Type.SPELL])
 
-    def createCommonCollection(self):
+        insurance2 = Card("Insurance", 0, None, [Type.OBJECT])
+        shareHolder2 = Card("Share Holder", 10, None, [Type.PERSON])
+        superstar2 = Card("Superstar", 15, None, [Type.PERSON])
+        hacker2 = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
+        university2 = Card("University", 15, None, [Type.STRUCTURE])
+        skyscraper2 = Card("Skyscraper", 3, None, [Type.STRUCTURE])
+        supplyTruck2 = Card("Supply Truck", 8, None, [Type.VEHICLE])
+        riotResponseVehicle2 = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
+        innovate2 = Card("Innovate", 0, None, [Type.SPELL])
+        solidWorkforce2 = Card("Solid Workforce", 0, None, [Type.SPELL])
+
+        deckCardList.extend([insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce])
+        deckCardList.extend([insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2])
+        allCardList.extend([insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce])
+        allCardList.extend([insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2])
+
+    def createCommonCollection(self, deckCardList, allCardList):
         bagOfCash = Card("Bag of Cash", 10, None, [Type.OBJECT])
         bigBagOfCash = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
         deed = Card("Deed", 25, None, [Type.OBJECT])
@@ -302,6 +352,19 @@ class Card(object):
         mansion = Card("Mansion", 30, None, [Type.STRUCTURE])
         student = Card("Student", 5, None, [Type.PERSON])
         car = Card("Car", 15, None, [Type.VEHICLE])
+
+        bagOfCash2 = Card("Bag of Cash", 10, None, [Type.OBJECT])
+        bigBagOfCash2 = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
+        deed2 = Card("Deed", 25, None, [Type.OBJECT])
+        dollaDollaBills2 = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
+        mansion2 = Card("Mansion", 30, None, [Type.STRUCTURE])
+        student2 = Card("Student", 5, None, [Type.PERSON])
+        car2 = Card("Car", 15, None, [Type.VEHICLE])
+
+        deckCardList.extend([bagOfCash, bigBagOfCash, deed, dollaDollaBills, mansion, student, car])
+        deckCardList.extend([bagOfCash2, bigBagOfCash2, deed2, dollaDollaBills2, mansion2, student2, car2])
+        allCardList.extend([bagOfCash, bigBagOfCash, deed, dollaDollaBills, mansion, student, car])
+        allCardList.extend([bagOfCash2, bigBagOfCash2, deed2, dollaDollaBills2, mansion2, student2, car2])
 
         #### COMMON WITH EFFECTS ###
 
@@ -320,6 +383,8 @@ class Card(object):
         rebuild = Card("Rebuild", 0, None, [Type.SPELL])
         saboteur = Card("Saboteur", 0, None, [Type.SPELL])
 
+        deckCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
+        allCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
 
 class Type(Enum):
     SPELL = auto()
