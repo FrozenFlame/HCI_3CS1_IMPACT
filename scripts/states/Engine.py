@@ -1118,11 +1118,13 @@ class Engine(object):
                         self.getting_in_place = False
                 else:
                     print("Everything in place, take first turn")
-
+                    # refresh graphic (smoothscale resolution problems)
                     self.bplayer_img.surface = pygame.transform.smoothscale(self.bplayer_img.original_surface, (round(self.bplayer_img.original_surface.get_rect().size[0] *0.505), round(self.bplayer_img.original_surface.get_rect().size[1] * 0.505)))
-                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.5), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.5)))
-                    self.bplayer_img.set_absolute(self.top_slot)
-                    self.bplayer2_img.set_absolute(self.bottom_slot)
+                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.505), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.505)))
+
+
+                    # self.bplayer_img.set_absolute(self.top_slot)
+                    # self.bplayer2_img.set_absolute(self.bottom_slot)
                     self.phase = Phase.OPENING
             # self.phase = Phase.OPENING
             # block down below
