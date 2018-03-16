@@ -166,8 +166,8 @@ class Engine(object):
         self.graveYardListOpp = list()
 
         # aim for the center of the slot
-        self.bottom_slot = (Globals.RESOLUTION_X * 0.10, Globals.RESOLUTION_Y * 0.8)
-        self.top_slot = (Globals.RESOLUTION_X * 0.10, Globals.RESOLUTION_Y * 0.2)
+        self.top_slot = (Globals.RESOLUTION_X *0.145, Globals.RESOLUTION_Y *0.36)
+        self.bottom_slot = (Globals.RESOLUTION_X *0.145, Globals.RESOLUTION_Y * 0.95)
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -1064,11 +1064,12 @@ class Engine(object):
                     self.phase = Phase.PREP
 
         elif self.phase == Phase.COIN_TOSS:
+            # note : timings below have been adjusted to allow faster debugging
             # additional animation updates
             if not self.has_faded_tossed_coin:
                 self.fadeOut()
                 self.has_faded_tossed_coin = True
-            elif not self.has_tossed_coin and currentTime - self.waitTick >= 2000:  # wait 2 seconds
+            elif not self.has_tossed_coin and currentTime - self.waitTick >= 1000:  # wait 2 seconds
                 print("COIN TOSSED")
                 self.toss_coin()
                 self.waitTick = currentTime
@@ -1076,7 +1077,7 @@ class Engine(object):
             if self.has_tossed_coin:
                 if self.first_toss_animating:
                     #animate coin?
-                    if currentTime - self.waitTick <= 2000:  # how long we want the coin to be spinning before stopping it
+                    if currentTime - self.waitTick <= 1000:  # how long we want the coin to be spinning before stopping it
                         self.waitTick = currentTime
                         self.board.coin.animating = False
                         self.first_toss_animating = False
@@ -1106,19 +1107,22 @@ class Engine(object):
                     self.bplayer_img.update(deltaTime)  # these two will take their place
                     self.bplayer2_img.update(deltaTime)
                     if not self.bplayer_img.destination:
-                        print("REFRESHING")
+                        print("REFRESHING") # unreachable righ tnowq
                         self.bplayer_img.instascale((self.bplayer_img.original_surface.get_rect()[0]*0.2, self.bplayer_img.original_surface.get_rect()[1]*0.2))
                     if not self.bplayer2_img.destination:
-                        print("REFRESHING")
+                        print("REFRESHING") # unreachable righ tnowq
                         self.bplayer2_img.instascale((self.bplayer2_img.original_surface.get_rect()[0]*0.2, self.bplayer2_img.original_surface.get_rect()[1]*0.2))
 
 
-                    if currentTime - self.waitTick >= 3000:
+                    if currentTime - self.waitTick >= 2000:
                         self.getting_in_place = False
                 else:
                     print("Everything in place, take first turn")
-                    self.bplayer_img.instascale(*(self.bplayer_img.original_surface.get_rect()[0], self.bplayer_img.original_surface.get_rect()[1] ))
-                    self.bplayer2_img.instascale(*(self.bplayer2_img.original_surface.get_rect()[0], self.bplayer2_img.original_surface.get_rect()[1] ))
+
+                    self.bplayer_img.surface = pygame.transform.smoothscale(self.bplayer_img.original_surface, (round(self.bplayer_img.original_surface.get_rect().size[0] *0.505), round(self.bplayer_img.original_surface.get_rect().size[1] * 0.505)))
+                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.5), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.5)))
+                    self.bplayer_img.set_absolute(self.top_slot)
+                    self.bplayer2_img.set_absolute(self.bottom_slot)
                     self.phase = Phase.OPENING
             # self.phase = Phase.OPENING
             # block down below

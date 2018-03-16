@@ -7,7 +7,8 @@ class Movable(object):
 
     def __init__(self, surface, speed, dspeed, move_type, defaultPos):
         self.surface = surface
-        self.original_surface = surface # in case we need to clean it up again
+        self.original_surface = surface  # in case we need to clean it up again
+        self.new_surface = None
         self.rect = surface.get_rect()
         self.defaultPos = defaultPos
         # self.posX = self.rect.center[0]
@@ -74,8 +75,8 @@ class Movable(object):
     def change_acceleration(self, newdistancespeed):
         self.distancespeed = newdistancespeed
 
-    def update_rect_center(self, posx,posy):
-        self.rect.center = posx, posy
+    def update_rect_center(self, center):
+        self.rect.center = center
 
     def current_pos_as_default(self):  # UNSTABLE for now
         self.defaultPos = self.exact_position = self.rect.center
@@ -138,7 +139,22 @@ class Movable(object):
         self.surface = pygame.transform.smoothscale(self.original_surface, (round(width),round(height)))
         self.new_width = round(width)
         self.new_height = round(height)
+        self.rect.center = self.exact_position
+        # self.posX = absolutexy[0]
+        # self.posY = absolutexy[1]
+        # self.exact_position = list((absolutexy[0], absolutexy[1]))
+        # self.rect.center = absolutexy[0], absolutexy[1]
 
     def original_scale(self):
         self.surface = self.original_surface
 
+
+    def instascalenew(self,width,height,new_img=None):  # None means you have a new image queued up, else, yuo can get from the outside
+        if new_img:
+            self.surface = pygame.transform.smoothscale(self.surface, (round(width), round(height)))
+            self.new_width = round(width)
+            self.new_height = round(height)
+        else:
+            self.surface = pygame.transform.smoothscale(self.new_surface, (round(width), round(height)))
+            self.new_width = round(width)
+            self.new_height = round(height)
