@@ -25,6 +25,7 @@ white = (255,255,255)
 class MainMenu(object):
     def __init__(self):
         tools.State.__init__(self)
+
         self.next = None
         self.buttons = Buttons(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.80)
         self.buttons.posX -= self.buttons.width *0.5
@@ -35,14 +36,40 @@ class MainMenu(object):
         self.play_button.posY -= self.play_button.height *0.5
         self.play_button.dspeed = 5
 
+        ''' (ascii font Ogre)
+           __             _          ___             _                      
+          / /  ___   __ _(_) ___    / __\ ___   ___ | | ___  __ _ _ __  ___ 
+         / /  / _ \ / _` | |/ __|  /__\/// _ \ / _ \| |/ _ \/ _` | '_ \/ __|
+        / /__| (_) | (_| | | (__  / \/  \ (_) | (_) | |  __/ (_| | | | \__ \
+        \____/\___/ \__, |_|\___| \_____/\___/ \___/|_|\___|\__,_|_| |_|___/
+                    |___/                                                   
+        '''
+
         self.player2_picking = False
         self.heroPrime = False  # hero has been held down
+
+        '''
+         _____                _                 
+        /__   \_ __ __ _  ___| | _____ _ __ ___ 
+          / /\/ '__/ _` |/ __| |/ / _ \ '__/ __|
+         / /  | | | (_| | (__|   <  __/ |  \__ \
+         \/   |_|  \__,_|\___|_|\_\___|_|  |___/
+                                        
+        '''
         self.hero_hover = None  # name of hero being hovered
         self.hero_selected = None  # name of hero that has been clicked
         self.player_hero = None
         self.player2_hero = None
+        self.phase = Phase.START_SCREEN
 
-        self.globals = Globals()
+        '''
+            ___          _                     _     _           _       
+           /   \___  ___(_) __ _ _ __     ___ | |__ (_) ___  ___| |_ ___ 
+          / /\ / _ \/ __| |/ _` | '_ \   / _ \| '_ \| |/ _ \/ __| __/ __|
+         / /_//  __/\__ \ | (_| | | | | | (_) | |_) | |  __/ (__| |_\__ \
+        /___,' \___||___/_|\__, |_| |_|  \___/|_.__// |\___|\___|\__|___/
+                           |___/                  |__/                   
+        '''
 
         pygame.mixer.music.load("assets\\music\\game\\hero_select.ogg")
         pygame.mixer.music.set_volume(0.12)
@@ -54,17 +81,15 @@ class MainMenu(object):
         # background
         self.backdrop = pygame.image.load("assets/logo/backdrop.jpg").convert_alpha()
         self.backdropMovable = Movable(self.logo,1000,5,"distance", self.logo_pos)
-
-        self.phase = Phase.START_SCREEN
-
         self.font = FontObj.factory("Team IMPACT", Globals.RESOLUTION_X/2,Globals.RESOLUTION_Y/2,'POORICH.ttf',115,silver)
         self.font.is_visible = False
-
-        # hero images and fonts and header
-        self.select_text = FontObj.factory("Select a Hero",Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
+        # HERO SELECT HEADER #
+        self.select_text = FontObj.factory("Select a Hero", Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
         self.select_text_pos2 = Globals.RESOLUTION_X *0.65, Globals.RESOLUTION_Y *0.10
-        self.player_text = FontObj.factory("Player 1",Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
-        self.player2_text = FontObj.factory("Player 2",Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player_text = FontObj.factory("Player 1", Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player2_text = FontObj.factory("Player 2", Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+
+        # HERO SELECT PANEL ASSETS #
 
         self.resizer = 1.35
         self.billy_img = pygame.image.load("assets/heroes/hero_billy.png").convert_alpha()
@@ -74,30 +99,38 @@ class MainMenu(object):
         self.victoria_img = pygame.image.load("assets/heroes/hero_victoria.png").convert_alpha()
         self.victoria_img = pygame.transform.smoothscale(self.victoria_img, (round(self.victoria_img.get_rect().width * self.resizer), round(self.victoria_img.get_rect().height * self.resizer)))
 
-
-        self.player_img = None
-        self.player2_img = None
-        self.player_imgmov = None
-        self.player2_imgmov = None
-
+        # HERO SELECT PANEL #
         self.hero_panel_pos = Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5
-
         self.billy = Movable(self.billy_img,1000,5,"distance", self.hero_panel_pos)
         self.billy.set_absolute((self.hero_panel_pos[0]-self.billy.rect.width -15, self.hero_panel_pos[1]))
         self.king = Movable(self.king_img,1000,5,"distance", self.hero_panel_pos)
         self.victoria = Movable(self.victoria_img,1000,5,"distance", self.hero_panel_pos)
         self.victoria.set_absolute((self.hero_panel_pos[0]+self.victoria.rect.width +15, self.hero_panel_pos[1]))
-
         self.billy.current_pos_as_default()
         self.king.current_pos_as_default()
         self.victoria.current_pos_as_default()
-
-        self.player_hero_movable = None
-        self.player2_hero_movable = None
+        self.billy_font = FontObj.factory("Uncle Billy", self.billy.rect.center[0], self.billy.rect.center[1]+120,"ONYX.TTF",100, white)
+        self.king_font = FontObj.factory("King of Beggars", self.king.rect.center[0], self.king.rect.center[1]+120, "POORICH.TTF", 50, white)
+        self.victoria_font = FontObj.factory("Victoria", self.victoria.rect.center[0], self.victoria.rect.center[1]+120, "Chalk-hand-lettering-shaded_demo.ttf", 100, white)
+        self.billy_font.distancespeed = 4.5
+        self.king_font.distancespeed = 4.6
+        self.victoria_font.distancespeed = 3.8
+        self.billy_font.set_absolute((self.billy_font.rect.center[0] +1200, self.billy_font.rect.center[1]))
+        self.king_font.set_absolute((self.king_font.rect.center[0]+950, self.king_font.rect.center[1]))
+        self.victoria_font.set_absolute((self.victoria_font.rect.center[0]+950, self.victoria_font.rect.center[1]))
 
         # timings
         self.phase_start_time = None
         self.delay_to_hero = 800
+
+        # READY SCREEN OBJECTS - forced to default for now*
+        self.player_img = self.victoria_img
+        self.player2_img = self.king_img
+        self.player_imgmov =  Movable(self.player_img, 1000, 4, "distance", (Globals.RESOLUTION_X * 0.5 - 1000, Globals.RESOLUTION_Y * 0.5))
+        self.player2_imgmov = Movable(self.player2_img, 1000, 5, "distance", (Globals.RESOLUTION_X * 0.5 + 1000, Globals.RESOLUTION_Y * 0.5))
+
+        self.hero_pick_name = None
+        self.hero2_pick_name = None
 
         # for persist #
         self.usera = None
@@ -107,7 +140,6 @@ class MainMenu(object):
         self.playera = None
         self.playerb = None
         # end for persists #
-
 
 
     def get_evt(self,event):
@@ -150,15 +182,12 @@ class MainMenu(object):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if click[0] == 1 and self.billy.is_pointed(*mouse):
-                    print(1)
                     self.hero_selected = "Billy"
                     self.heroPrime = True
                 elif click[0] == 1 and self.king.is_pointed(*mouse):
-                    print(2)
                     self.hero_selected = "King"
                     self.heroPrime = True
                 elif click[0] == 1 and self.victoria.is_pointed(*mouse):
-                    print(3)
                     self.hero_selected = "Victoria"
                     self.heroPrime = True
 
@@ -182,6 +211,9 @@ class MainMenu(object):
                         self.billy.set_destination(self.billy.posX,self.billy.posY - 1000)
                         self.king.set_destination(self.king.posX,self.king.posY - 1000)
                         self.victoria.set_destination(self.victoria.posX,self.victoria.posY - 1000)
+                        self.billy_font.set_destination(self.billy.posX, self.billy.posY - 1000)
+                        self.king_font.set_destination(self.king.posX, self.king.posY - 1000)
+                        self.victoria_font.set_destination(self.victoria.posX, self.victoria.posY - 1000)
 
                         if self.player_hero == "Billy":
                             self.player_img = self.billy_img
@@ -189,7 +221,6 @@ class MainMenu(object):
                             self.player_img = self.king_img
                         else:
                             self.player_img = self.victoria_img
-
 
                         if self.player2_hero == "Billy":
                             self.player2_img = self.billy_img
@@ -203,46 +234,20 @@ class MainMenu(object):
 
                         self.phase_start_time = pygame.time.get_ticks()
                         self.play_button.set_image(self.play_button.startButtonNormal)
-                        self.player_imgmov.set_destination(Globals.RESOLUTION_X*0.5-300, Globals.RESOLUTION_Y*0.5)
-                        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5+300, Globals.RESOLUTION_Y * 0.5)
+                        self.player_imgmov.set_destination(Globals.RESOLUTION_X*0.5-300, Globals.RESOLUTION_Y*0.5-100)
+                        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5+300, Globals.RESOLUTION_Y * 0.5-100)
                         self.play_button.set_destination(Globals.RESOLUTION_X*0.50-(self.play_button.width/2), Globals.RESOLUTION_Y *0.90-(self.play_button.height/2))
                         self.phase = Phase.TO_READY
 
             if event.type == pygame.KEYDOWN:
-                if not self.player2_picking:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.fadeout(600)
-                        self.phase = Phase.TO_START
-                        self.phase_start_time = pygame.time.get_ticks()
-                        print("[MainMenu(STATE)] Going back to StartScreen")
-
-                        self.font.set_destination(0, 0)
-                        self.backdropMovable.back_to_default()
-                        self.buttons.back_to_default()
-                        self.buttons.set_image(self.buttons.startButtonNormal)
-                        self.select_text.distancespeed = 7
-                        self.player_text.distancespeed = 8
-                        self.player2_text.distancespeed = 4
-
-                        self.select_text.set_destination(self.select_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.10)
-                        self.player_text.set_destination(self.player_text.rect.center[0] + 1450, Globals.RESOLUTION_Y * 0.14)
-                        # self.player2_text.set_destination(self.player2_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.15)
-
-                        self.billy.set_destination(self.hero_panel_pos[0] +900, self.hero_panel_pos[1])
-                        self.king.set_destination(self.hero_panel_pos[0] +900, self.hero_panel_pos[1])
-                        self.victoria.set_destination(self.hero_panel_pos[0] +900, self.hero_panel_pos[1])
-                else:
-                    if event.key == pygame.K_ESCAPE:
-                        # animations
-                        self.player2_picking = False
-                        self.select_text.back_to_default()
-                        self.player_text.back_to_default()
-                        self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.14)
+                if event.key == pygame.K_ESCAPE:
+                    self.getevt_heroselect_esc()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if click[2] == 1:
+                    self.getevt_heroselect_esc()
 
         elif self.phase == Phase.START_SCREEN:
             self.buttons.get_evt(click, event, mouse)
-
-
             if self.buttons.has_message:  # start button
                 self.buttons.has_message = False
                 message = self.buttons.get_message()
@@ -269,9 +274,8 @@ class MainMenu(object):
                     self.billy.set_absolute((self.hero_panel_pos[0] +900, self.hero_panel_pos[1]))
                     self.king.set_absolute((self.hero_panel_pos[0] +900, self.hero_panel_pos[1]))
                     self.victoria.set_absolute((self.hero_panel_pos[0] +900, self.hero_panel_pos[1]))
-                    self.billy.back_to_default()
-                    self.king.back_to_default()
-                    self.victoria.back_to_default()
+
+                    self.heroes_to_default()
 
                     # allow coins to get moving
                     # reset wait timer
@@ -279,7 +283,6 @@ class MainMenu(object):
             self.play_button.get_evt(click,event,mouse)
             if self.play_button.has_message:
                 self.play_button.has_message = False
-
                 # usera = User("Player", 99, 0)
                 # userb = User("Challenger", 0, 0)
                 #
@@ -295,19 +298,15 @@ class MainMenu(object):
                 self.phase = Phase.TO_GAME
                 self.delay_to_hero = pygame.time.get_ticks()
 
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.billy.back_to_default()
-                    self.king.back_to_default()
-                    self.victoria.back_to_default()
-                    self.select_text.set_destination(*self.select_text_pos2)
-                    self.player2_text.back_to_default()
-                    self.phase_start_time = pygame.time.get_ticks()
-                    self.play_button.back_to_default()
-                    self.phase = Phase.TO_HERO
 
+                    self.getevt_readyup_esc()
 
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if click[2] == 1:
+
+                    self.getevt_readyup_esc()
 
     def update(self, screen, keys, currentTime, dt):
 
@@ -320,13 +319,12 @@ class MainMenu(object):
             self.buttons.update(dt)
 
             # player texts
-            self.select_text.update(dt)
-            self.player_text.update(dt)
-            self.player2_text.update(dt)
+            self.update_select_text(dt)
             # heroes animation
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
+            self.update_heroes(dt)
+
+            self.player_imgmov.update(dt)
+            self.player2_imgmov.update(dt)
             # buttons animation
             # hero fonts
             self.play_button.update(dt)
@@ -335,27 +333,16 @@ class MainMenu(object):
                 self.phase = Phase.HERO_SELECT
         elif self.phase == Phase.HERO_SELECT:  # backdrop and buttons no longer updated
             # player texts
-            self.select_text.update(dt)
-            self.player_text.update(dt)
-            self.player2_text.update(dt)
-
+            self.update_select_text(dt)
             # heroes animation
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
-
+            self.update_heroes(dt)
             # buttons animation
             # hero fonts
         elif self.phase == Phase.TO_START:
             self.backdropMovable.update(dt)
             self.buttons.update(dt)
-            self.select_text.update(dt)
-            self.player_text.update(dt)
-            self.player2_text.update(dt)
-
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
+            self.update_select_text(dt)
+            self.update_heroes(dt)
 
             if currentTime - self.phase_start_time >= self.delay_to_hero:
                 print("Changing Phase to START_SCREEN")
@@ -367,9 +354,8 @@ class MainMenu(object):
 
             self.play_button.update(dt)
 
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
+            self.update_heroes(dt)
+
             self.player_imgmov.update(dt)
             self.player2_imgmov.update(dt)
 
@@ -379,13 +365,9 @@ class MainMenu(object):
             # self.buttons.update(dt)
             self.play_button.update(dt)
 
-            self.select_text.update(dt)
-            self.player_text.update(dt)
-            self.player2_text.update(dt)
+            self.update_select_text(dt)
+            self.update_heroes(dt)
 
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
             self.player_imgmov.update(dt)
             self.player2_imgmov.update(dt)
             if currentTime - self.phase_start_time >= 500:
@@ -403,13 +385,9 @@ class MainMenu(object):
         elif self.phase == Phase.TO_GAME:
             self.play_button.update(dt)
 
-            self.select_text.update(dt)
-            self.player_text.update(dt)
-            self.player2_text.update(dt)
+            self.update_select_text(dt)
 
-            self.billy.update(dt)
-            self.king.update(dt)
-            self.victoria.update(dt)
+            self.update_heroes(dt)
             if currentTime - self.phase_start_time >= 300:
                 self.setup_players("Vex", "Slasher399")
                 self.phase = Phase.GAME
@@ -418,8 +396,6 @@ class MainMenu(object):
             print("POPPING THE SPEAR")
             self.next = "AVARICE"
             self.finished = True
-
-
 
         self.draw(screen)
 
@@ -442,8 +418,6 @@ class MainMenu(object):
             self.herob = Hero(self.player2_hero, self.victoria_img)
         self.playerb = Player(self.userb, self.herob, DeckBuilder.build_deck(self.player2_hero))  # NOTE set hero name deck here
 
-
-
     def draw(self, screen):
         pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
@@ -459,46 +433,37 @@ class MainMenu(object):
             self.buttons.draw(screen)
             self.backdropMovable.draw(screen)
 
-            self.select_text.draw(screen)
-            self.player_text.draw(screen)
-            self.player2_text.draw(screen)
+            self.draw_select_text(screen)
 
-            self.billy.draw(screen)
-            self.king.draw(screen)
-            self.victoria.draw(screen)
+            self.draw_heroes(screen)
+            self.player_imgmov.draw(screen)
+            self.player2_imgmov.draw(screen)
             self.play_button.draw(screen)
+
         elif self.phase == Phase.HERO_SELECT:
             # draw back and next buttons
             # draw heroes
             # draw heroes text
-            self.select_text.draw(screen)
-            self.player_text.draw(screen)
-            self.player2_text.draw(screen)
+            self.draw_select_text(screen)
 
-            self.billy.draw(screen)
-            self.king.draw(screen)
-            self.victoria.draw(screen)
+            self.draw_heroes(screen)
+
         elif self.phase == Phase.READY_UP:
-            self.select_text.draw(screen)
-            self.player_text.draw(screen)
-            self.player2_text.draw(screen)
-
             self.play_button.draw(screen)
 
-            self.billy.draw(screen)
-            self.king.draw(screen)
-            self.victoria.draw(screen)
             self.player_imgmov.draw(screen)
             self.player2_imgmov.draw(screen)
+
         elif self.phase == Phase.TO_READY:
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
             self.play_button.draw(screen)
-            self.billy.draw(screen)
-            self.king.draw(screen)
-            self.victoria.draw(screen)
+
+            self.draw_heroes(screen)
+
             self.player_imgmov.draw(screen)
             self.player2_imgmov.draw(screen)
+
         elif self.phase == Phase.TO_GAME:
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
@@ -506,6 +471,95 @@ class MainMenu(object):
             self.billy.draw(screen)
             self.king.draw(screen)
             self.victoria.draw(screen)
+
+    '''
+    #    ___           _           _ _                                          _                  _                      _                               _           _                 _        _       _
+    #   / __\ __ _ ___(_) ___ __ _| | |_   _   ___  ___  _ __ ___   ___   _ __ | | __ _  ___ ___  | |_ ___    _ __  _   _| |_   _ __ ___ _ __   ___  __ _| |_ ___  __| |   ___ ___   __| | ___  | | ___ | |
+    #  /__\/// _` / __| |/ __/ _` | | | | | | / __|/ _ \| '_ ` _ \ / _ \ | '_ \| |/ _` |/ __/ _ \ | __/ _ \  | '_ \| | | | __| | '__/ _ \ '_ \ / _ \/ _` | __/ _ \/ _` |  / __/ _ \ / _` |/ _ \ | |/ _ \| |
+    # / \/  \ (_| \__ \ | (_| (_| | | | |_| | \__ \ (_) | | | | | |  __/ | |_) | | (_| | (_|  __/ | || (_) | | |_) | |_| | |_  | | |  __/ |_) |  __/ (_| | ||  __/ (_| | | (_| (_) | (_| |  __/ | | (_) | |
+    # \_____/\__,_|___/_|\___\__,_|_|_|\__, | |___/\___/|_| |_| |_|\___| | .__/|_|\__,_|\___\___|  \__\___/  | .__/ \__,_|\__| |_|  \___| .__/ \___|\__,_|\__\___|\__,_|  \___\___/ \__,_|\___| |_|\___/|_|
+    #                                  |___/                             |_|                                 |_|                        |_|
+    '''
+    # get_event
+    def getevt_heroselect_esc(self):
+        if not self.player2_picking:
+            pygame.mixer.music.fadeout(600)
+            self.phase = Phase.TO_START
+            self.phase_start_time = pygame.time.get_ticks()
+            print("[MainMenu(STATE)] Going back to StartScreen")
+
+            self.font.set_destination(0, 0)
+            self.backdropMovable.back_to_default()
+            self.buttons.back_to_default()
+            self.buttons.set_image(self.buttons.startButtonNormal)
+            self.select_text.distancespeed = 7
+            self.player_text.distancespeed = 8
+            self.player2_text.distancespeed = 4
+
+            self.select_text.set_destination(self.select_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.10)
+            self.player_text.set_destination(self.player_text.rect.center[0] + 1450, Globals.RESOLUTION_Y * 0.14)
+            # self.player2_text.set_destination(self.player2_text.rect.center[0] + 1200, Globals.RESOLUTION_Y * 0.15)
+
+            self.billy.set_destination(self.hero_panel_pos[0] + 900, self.hero_panel_pos[1])
+            self.king.set_destination(self.hero_panel_pos[0] + 900, self.hero_panel_pos[1])
+            self.victoria.set_destination(self.hero_panel_pos[0] + 900, self.hero_panel_pos[1])
+            self.billy_font.set_destination(self.billy_font.rect.center[0] + 1250, self.billy_font.rect.center[1])
+            self.king_font.set_destination(self.king_font.rect.center[0] + 950, self.king_font.rect.center[1])
+            self.victoria_font.set_destination(self.victoria_font.rect.center[0] + 950, self.victoria_font.rect.center[1])
+        else:
+            # animations
+            self.player2_picking = False
+            self.select_text.back_to_default()
+            self.player_text.back_to_default()
+            self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.14)
+    def getevt_readyup_esc(self):
+        self.heroes_to_default()
+        self.select_text.set_destination(*self.select_text_pos2)
+        self.player2_text.back_to_default()
+
+        self.player_imgmov.set_destination(Globals.RESOLUTION_X * 0.5 - 1000, Globals.RESOLUTION_Y * 0.5 + 100)
+        self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5 + 1000, Globals.RESOLUTION_Y * 0.5 + 100)
+
+        self.play_button.back_to_default()
+        self.phase = Phase.TO_HERO
+        self.phase_start_time = pygame.time.get_ticks()
+
+    # update
+    def update_heroes(self, dt):
+        self.billy.update(dt)
+        self.king.update(dt)
+        self.victoria.update(dt)
+        self.billy_font.update(dt)
+        self.king_font.update(dt)
+        self.victoria_font.update(dt)
+    def update_select_text(self, dt):
+        self.select_text.update(dt)
+        self.player_text.update(dt)
+        self.player2_text.update(dt)
+    # draw
+    def draw_heroes(self, screen):
+        self.billy.draw(screen)
+        self.king.draw(screen)
+        self.victoria.draw(screen)
+
+        self.billy_font.draw(screen)
+        self.king_font.draw(screen)
+        self.victoria_font.draw(screen)
+
+    def draw_select_text(self, screen):
+        self.select_text.draw(screen)
+        self.player_text.draw(screen)
+        self.player2_text.draw(screen)
+
+    # generic
+
+    def heroes_to_default(self):
+        self.billy.back_to_default()
+        self.king.back_to_default()
+        self.victoria.back_to_default()
+        self.billy_font.back_to_default()
+        self.king_font.back_to_default()
+        self.victoria_font.back_to_default()
 
 
     def startup(self, currentTime, persistent):

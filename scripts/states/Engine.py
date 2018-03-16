@@ -1052,11 +1052,11 @@ class Engine(object):
         self.deckImgHolderOpp2.update(deltaTime, 1175, 49)
         self.deckImgHolderOpp3.update(deltaTime, 1180, 48)
 
-        for a in self.allCardsList:
-            if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
-                a.addTexts(self.player.hero.name)
-            elif a.front:
-                a.addTexts(self.player2.hero.name)
+        # for a in self.allCardsList:
+        #     if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
+        #         # a.addTexts(self.player.hero.name)
+        #     elif a.front:
+        #         # a.addTexts(self.player2.hero.name)
         self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)

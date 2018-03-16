@@ -95,49 +95,14 @@ class FontObj(object):
         posX 100 defX 0 posY 200 defY 0
         '''
 
+    def set_absolute(self, absolutexy):
+        self.posX = absolutexy[0]
+        self.posY = absolutexy[1]
+        self.exact_position = list((absolutexy[0], absolutexy[1]))
+        self.rect.center = absolutexy[0], absolutexy[1]
 
     def back_to_default(self):
         self.set_destination(*self.defaultPos)
-
-    # code from card
-    # def update(self, dTime, mouseX, mouseY):
-    #     if self.destination:
-    #         if self.isHeld == True:
-    #             self.posX = mouseX - self.width * 0.75
-    #             self.posY = mouseY - self.height * 0.75
-    #         # animating but not held card
-    #         elif self.isHeld == False and self.resting == False:
-    #             self.set_destination(self.defaultPos[0], self.defaultPos[1])
-    #             travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
-    #             self.distance -= travelled
-    #             if self.distance <= 0:  # destination reached
-    #                 self.posX = self.defaultPos[0]  # * dTime
-    #                 self.posY = self.defaultPos[1]  # * dTime
-    #                 self.resting = True
-    #                 self.destination = None
-    #             else:  # this is for returning the card to your hand with animation
-    #                 self.posX += self.vector[0] * dTime
-    #                 self.posY += self.vector[1] * dTime
-    #     else:
-    #         self.posX = mouseX
-    #         self.posY = mouseY
-    #
-    #     # setting of destination, or the relative vector to location
-    #
-    # def set_destination(self, x, y):
-    #     xDistance = x - self.posX
-    #     yDistance = y - self.posY
-    #     self.distance = math.hypot(xDistance, yDistance)  # distance from default position
-    #     try:
-    #         self.vector = (self.speed + (self.distance * 10)) * xDistance / self.distance, (
-    #                 self.speed + (self.distance * 10)) * yDistance / self.distance
-    #         self.destination = list((x, y))
-    #     except ZeroDivisionError:
-    #         pass
-    #     '''
-    #     Distance: 100 (random angle)
-    #     posX 100 defX 0 posY 200 defY 0
-    #     '''
 
     def go(self):   # 'orders' object to proceed to next destination
         pass
