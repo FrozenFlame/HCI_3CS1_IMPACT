@@ -1,4 +1,4 @@
-import math
+import math, pygame
 '''
 movable is a generic class that will allow us to take advantage of the animation code
 '''
@@ -7,6 +7,7 @@ class Movable(object):
 
     def __init__(self, surface, speed, dspeed, move_type, defaultPos):
         self.surface = surface
+        self.original_surface = surface # in case we need to clean it up again
         self.rect = surface.get_rect()
         self.defaultPos = defaultPos
         # self.posX = self.rect.center[0]
@@ -17,6 +18,9 @@ class Movable(object):
         self.rect.center = self.posX, self.posY
         self.is_visible = True
 
+        self.is_scaling = True
+        self.new_width = 0
+        self.new_height = 0
 
         self.exact_position = list(self.rect.center)
         self.speed = speed
@@ -25,6 +29,7 @@ class Movable(object):
         self.destination = None
         self.vector = None
         self.move_type = move_type
+        self.scalespeed = 10
 
     def update(self, dTime):
         if self.destination:
@@ -61,6 +66,10 @@ class Movable(object):
                     self.posY += self.vector[1] * dTime
                     self.rect.center = self.posX, self.posY
                     self.exact_position = self.rect.center
+
+    def draw(self, screen):
+        if self.is_visible:
+            screen.blit(self.surface, self.rect)
 
     def change_acceleration(self, newdistancespeed):
         self.distancespeed = newdistancespeed
@@ -103,9 +112,6 @@ class Movable(object):
         Distance: 100 (random angle)
         posX 100 defX 0 posY 200 defY 0
         '''
-    def draw(self, screen):
-        if self.is_visible:
-            screen.blit(self.surface, self.rect)
 
     def back_to_default(self):
         self.set_destination(*self.defaultPos)
@@ -116,4 +122,23 @@ class Movable(object):
         #     collide = True
         collide = self.rect.collidepoint(x,y)
         return collide
+
+    def set_new_scale(self, width, height):
+        self.is_scaling = True
+        self.new_width = width
+        self.new_height = height
+
+    def scale(self, currentTick): # send to backburner for now, this is for smooth scaling
+
+        # if self.surface.get_rect.width != self.new_width and self.surface.get_rect.height != self.new_width:
+        #if self.new_width >
+        pass
+
+    def instascale(self, width, height):
+        self.surface = pygame.transform.smoothscale(self.original_surface, (round(width),round(height)))
+        self.new_width = round(width)
+        self.new_height = round(height)
+
+    def original_scale(self):
+        self.surface = self.original_surface
 

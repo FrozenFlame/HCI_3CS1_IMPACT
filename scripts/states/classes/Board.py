@@ -51,7 +51,18 @@ class Board(object):
             # self.img have image here
             self.side = 0 # 0 and 1 for heads and tails
             self.animating = False # spinning in the air
+            self.longanim = False
         def flip(self):
+            self.animating = True
+            self.shortanim = True
             self.side = 0 if self.side != 0 else 1
         def toss(self): # random first toss in the game
+            self.animating = True
+            self.longanim = True
             self.side = random.randrange(0,2)
+
+        def update(self, dTime):
+            pass
+        def flipAnim(self):
+            pass
+

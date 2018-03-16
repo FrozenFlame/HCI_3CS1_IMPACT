@@ -3,7 +3,8 @@ from enum import Enum, auto
 from .classes.BoardField import BoardField
 from .classes.Card import Card
 from .classes.Board import Board
-
+from .classes.Movable import Movable
+from .classes.FontObj import FontObj
 from .. import tools
 
 from ..Globals import Globals
@@ -65,6 +66,16 @@ class Engine(object):
         self.cards_played = 0  # counter to determine how many cards you've played that turn
         self.phase = Phase.COIN_TOSS
 
+        '''
+        CUTSCENE BOOLEANS
+        '''
+        # initial coin toss
+        self.has_faded_tossed_coin = False
+        self.has_tossed_coin = False
+        self.first_toss_animating = True
+        self.notif_pause = True
+        self.getting_in_place = True
+
         # logic booleans
         self.first_player_set = False  # becomes true after coin toss, and hands/decks set
         self.holdingCard = False
@@ -75,6 +86,7 @@ class Engine(object):
         self.may_drag = False
         self.passed = False  # a player has passed their turn
         self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
+        self.big_portraits_visible = False
         # self.opening = True
 
         # objects
@@ -92,6 +104,9 @@ class Engine(object):
         # self.boardFieldList = [self.boardField, self.boardField2, self.boardFieldOpp, self.boardFieldOpp2]
         self.boardFieldList = [self.boardField, self.boardField2]
         # self.boardCardList = list()
+
+        self.bplayer_img = None
+        self.bplayer2_img = None
 
         self.allCardsList = list()
 
@@ -150,6 +165,11 @@ class Engine(object):
         self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
+        # aim for the center of the slot
+        self.bottom_slot = (Globals.RESOLUTION_X * 0.10, Globals.RESOLUTION_Y * 0.8)
+        self.top_slot = (Globals.RESOLUTION_X * 0.10, Globals.RESOLUTION_Y * 0.2)
+
+        # fade things
         self.screen = pygame.display.set_mode((1280, 720))
         self.fadeScreen = pygame.Surface((1280, 720))
         self.fadeScreen.fill((0,0,0)) #black
@@ -585,7 +605,13 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
+        self.deckImgHolder1.update(deltaTime, 1170, 565)
+        self.deckImgHolder2.update(deltaTime, 1175, 564)
+        self.deckImgHolder3.update(deltaTime, 1180, 563)
 
+        self.deckImgHolderOpp1.update(deltaTime, 1170, 50)
+        self.deckImgHolderOpp2.update(deltaTime, 1175, 49)
+        self.deckImgHolderOpp3.update(deltaTime, 1180, 48)
         if not self.opening:
             # print(self.player.user.username)
             # print(self.turn_no)
@@ -601,6 +627,10 @@ class Engine(object):
                     a.update(deltaTime, a.defaultPos[0], a.defaultPos[1])
             if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
                 a.flipAnim(self.waitTick)
+
+
+        if self.board.coin.animating:
+            self.board.coin.flipAnim()
 
         ''' UPDATE
          ____  _  _   __   ____  ____  ____
@@ -1035,8 +1065,62 @@ class Engine(object):
 
         elif self.phase == Phase.COIN_TOSS:
             # additional animation updates
-            self.toss_coin()
-            self.phase = Phase.OPENING
+            if not self.has_faded_tossed_coin:
+                self.fadeOut()
+                self.has_faded_tossed_coin = True
+            elif not self.has_tossed_coin and currentTime - self.waitTick >= 2000:  # wait 2 seconds
+                print("COIN TOSSED")
+                self.toss_coin()
+                self.waitTick = currentTime
+                self.has_tossed_coin = True
+            if self.has_tossed_coin:
+                if self.first_toss_animating:
+                    #animate coin?
+                    if currentTime - self.waitTick <= 2000:  # how long we want the coin to be spinning before stopping it
+                        self.waitTick = currentTime
+                        self.board.coin.animating = False
+                        self.first_toss_animating = False
+                        if self.coin_side() == 0:
+                            print("Coin pointing left")
+                            # self.board.coin.setimg(self.imgleft)  pseudo code for now
+                            # set bplayerimg to bottom left slot
+                            self.bplayer_img.set_destination(*self.bottom_slot)
+                            # set bplayer2img to top left slot
+                            self.bplayer2_img.set_destination(*self.top_slot)
+                        else:
+                            print("Coin pointing right")
+                            # self.board.coin.setimg(self.imgright) pseudo code for now
+                            # set bplayer2img to bottom left slot
+                            self.bplayer2_img.set_destination(*self.bottom_slot)
+                            # set bplayerimg to top left slot
+                            self.bplayer_img.set_destination(*self.top_slot)
+
+                elif self.notif_pause: # time paused to notify who goes first
+                    if currentTime - self.waitTick >= 1000:
+                        self.notif_pause = False
+                        self.may_see_first = True
+                        #self.first_fontobj absolute position below first player card
+                        self.waitTick = currentTime
+                elif self.getting_in_place:
+                    self.board.coin.update(deltaTime)  # probably heading to the coin slot to the left
+                    self.bplayer_img.update(deltaTime)  # these two will take their place
+                    self.bplayer2_img.update(deltaTime)
+                    if not self.bplayer_img.destination:
+                        print("REFRESHING")
+                        self.bplayer_img.instascale((self.bplayer_img.original_surface.get_rect()[0]*0.2, self.bplayer_img.original_surface.get_rect()[1]*0.2))
+                    if not self.bplayer2_img.destination:
+                        print("REFRESHING")
+                        self.bplayer2_img.instascale((self.bplayer2_img.original_surface.get_rect()[0]*0.2, self.bplayer2_img.original_surface.get_rect()[1]*0.2))
+
+
+                    if currentTime - self.waitTick >= 3000:
+                        self.getting_in_place = False
+                else:
+                    print("Everything in place, take first turn")
+                    self.bplayer_img.instascale(*(self.bplayer_img.original_surface.get_rect()[0], self.bplayer_img.original_surface.get_rect()[1] ))
+                    self.bplayer2_img.instascale(*(self.bplayer2_img.original_surface.get_rect()[0], self.bplayer2_img.original_surface.get_rect()[1] ))
+                    self.phase = Phase.OPENING
+            # self.phase = Phase.OPENING
             # block down below
             # if self.opening:
             #     self.phase = Phase.OPENING
@@ -1044,13 +1128,7 @@ class Engine(object):
             #     self.phase = Phase.SWAP
 
 
-        self.deckImgHolder1.update(deltaTime, 1170, 565)
-        self.deckImgHolder2.update(deltaTime, 1175, 564)
-        self.deckImgHolder3.update(deltaTime, 1180, 563)
 
-        self.deckImgHolderOpp1.update(deltaTime, 1170, 50)
-        self.deckImgHolderOpp2.update(deltaTime, 1175, 49)
-        self.deckImgHolderOpp3.update(deltaTime, 1180, 48)
 
         # for a in self.allCardsList:
         #     if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
@@ -1073,18 +1151,18 @@ class Engine(object):
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-                if a.front:
-                    a.textBaseVal.draw(screen)
-                    a.textCurrVal.draw(screen)
-                    a.textName.draw(screen)
+                # if a.front:
+                #     a.textBaseVal.draw(screen)
+                #     a.textCurrVal.draw(screen)
+                #     a.textName.draw(screen)
             else:
                 onTopCard = a
         if onTopCard != None:
             onTopCard.draw(screen)
-            if onTopCard.front:
-                onTopCard.textBaseVal.draw(screen)
-                onTopCard.textCurrVal.draw(screen)
-                onTopCard.textName.draw(screen)
+            # if onTopCard.front:
+            #     onTopCard.textBaseVal.draw(screen)
+            #     onTopCard.textCurrVal.draw(screen)
+            #     onTopCard.textName.draw(screen)
             onTopCard.onTop = False
 
         self.deckImgHolder1.draw(screen)
@@ -1106,6 +1184,9 @@ class Engine(object):
         if self.showHandButton:
             screen.blit(self.showHandImg, (self.showHandImgX, self.showHandImgY))
 
+        if self.big_portraits_visible:
+            self.bplayer_img.draw(screen)
+            self.bplayer2_img.draw(screen)
 
 
 
@@ -1147,18 +1228,12 @@ class Engine(object):
         self.may_end_round = False
         self.passed = False
         self.done_drawing = False
-        # #temp
-        # self.deck = self.persist['playerB'].deck
-        # self.opponent_deck = self.persist['playerA'].deck
-        # self.hand = self.get_first_cards(self.deck)
-        # self.opponent_hand = self.get_first_cards(self.opponent_deck)
-        # self.player = self.persist['playerB']
-        # self.first_player = self.persist['playerB']
-        # self.player2 = self.persist['playerA']
-        # #endtemp
 
-
-
+        self.bplayer_img = persistent['portraitA']
+        self.bplayer_img.set_absolute((Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45))
+        self.bplayer2_img = persistent['portraitB']
+        self.bplayer2_img.set_absolute((Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45))
+        self.big_portraits_visible = True
 
     def cleanup(self):
         self.board = None

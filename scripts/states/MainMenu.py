@@ -141,6 +141,35 @@ class MainMenu(object):
         self.playerb = None
         # end for persists #
 
+        # faders
+        self.screen = pygame.display.set_mode((1280, 720))
+        self.fadeScreen = pygame.Surface((1280, 720))
+        self.fadeScreen.fill((0, 0, 0))  # black
+        self.faded = False
+        self.buttons.set_image(self.buttons.startButtonNormal)
+        self.has_faded_out = False
+
+    def fadeIn(self):
+        alpha = 0
+        while alpha <= 255:
+            self.fadeScreen.set_alpha(alpha)
+            self.draw(self.screen)
+            self.screen.blit(self.fadeScreen, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(1)
+            alpha += 5
+        self.faded = True
+
+    def fadeOut(self):
+        alpha = 250
+        while alpha >= 0:
+            self.fadeScreen.set_alpha(alpha)
+            self.draw(self.screen)
+            self.screen.blit(self.fadeScreen, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(1)
+            alpha -= 5
+        self.faded = False
 
     def get_evt(self,event):
         mouse = pygame.mouse.get_pos()
@@ -295,6 +324,7 @@ class MainMenu(object):
                 # self.persist['playerB'] = playerb
                 # self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
                 # Globals.gameStart = True
+                self.fadeIn()
                 self.phase = Phase.TO_GAME
                 self.delay_to_hero = pygame.time.get_ticks()
 
@@ -312,8 +342,10 @@ class MainMenu(object):
 
         self.font.update(dt)
         if self.phase == Phase.START_SCREEN:
+            if not self.has_faded_out:
+                self.has_faded_out = True
+                self.fadeOut()
 
-            pass
         elif self.phase == Phase.TO_HERO:
             self.backdropMovable.update(dt)
             self.buttons.update(dt)
@@ -388,6 +420,8 @@ class MainMenu(object):
             self.update_select_text(dt)
 
             self.update_heroes(dt)
+            pygame.mixer.music.fadeout(1000)
+
             if currentTime - self.phase_start_time >= 300:
                 self.setup_players("Vex", "Slasher399")
                 self.phase = Phase.GAME
@@ -395,7 +429,9 @@ class MainMenu(object):
         elif self.phase == Phase.GAME:
             print("POPPING THE SPEAR")
             self.next = "AVARICE"
+
             self.finished = True
+
 
         self.draw(screen)
 
@@ -422,7 +458,7 @@ class MainMenu(object):
         pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
         self.font.draw(screen)
-
+        print("PHASE ", self.phase)
         if self.phase == Phase.START_SCREEN:
             self.buttons.draw(screen)
             # screen.blit(self.logo, self.logo_pos)
@@ -465,13 +501,11 @@ class MainMenu(object):
             self.player2_imgmov.draw(screen)
 
         elif self.phase == Phase.TO_GAME:
-            self.select_text.draw(screen)
-            self.player2_text.draw(screen)
-            self.play_button.draw(screen)
-            self.billy.draw(screen)
-            self.king.draw(screen)
-            self.victoria.draw(screen)
-
+            self.player_imgmov.draw(screen)
+            self.player2_imgmov.draw(screen)
+        elif self.phase == Phase.GAME:
+            # self.draw(self.screen)
+            screen.fill((0,0,0))
     '''
     #    ___           _           _ _                                          _                  _                      _                               _           _                 _        _       _
     #   / __\ __ _ ___(_) ___ __ _| | |_   _   ___  ___  _ __ ___   ___   _ __ | | __ _  ___ ___  | |_ ___    _ __  _   _| |_   _ __ ___ _ __   ___  __ _| |_ ___  __| |   ___ ___   __| | ___  | | ___ | |
@@ -591,6 +625,8 @@ class MainMenu(object):
         if not Globals.gameStart:
             self.persist['playerA'] = self.playera
             self.persist['playerB'] = self.playerb
+            self.persist['portraitA'] = self.player_imgmov
+            self.persist['portraitB'] = self.player2_imgmov
             self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
             Globals.gameStart = True
             self.usera = None
