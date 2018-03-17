@@ -91,7 +91,7 @@ class Engine(object):
         self.passed = False  # a player has passed their turn
         self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
         self.big_portraits_visible = False
-
+        self.player1heads = False
 
         # self.opening = True
 
@@ -254,6 +254,14 @@ class Engine(object):
 
     def swap_portrait(self):
         if self.player1heads:
+            self.bplayer_img.set_absolute(self.top_slot)
+            self.bplayer2_img.set_absolute(self.bottom_slot)
+            self.player1heads = False
+        else:
+            self.bplayer2_img.set_absolute(self.top_slot)
+            self.bplayer_img.set_absolute(self.bottom_slot)
+            self.player1heads = True
+
 
 
     def empty_field_to_grave(self, boardField, graveYardList):
@@ -844,6 +852,7 @@ class Engine(object):
             self.phase = Phase.PREP
             self.done_turn = False
             self.fadeIn()
+            self.swap_portrait()
 
         elif self.phase == Phase.END_ROUND:
             # here we compare scores, decide which hero to damage, and give score.
@@ -1101,7 +1110,7 @@ class Engine(object):
 
                     self.boardFieldOpp.owner = self.persist['playerB'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerB'].user.username
-
+                    self.player1heads = True
                 else:
                     print("LANDED TAILS")
                     self.deck = self.persist['playerB'].deck
@@ -1118,6 +1127,7 @@ class Engine(object):
 
                     self.boardFieldOpp.owner = self.persist['playerA'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerA'].user.username
+                    self.player1heads = False
 
                 self.first_player_set = True
 
