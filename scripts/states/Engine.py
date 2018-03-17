@@ -92,7 +92,7 @@ class Engine(object):
         self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
         self.big_portraits_visible = False
         self.player1heads = False
-
+        self.declared_winner = False
         # self.opening = True
 
         # objects
@@ -496,6 +496,10 @@ class Engine(object):
                         self.showPassTurnButton = False
                         self.passed = True
 
+                        if self.player.cash < self.player2.cash:
+                            self.may_end_round = True
+
+
                     print("unheld")
                     self.holdingCard = False
                     if self.cardMousedOver(pygame.mouse.get_pos()):
@@ -575,6 +579,19 @@ class Engine(object):
                             self.clickedCard[0].set_destination(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                             self.drawCardSound.play()
 
+            if self.done_turn:
+                self.end_turn()
+                if self.may_end_round:
+                    # giving a point to a player/ draw
+                    self.passed = False
+                    self.may_end_round = False
+                    self.phase = Phase.END_ROUND
+                    self.done_turn = False
+                elif not self.passed:
+                    self.phase = Phase.SWAP
+                else:
+                    self.may_end_round = True
+                    self.phase = Phase.SWAP
         elif self.phase == Phase.SWAP:
             # have some fade animation play here, give flag to swap elements, and prep someone to play >mostly flags in get_evt
             # pseudo flag fade out
@@ -623,23 +640,10 @@ class Engine(object):
 
             # clicking this will set phase to Play
 
-        if self.done_turn:
-            self.end_turn()
-            if self.may_end_round:
-                # giving a point to a player/ draw
-                self.passed = False
-                self.may_end_round = False
-                self.phase = Phase.END_ROUND
-                self.done_turn = False
-            elif not self.passed:
-                self.phase = Phase.SWAP
-            else:
-                self.may_end_round = True
-                self.phase = Phase.SWAP
+
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-        print(self.phase)
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
@@ -802,7 +806,6 @@ class Engine(object):
             self.boardFieldOpp2 = tempBackRow
             self.boardFieldList = tempBoardFieldList
 
-            # TODO aggin
 
             '''
             a = b
@@ -857,6 +860,15 @@ class Engine(object):
                     self.phase = Phase.FINAL_ROUND
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
+                    if self.phase == Phase.MATCH_COMPLETE:
+                        self.hero_turn_obj.surface = self.player.hero.img
+                        self.font_turn_obj = FontObj.factory(self.player.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
+                        self.font_turn_obj.distancespeed = 3.5
+                        self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
+
+                        self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y * 0.5 + 200))
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.phase = Phase.ROUND_DRAW
@@ -867,8 +879,14 @@ class Engine(object):
                     self.phase = Phase.FINAL_ROUND
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
-
-
+                    if self.phase == Phase.MATCH_COMPLETE:
+                        self.hero_turn_obj.surface = self.player2.hero.img
+                        self.font_turn_obj = FontObj.factory(self.player2.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
+                        self.font_turn_obj.distancespeed = 3.5
+                        self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
+                        self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
 
             # play appropriate animations
             # check if it was the winning blow
@@ -932,12 +950,15 @@ class Engine(object):
                     self.phase = Phase.PREP
 
         elif self.phase == Phase.MATCH_COMPLETE:
-            print("[Engine] Match Complete!")
-            self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
-            print("{0} wins!".format(self.winning_player.user.username))
-            self.hero_turn_obj.update(deltaTime)
-            self.font_turn_obj.update(deltaTime)
-            # self.backToMain()
+            if not self.declared_winner:
+                self.declared_winner = True
+                print("[Engine] Match Complete!")
+                self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
+                print("{0} wins!".format(self.winning_player.user.username))
+                self.may_see_hero_cutscene = True
+            else:
+                self.hero_turn_obj.update(deltaTime)
+                self.font_turn_obj.update(deltaTime)
 
         elif self.phase == Phase.FINAL_ROUND:
             print("[Engine] Entering Final Round!")
@@ -1180,7 +1201,6 @@ class Engine(object):
                         print("REFRESHING") # unreachable righ tnowq
                         self.bplayer2_img.instascale((self.bplayer2_img.original_surface.get_rect()[0]*0.2, self.bplayer2_img.original_surface.get_rect()[1]*0.2))
 
-
                     if currentTime - self.waitTick >= 2000:
                         self.getting_in_place = False
                 else:
@@ -1262,9 +1282,6 @@ class Engine(object):
         if self.may_see_hero_cutscene:
             self.hero_turn_obj.draw(screen)
             self.font_turn_obj.draw(screen)
-
-
-
 
     def startup(self, currentTime, persistent):
 
