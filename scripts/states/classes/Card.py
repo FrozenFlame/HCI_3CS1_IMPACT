@@ -38,7 +38,7 @@ class Card(object):
         self.owner = ""  # the owner of the card
 
         self.fontDictionary = {"King": 'POORICH.TTF',
-                          "Uncle Billy": 'POORICH.TTF',
+                          "Billy": 'POORICH.TTF',
                           "Victoria": 'big_noodle_titling.ttf',
                           "": 'OLDENGL.TTF'}
 
@@ -243,7 +243,6 @@ class Card(object):
         self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
         self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
         self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____               _  ______                _   _

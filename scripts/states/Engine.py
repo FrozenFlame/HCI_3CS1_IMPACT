@@ -481,7 +481,7 @@ class Engine(object):
         (__)  \_)(_/\_/\_/(____/(____)(____/
         
         '''
-        if self.phase == Phase.PLAY:
+        if self.phase == Phase.PLAY and not self.hero_cutscene:
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
@@ -598,11 +598,11 @@ class Engine(object):
                 if click[0] == 0:
                     if self.mouseOnShowHandButton and self.showHandButton:
                         print("[Engine]Showing cards")
+                        self.showHandButton = False
                         if self.faded:
                             self.fadeOut()
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
-                        self.showHandButton = False
                         if not self.passed:
                             self.showPassTurnButton = True
                         else:
@@ -832,23 +832,6 @@ class Engine(object):
             self.empty_field_to_grave(self.boardField2, self.graveYardList)
             self.empty_field_to_grave(self.boardFieldOpp, self.graveYardList)
             self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardList)
-            # for boardCard in self.boardField.cardList:
-            #     # self.sendToGraveyard(boardCard)
-            #     print("Trashing some dogs1")
-            #     self.empty_field_to_grave(self.boardField, self.graveYardList)
-            # for boardCard in self.boardField2.cardList:
-            #     # self.sendToGraveyard(boardCard)
-            #     print("Trashing some dogs2")
-            #     self.send_to_grave_fromboard(boardCard, self.boardField2, self.graveYardList)
-            #     self.empty_field_to_grave(self.boardField2, self.graveYardList)
-            # for boardCard in self.boardFieldOpp.cardList:
-            #     print("Trashing some dogs3")
-            #     # self.sendToGraveyard(boardCard)
-            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp, self.graveYardListOpp)
-            # for boardCard in self.boardFieldOpp2.cardList:
-            #     print("Trashing some dogs4")
-            #     # self.sendToGraveyard(boardCard)
-            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp2, self.graveYardListOpp)
 
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
@@ -1203,11 +1186,11 @@ class Engine(object):
 
 
 
-        # for a in self.allCardsList:
-        #     if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
-        #         # a.addTexts(self.player.hero.name)
-        #     elif a.front:
-        #         # a.addTexts(self.player2.hero.name)
+        for a in self.allCardsList:
+            if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
+                a.addTexts(self.player.hero.name)
+            elif a.front:
+                a.addTexts(self.player2.hero.name)
         self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
