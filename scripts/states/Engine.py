@@ -74,12 +74,12 @@ class Engine(object):
         self.has_tossed_coin = False
         self.first_toss_animating = True
         self.notif_pause = True
+        self.may_see_first = False
         self.getting_in_place = True
         self.hero_cutscene = True
         self.hero_cutscene_flyin = True
         self.hero_cutscene_flyout = True
         self.may_see_hero_cutscene = False
-
         # logic booleans
         self.first_player_set = False  # becomes true after coin toss, and hands/decks set
         self.holdingCard = False
@@ -497,14 +497,11 @@ class Engine(object):
                         if self.player.cash < self.player2.cash:
                             self.may_end_round = True
 
-
                     print("unheld")
                     self.holdingCard = False
                     if self.cardMousedOver(pygame.mouse.get_pos()):
                         self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
-                        print("Lettng go of card")
-                        print("Contents of self.clickedCard, ",self.clickedCard)
                         if len(self.clickedCard) > 1:  # cheap man gaming
                             for c in self.clickedCard:
                                 c.isHeld = False
@@ -643,8 +640,6 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
 
             # clicking this will set phase to Play
-
-
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
@@ -1173,20 +1168,20 @@ class Engine(object):
                         self.first_toss_animating = False
                         if self.coin_side() == 0:
                             print("Coin pointing left")
-                            # self.board.coin.setimg(self.imgleft)  pseudo code for now
+                            self.board.coin.point_left()
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
                         else:
                             print("Coin pointing right")
-                            # self.board.coin.setimg(self.imgright) pseudo code for now
+                            self.board.coin.point_right()
                             # set bplayer2img to bottom left slot
                             self.bplayer2_img.set_destination(*self.bottom_slot)
                             # set bplayerimg to top left slot
                             self.bplayer_img.set_destination(*self.top_slot)
 
-                elif self.notif_pause: # time paused to notify who goes first
+                elif self.notif_pause:  # time paused to notify who goes first
                     if currentTime - self.waitTick >= 1000:
                         self.notif_pause = False
                         self.may_see_first = True
