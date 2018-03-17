@@ -394,8 +394,6 @@ class Engine(object):
 #                                           |___/
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-
     def cardMousedOver(self, xy) -> bool:
         self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]  # not actually clicked, but moused over
         return True if len(self.clickedCard) == 1 else False
@@ -505,7 +503,13 @@ class Engine(object):
                     if self.cardMousedOver(pygame.mouse.get_pos()):
                         self.board.hasPreviewCard = False
                     if not len(self.clickedCard) == 0:
-                        self.clickedCard[0].isHeld = False
+                        print("Lettng go of card")
+                        print("Contents of self.clickedCard, ",self.clickedCard)
+                        if len(self.clickedCard) > 1:  # cheap man gaming
+                            for c in self.clickedCard:
+                                c.isHeld = False
+                        else:
+                            self.clickedCard[0].isHeld = False
                         # self.clickedCard[0].flip()
 
                         #let go into a boardField
@@ -513,9 +517,9 @@ class Engine(object):
                         #     self.boardCardList.append(self.clickedCard[0])
                         #     self.clickedCard[0].onBoard = True
 
-                        if self.player == self.first_player:  #
+                        if self.player == self.first_player:
                             for bF in self.boardFieldList:
-                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
+                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
                                     bF.take_card(self.clickedCard[0])
 
                                     # bF.cardList.append(self.clickedCard[0])
@@ -524,7 +528,7 @@ class Engine(object):
                                     # print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card(self.clickedCard[0], self.boardFieldList)
                                     # self.end_turn()
-                        elif self.player2 == self.first_player:
+                        elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
                             for bF in self.boardFieldListOpp:
                                 if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
                                     bF.take_card(self.clickedCard[0])
@@ -715,7 +719,6 @@ class Engine(object):
         if self.phase == Phase.PLAY:
             if self.hero_cutscene:  # TODO Cutscene
                 if self.hero_cutscene_flyin:
-                    print("Hero flying in")
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     # these two set destination codes below are actually triggered in the get_evt block
@@ -727,7 +730,6 @@ class Engine(object):
                         self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5))
                         self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5 +200))
                 elif self.hero_cutscene_flyout:
-                    print("Hero flying out")
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     if currentTime - self.waitTick >= 800:  # timeout before players can start clicking around again
