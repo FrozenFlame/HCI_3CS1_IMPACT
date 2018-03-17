@@ -11,3 +11,6 @@ class Globals:
     gameStart = False
 
     mixer_volume = 0.5
+
+    user1name = "Vex"
+    user2name = "Slasher399"

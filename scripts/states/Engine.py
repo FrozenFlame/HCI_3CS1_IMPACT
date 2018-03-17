@@ -75,6 +75,10 @@ class Engine(object):
         self.first_toss_animating = True
         self.notif_pause = True
         self.getting_in_place = True
+        self.hero_cutscene = True
+        self.hero_cutscene_flyin = True
+        self.hero_cutscene_flyout = True
+        self.may_see_hero_cutscene = False
 
         # logic booleans
         self.first_player_set = False  # becomes true after coin toss, and hands/decks set
@@ -87,8 +91,7 @@ class Engine(object):
         self.passed = False  # a player has passed their turn
         self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
         self.big_portraits_visible = False
-        self.hero_cutscene_flyin = True
-        self.hero_cutscene_flyout = True
+
 
         # self.opening = True
 
@@ -248,6 +251,10 @@ class Engine(object):
         temp = player
         self.player = self.player2
         self.player2 = temp
+
+    def swap_portrait(self):
+        if self.player1heads:
+
 
     def empty_field_to_grave(self, boardField, graveYardList):
         # boardField.cardList.pop(boardField.cardList.index(card))
@@ -593,6 +600,19 @@ class Engine(object):
                         else:
                             self.showEndTurnButton = True
 
+                        #cutscene prep:
+                        self.waitTick = pygame.time.get_ticks()  # this is so that fly in doesn't end instantly
+                        self.hero_cutscene = True
+                        self.hero_cutscene_flyin = True
+                        self.hero_cutscene_flyout = True
+                        self.may_see_hero_cutscene = True
+                        # swapping it to the next player's assets
+                        self.hero_turn_obj.surface = self.player.hero.img
+                        self.font_turn_obj = FontObj.factory(self.player.user.username + "'s turn", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
+                        self.font_turn_obj.distancespeed = 3.5
+                        self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
+
             # clicking this will set phase to Play
 
         if self.done_turn:
@@ -611,7 +631,7 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
-        print("CurrentPhase, ", self.phase)
+        print(self.phase)
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
@@ -681,6 +701,32 @@ class Engine(object):
                         newX += 80
 
         if self.phase == Phase.PLAY:
+            if self.hero_cutscene:  # TODO Cutscene
+                if self.hero_cutscene_flyin:
+                    print("Hero flying in")
+                    self.hero_turn_obj.update(deltaTime)
+                    self.font_turn_obj.update(deltaTime)
+                    # these two set destination codes below are actually triggered in the get_evt block
+                    self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
+                    self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
+                    if currentTime - self.waitTick >= 3000:
+                        self.hero_cutscene_flyin = False
+                        self.waitTick = currentTime
+                        self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5))
+                        self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5 +200))
+                elif self.hero_cutscene_flyout:
+                    print("Hero flying out")
+                    self.hero_turn_obj.update(deltaTime)
+                    self.font_turn_obj.update(deltaTime)
+                    if currentTime - self.waitTick >= 2000:  # timeout before players can start clicking around again
+                        self.waitTick = currentTime
+                        self.hero_cutscene_flyout = False
+                        # self.control_enabled = True     actually non-factor I think
+                        self.may_see_hero_cutscene = False
+                        self.hero_cutscene = False
+
+
+
             if not self.done_turn:
                 if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > \
                         pygame.mouse.get_pos()[1] > self.endTurnImgY:
@@ -697,24 +743,34 @@ class Engine(object):
                     self.mouseOnPassTurnButton = False
                     # print("Mouse NOT on pass turn button")
                 pass
-            elif self.hero_cutscene:  # TODO Cutscene
-                if self.hero_cutscene_flyin:
-                    # self.hero_turn_obj.update(deltaTime)
-                    # self.font_turn_obj.update(deltaTime)
-                    # these two set destination codes below are actually triggered in the get_evt block
-                    # self.hero_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
-                    # self.player_font_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
-                    if currentTime - self.waitTick >= 1000:
-                        self.hero_cutscene_flyin = False
-                        self.waitTick = currentTime
-                        # self.hero_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5))
-                        # self.player_font_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5 +200))
-                elif self.hero_cutscene_flyout:
-                    # self.hero_turn_obj.update(deltaTime)
-                    # self.font_turn_obj.update(deltaTime)
-                    if currentTime - self.waitTick >= 1000:  # timeout before players can start clicking around again
-                        self.hero_cutscene_flyout = False
-                        # self.control_enabled = True     actually non-factor I think
+            # elif self.hero_cutscene:  # TODO Cutscene
+            #     if self.hero_cutscene_flyin:
+            #         print("Hero flying in")
+            #         self.hero_turn_obj.update(deltaTime)
+            #         self.font_turn_obj.update(deltaTime)
+            #         # these two set destination codes below are actually triggered in the get_evt block
+            #         self.hero_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
+            #         self.font_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
+            #         if currentTime - self.waitTick >= 1000:
+            #             self.hero_cutscene_flyin = False
+            #             self.waitTick = currentTime
+            #             self.hero_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5))
+            #             self.font_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5 +200))
+            #     elif self.hero_cutscene_flyout:
+            #         print("Hero flying out")
+            #         self.hero_turn_obj.update(deltaTime)
+            #         self.font_turn_obj.update(deltaTime)
+            #         if currentTime - self.waitTick >= 1000:  # timeout before players can start clicking around again
+            #             self.hero_cutscene_flyout = False
+            #             # self.control_enabled = True     actually non-factor I think
+            #             self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
+            #             self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
+            #             self.may_see_hero_cutscene = False
+            #             self.hero_cutscene = False
+            #             # swapping it to the next player's assets
+            #             self.hero_turn_obj.surface = self.player2.hero.img
+            #             self.font_turn_obj = FontObj.factory(self.player2.user.username,0,0,"big_noodle_titling_oblique.ttf",80,(255,255,255))
+
 
             else:  # this part is not triggering because the phase has been changed @ the get_evt block
                 self.phase = Phase.SWAP
@@ -726,7 +782,10 @@ class Engine(object):
                 if self.hand[0].front:
                     self.flip_hand(self.hand)
 
+
+
             self.showHandButton = True
+
 
         elif self.phase == Phase.SWAP:
 
@@ -762,6 +821,8 @@ class Engine(object):
             self.boardFieldOpp = tempFrontRow
             self.boardFieldOpp2 = tempBackRow
             self.boardFieldList = tempBoardFieldList
+
+            # TODO aggin
 
             '''
             a = b
@@ -1041,7 +1102,6 @@ class Engine(object):
                     self.boardFieldOpp.owner = self.persist['playerB'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerB'].user.username
 
-                    self.first_player_set = True
                 else:
                     print("LANDED TAILS")
                     self.deck = self.persist['playerB'].deck
@@ -1059,7 +1119,14 @@ class Engine(object):
                     self.boardFieldOpp.owner = self.persist['playerA'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerA'].user.username
 
-                    self.first_player_set = True
+                self.first_player_set = True
+
+                # TODO I have a feeling this would cause some issues if the players used the same image, but we'll see. #python names not variables
+                self.hero_turn_obj = Movable(self.player.hero.img,1000,4,"distance",(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
+                self.font_turn_obj = FontObj.factory(self.player.user.username+"'s turn",-200,0,"big_noodle_titling_oblique.ttf",80,(255,255,255))
+                self.font_turn_obj.distancespeed = 3.5
+                self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
+                self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
 
             # graphical representation of card giving (hands are already pre determined by get_first_cards)
             if currentTick - self.waitTick >= self.drawCardWait:
@@ -1178,7 +1245,9 @@ class Engine(object):
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
         # self.card.draw(screen)
-
+        if self.big_portraits_visible:
+            self.bplayer_img.draw(screen)
+            self.bplayer2_img.draw(screen)
         onTopCard = None
         for a in self.allCardsList:
             if not a.onTop:
@@ -1216,9 +1285,10 @@ class Engine(object):
         if self.showHandButton:
             screen.blit(self.showHandImg, (self.showHandImgX, self.showHandImgY))
 
-        if self.big_portraits_visible:
-            self.bplayer_img.draw(screen)
-            self.bplayer2_img.draw(screen)
+        if self.may_see_hero_cutscene:
+            self.hero_turn_obj.draw(screen)
+            self.font_turn_obj.draw(screen)
+
 
 
 

@@ -86,8 +86,8 @@ class MainMenu(object):
         # HERO SELECT HEADER #
         self.select_text = FontObj.factory("Select a Hero", Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
         self.select_text_pos2 = Globals.RESOLUTION_X *0.65, Globals.RESOLUTION_Y *0.10
-        self.player_text = FontObj.factory("Player 1", Globals.RESOLUTION_X *0.15 +1000, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
-        self.player2_text = FontObj.factory("Player 2", Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player_text = FontObj.factory(Globals.user1name, Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.player2_text = FontObj.factory(Globals.user2name, Globals.RESOLUTION_X *0.15 +1300, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
 
         # HERO SELECT PANEL ASSETS #
 
@@ -423,7 +423,7 @@ class MainMenu(object):
             pygame.mixer.music.fadeout(1000)
 
             if currentTime - self.phase_start_time >= 300:
-                self.setup_players("Vex", "Slasher399")
+                self.setup_players(Globals.user1name, Globals.user2name)
                 self.phase = Phase.GAME
 
         elif self.phase == Phase.GAME:
@@ -458,7 +458,6 @@ class MainMenu(object):
         pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
         # screen.blit(self.backdrop, (0,0))
         self.font.draw(screen)
-        print("PHASE ", self.phase)
         if self.phase == Phase.START_SCREEN:
             self.buttons.draw(screen)
             # screen.blit(self.logo, self.logo_pos)
