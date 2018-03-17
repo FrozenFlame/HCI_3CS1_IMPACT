@@ -87,6 +87,9 @@ class Engine(object):
         self.passed = False  # a player has passed their turn
         self.may_end_round = False  # prompting 2nd player to end his turn after opponent has passed.
         self.big_portraits_visible = False
+        self.hero_cutscene_flyin = True
+        self.hero_cutscene_flyout = True
+
         # self.opening = True
 
         # objects
@@ -107,6 +110,9 @@ class Engine(object):
 
         self.bplayer_img = None
         self.bplayer2_img = None
+        self.hero_turn_obj = None
+        self.font_turn_obj = None
+
 
         self.allCardsList = list()
 
@@ -605,6 +611,7 @@ class Engine(object):
 
     # orders individual elements to update themselves (your coordinates, sprite change, state, etc)
     def update(self, screen, keys, currentTime, deltaTime):
+        print("CurrentPhase, ", self.phase)
         self.deckImgHolder1.update(deltaTime, 1170, 565)
         self.deckImgHolder2.update(deltaTime, 1175, 564)
         self.deckImgHolder3.update(deltaTime, 1180, 563)
@@ -690,7 +697,26 @@ class Engine(object):
                     self.mouseOnPassTurnButton = False
                     # print("Mouse NOT on pass turn button")
                 pass
-            else:
+            elif self.hero_cutscene:  # TODO Cutscene
+                if self.hero_cutscene_flyin:
+                    # self.hero_turn_obj.update(deltaTime)
+                    # self.font_turn_obj.update(deltaTime)
+                    # these two set destination codes below are actually triggered in the get_evt block
+                    # self.hero_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
+                    # self.player_font_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
+                    if currentTime - self.waitTick >= 1000:
+                        self.hero_cutscene_flyin = False
+                        self.waitTick = currentTime
+                        # self.hero_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5))
+                        # self.player_font_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5 +200))
+                elif self.hero_cutscene_flyout:
+                    # self.hero_turn_obj.update(deltaTime)
+                    # self.font_turn_obj.update(deltaTime)
+                    if currentTime - self.waitTick >= 1000:  # timeout before players can start clicking around again
+                        self.hero_cutscene_flyout = False
+                        # self.control_enabled = True     actually non-factor I think
+
+            else:  # this part is not triggering because the phase has been changed @ the get_evt block
                 self.phase = Phase.SWAP
                 self.done_turn = False
                 self.showEndTurnButton = False  #this is not working
