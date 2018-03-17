@@ -1209,18 +1209,18 @@ class Engine(object):
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-                # if a.front:
-                #     a.textBaseVal.draw(screen)
-                #     a.textCurrVal.draw(screen)
-                #     a.textName.draw(screen)
+                if a.front:
+                    a.textBaseVal.draw(screen)
+                    a.textCurrVal.draw(screen)
+                    a.textName.draw(screen)
             else:
                 onTopCard = a
         if onTopCard != None:
             onTopCard.draw(screen)
-            # if onTopCard.front:
-            #     onTopCard.textBaseVal.draw(screen)
-            #     onTopCard.textCurrVal.draw(screen)
-            #     onTopCard.textName.draw(screen)
+            if onTopCard.front:
+                onTopCard.textBaseVal.draw(screen)
+                onTopCard.textCurrVal.draw(screen)
+                onTopCard.textName.draw(screen)
             onTopCard.onTop = False
 
         self.deckImgHolder1.draw(screen)
