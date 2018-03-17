@@ -550,7 +550,7 @@ class Engine(object):
                         #     self.clickedCard.pop()
 
 
-            if event.type == pygame.MOUSEBUTTONDOWN and not self.opening:
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.opening and not self.hero_cutscene:
                 # print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
 
                 # print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
@@ -717,7 +717,7 @@ class Engine(object):
                     # these two set destination codes below are actually triggered in the get_evt block
                     self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
                     self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
-                    if currentTime - self.waitTick >= 3000:
+                    if currentTime - self.waitTick >= 2500:
                         self.hero_cutscene_flyin = False
                         self.waitTick = currentTime
                         self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5))
@@ -726,7 +726,7 @@ class Engine(object):
                     print("Hero flying out")
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
-                    if currentTime - self.waitTick >= 2000:  # timeout before players can start clicking around again
+                    if currentTime - self.waitTick >= 800:  # timeout before players can start clicking around again
                         self.waitTick = currentTime
                         self.hero_cutscene_flyout = False
                         # self.control_enabled = True     actually non-factor I think
@@ -751,34 +751,6 @@ class Engine(object):
                     self.mouseOnPassTurnButton = False
                     # print("Mouse NOT on pass turn button")
                 pass
-            # elif self.hero_cutscene:  # TODO Cutscene
-            #     if self.hero_cutscene_flyin:
-            #         print("Hero flying in")
-            #         self.hero_turn_obj.update(deltaTime)
-            #         self.font_turn_obj.update(deltaTime)
-            #         # these two set destination codes below are actually triggered in the get_evt block
-            #         self.hero_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
-            #         self.font_turn_obj.set_destination((Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
-            #         if currentTime - self.waitTick >= 1000:
-            #             self.hero_cutscene_flyin = False
-            #             self.waitTick = currentTime
-            #             self.hero_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5))
-            #             self.font_turn_obj.set_destination((-400, Globals.RESOLUTION_Y*0.5 +200))
-            #     elif self.hero_cutscene_flyout:
-            #         print("Hero flying out")
-            #         self.hero_turn_obj.update(deltaTime)
-            #         self.font_turn_obj.update(deltaTime)
-            #         if currentTime - self.waitTick >= 1000:  # timeout before players can start clicking around again
-            #             self.hero_cutscene_flyout = False
-            #             # self.control_enabled = True     actually non-factor I think
-            #             self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
-            #             self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
-            #             self.may_see_hero_cutscene = False
-            #             self.hero_cutscene = False
-            #             # swapping it to the next player's assets
-            #             self.hero_turn_obj.surface = self.player2.hero.img
-            #             self.font_turn_obj = FontObj.factory(self.player2.user.username,0,0,"big_noodle_titling_oblique.ttf",80,(255,255,255))
-
 
             else:  # this part is not triggering because the phase has been changed @ the get_evt block
                 self.phase = Phase.SWAP
@@ -883,23 +855,18 @@ class Engine(object):
                 self.player2.hitpoints -= 1
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
-                    pass
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
-                    pass
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.phase = Phase.ROUND_DRAW
-                pass
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
-                    pass
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
-                    pass
 
 
 
@@ -968,10 +935,9 @@ class Engine(object):
             print("[Engine] Match Complete!")
             self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
             print("{0} wins!".format(self.winning_player.user.username))
-            self.backToMain()
-
-
-
+            self.hero_turn_obj.update(deltaTime)
+            self.font_turn_obj.update(deltaTime)
+            # self.backToMain()
 
         elif self.phase == Phase.FINAL_ROUND:
             print("[Engine] Entering Final Round!")
@@ -1085,8 +1051,6 @@ class Engine(object):
                     self.done_drawing = False
                     self.openingIndex = 0
                     self.phase = Phase.PREP
-
-
 
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
