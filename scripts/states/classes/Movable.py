@@ -31,11 +31,14 @@ class Movable(object):
 
         # scale factors
         self.is_scaling = False
+        self.xdone = False
+        self.ydone = False
         self.new_width = 0
         self.new_height = 0
         self.scalespeed = 10  # more of a tick delay
+        self.scalexfactor = 5
+        self.scaleyfactor = 5
         self.scalevec = None  # proportional grow/shrink maybe?
-
 
     def update(self, dTime):
         if self.destination:
@@ -72,6 +75,27 @@ class Movable(object):
                     self.posY += self.vector[1] * dTime
                     self.rect.center = self.posX, self.posY
                     self.exact_position = self.rect.center
+        if self.is_scaling:
+            print("Scaling like a dog")
+            if self.surface.get_rect().size[0] > self.new_width:  # shrinking block
+                if not self.surface.get_rect().size[0] - self.scalexfactor < 10:
+                    self.surface = pygame.transform.smoothscale(self.surface, (self.surface.get_rect().size[0] - self.scalexfactor, self.surface.get_rect().size[1]))
+                else:
+                    print("done scaling X!")
+                    self.xdone = True
+
+            if self.surface.get_rect().size[1] > self.new_height:  # shrinking block
+                if not self.surface.get_rect().size[1] - self.scaleyfactor < 10:
+                    self.surface = pygame.transform.smoothscale(self.surface, (self.surface.get_rect().size[0], self.surface.get_rect().size[1] - self.scaleyfactor))
+                else:
+                    print("done scaling Y!")
+                    self.ydone = True
+            if self.xdone and self.ydone:
+                print("is scaling set to false!")
+                self.is_scaling = False
+                self.xdone = False
+                self.ydone = False
+
 
     def draw(self, screen):
         if self.is_visible:
@@ -137,8 +161,11 @@ class Movable(object):
 
     def scaleanim(self, waitTick):
         currentTick = pygame.time.get_ticks()
-        if currentTick - waitTick >= self.scalespeed:
-            self.surface = pygame.transform.smoothscale(self.surface, (self.new_width, self.new_height))
+        if self.scalexfactor > 0:
+            if currentTick - waitTick >= self.scalespeed:
+                waitTick = currentTick
+                self.surface = pygame.transform.smoothscale(self.surface, (round(self.surface.get_rect().size[0] - self.scalexfactor), round(self.new_height)))
+
 
     def instascale(self, width, height):
         self.surface = pygame.transform.smoothscale(self.original_surface, (round(width),round(height)))
