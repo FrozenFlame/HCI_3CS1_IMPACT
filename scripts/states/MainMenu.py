@@ -74,7 +74,7 @@ class MainMenu(object):
 
         pygame.mixer.music.load("assets\\music\\game\\hero_select.ogg")
         pygame.mixer.music.set_volume(0.12)
-        self.navigating = pygame.mixer.Sound("\\Avarice Soundtracks\\navigating again.ogg")
+        self.navigating = pygame.mixer.Sound("assets\\sounds\\navigating again.ogg")
 
         # logo
         self.logo = pygame.image.load("assets/logo/Avarice-Logo-final.png").convert_alpha()
@@ -151,7 +151,8 @@ class MainMenu(object):
         self.faded = False
         self.buttons.set_image(self.buttons.startButtonNormal)
         self.has_faded_out = False
-        self.fadeInSound = pygame.mixer.Sound("\\Avarice Soundtracks\\waterdrop.ogg")
+        self.fadeInSound = pygame.mixer.Sound("assets\\sounds\\waterdrop_short.ogg")
+        self.fadeInSound.set_volume(0.10)
 
     def fadeIn(self):
         alpha = 0
@@ -168,15 +169,17 @@ class MainMenu(object):
 
 
     def fadeOut(self):
+        self.fadeInSound.play()
         alpha = 250
         while alpha >= 0:
+
+
             self.fadeScreen.set_alpha(alpha)
             self.draw(self.screen)
             self.screen.blit(self.fadeScreen, (0, 0))
             pygame.display.update()
             pygame.time.delay(1)
             alpha -= 5
-            self.fadeInSound.play()
         self.faded = False
 
     def get_evt(self,event):

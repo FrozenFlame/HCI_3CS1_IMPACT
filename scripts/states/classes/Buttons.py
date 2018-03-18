@@ -38,6 +38,7 @@ class Buttons(object):
         self.rect = pygame.Rect(self.posX, self.posY, self.width, self.height)
         self.rect.center = self.posX , self.posY
         self.blitted = False
+        self.playing_sound = False
         self.startPrime = False  # button has been held down
         self.has_message = False # wants to return something to where it has been instantiated
         self.message = {}
@@ -52,7 +53,7 @@ class Buttons(object):
         self.destination = None
         self.vector = None
         self.move_type = "distance"
-        self.navigatingSound = pygame.mixer.Sound("\\Avarice Soundtracks\\navigating again.ogg")
+        self.navigatingSound = pygame.mixer.Sound("assets\\sounds\\navigating again_trimmed.ogg")
 
         # end
 
@@ -71,7 +72,9 @@ class Buttons(object):
         # mouse over
         if (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY and not self.startPrime:
             self.image = self.startButtonHover
-            self.navigatingSound.play()
+            if not self.playing_sound:
+                self.playing_sound = True
+                self.navigatingSound.play()
             self.startButton = self.image.convert_alpha()
 
 
@@ -85,6 +88,9 @@ class Buttons(object):
         elif not (self.posX + self.width) >= mouse[0] >= self.posX or not (self.posY + self.height) >= mouse[1] >= self.posY:
             self.image = self.startButtonNormal
             self.startButton = self.image.convert_alpha()
+            if self.playing_sound:
+                self.playing_sound = False
+                self.navigatingSound.stop()
 
         #for changing states button
         if event.type == pygame.MOUSEBUTTONDOWN:

@@ -348,8 +348,6 @@ class Engine(object):
             self.graveYardOppX += 5
             self.graveYardOppY -= 1
 
-
-
         for boardCard in self.boardField.cardList:
             if card == boardCard:
                 self.boardField.cardList.pop(self.boardField.cardList.index(boardCard))
@@ -1186,7 +1184,6 @@ class Engine(object):
                 self.has_tossed_coin = True
             if self.has_tossed_coin:
                 if self.first_toss_animating:
-
                     #animate coin?
                     if currentTime - self.waitTick <= 3000:  # how long we want the coin to be spinning before stopping it
                         self.waitTick = currentTime
@@ -1199,8 +1196,10 @@ class Engine(object):
 
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect()[0]*0.2, self.bplayer_img.original_surface.get_rect()[1]*0.2))
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect()[0]*0.2, self.bplayer2_img.original_surface.get_rect()[1]*0.2))
 
                         else:
                             print("Coin pointing right")
@@ -1268,7 +1267,7 @@ class Engine(object):
         #     self.card.blitted = True
         # self.card.draw(screen)
 
-
+        self.board.coin.draw(screen)
         if self.big_portraits_visible:
             self.bplayer_img.draw(screen)
             self.bplayer2_img.draw(screen)
@@ -1303,7 +1302,6 @@ class Engine(object):
         # elif self.showPassTurnButton:
         #     screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
 
-        self.board.coin.draw(screen)
 
         if self.faded:
             self.screen.blit(self.fadeScreen, (0, 0))

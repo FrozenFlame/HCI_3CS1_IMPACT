@@ -19,9 +19,7 @@ class Movable(object):
         self.rect.center = self.posX, self.posY
         self.is_visible = True
 
-        self.is_scaling = True
-        self.new_width = 0
-        self.new_height = 0
+
 
         self.exact_position = list(self.rect.center)
         self.speed = speed
@@ -30,7 +28,14 @@ class Movable(object):
         self.destination = None
         self.vector = None
         self.move_type = move_type
-        self.scalespeed = 10
+
+        # scale factors
+        self.is_scaling = False
+        self.new_width = 0
+        self.new_height = 0
+        self.scalespeed = 10  # more of a tick delay
+        self.scalevec = None  # proportional grow/shrink maybe?
+
 
     def update(self, dTime):
         if self.destination:
@@ -124,16 +129,16 @@ class Movable(object):
         collide = self.rect.collidepoint(x,y)
         return collide
 
-    def set_new_scale(self, width, height):
+    def scale_to(self, newxy):
         self.is_scaling = True
-        self.new_width = width
-        self.new_height = height
+        self.new_width = newxy[0]
+        self.new_height = newxy[1]
+        # self.scalevec = math.hypot((self.surface.get_rect().size[0] - self.new_width),(self.surface.get_rect().size[1] - self.new_width))
 
-    def scale(self, currentTick): # send to backburner for now, this is for smooth scaling
-
-        # if self.surface.get_rect.width != self.new_width and self.surface.get_rect.height != self.new_width:
-        #if self.new_width >
-        pass
+    def scaleanim(self, waitTick):
+        currentTick = pygame.time.get_ticks()
+        if currentTick - waitTick >= self.scalespeed:
+            self.surface = pygame.transform.smoothscale(self.surface, (self.new_width, self.new_height))
 
     def instascale(self, width, height):
         self.surface = pygame.transform.smoothscale(self.original_surface, (round(width),round(height)))
