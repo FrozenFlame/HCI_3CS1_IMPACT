@@ -434,6 +434,19 @@ class Engine(object):
                 self.player.cash += c.current_val
         print("[Engine] After recalculation cash: ", self.player.cash)
 
+    def apply_effects(self): #f this sh
+        for boardCard in self.boardField.cardList and not boardCard.effectActivated:
+            if boardCard.name == "Parking Lot":
+                count = 0
+                for c in self.boardField.cardList and c.type == "Type.VEHICLE":
+                    count+=1
+                boardCard += 2*count
+                boardCard.effectActivated = True
+                continue
+
+            if boardCard.name == "Saboteur":
+                pass
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _

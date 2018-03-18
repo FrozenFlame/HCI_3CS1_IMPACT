@@ -19,6 +19,8 @@ class Card(object):
         self.debuffs = []
         self.constants = []
         self.effect = effect
+        self.effectActivated = False
+
         self.owner = heroOwner      #owner of the card
 
 
