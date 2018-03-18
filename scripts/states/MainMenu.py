@@ -90,6 +90,7 @@ class MainMenu(object):
         self.select_text_pos2 = Globals.RESOLUTION_X *0.65, Globals.RESOLUTION_Y *0.10
         self.player_text = FontObj.factory(Globals.user1name, Globals.RESOLUTION_X *0.15 +1200, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
         self.player2_text = FontObj.factory(Globals.user2name, Globals.RESOLUTION_X *0.15 +1300, Globals.RESOLUTION_Y *0.14, 'big_noodle_titling_oblique.ttf', 80, white)
+        self.vs_text = FontObj.factory("VS", Globals.RESOLUTION_X *0.5, 1300, "big_noodle_titling_oblique.ttf", 120, white)
 
         # HERO SELECT PANEL ASSETS #
 
@@ -358,6 +359,7 @@ class MainMenu(object):
         elif self.phase == Phase.TO_HERO:
             self.backdropMovable.update(dt)
             self.buttons.update(dt)
+            self.vs_text.update(dt)
 
             # player texts
             self.update_select_text(dt)
@@ -390,9 +392,8 @@ class MainMenu(object):
                 self.phase = Phase.START_SCREEN
         elif self.phase == Phase.READY_UP:
 
-            self.select_text.update(dt)
-            self.player2_text.update(dt)
-
+            self.update_select_text(dt)
+            self.vs_text.update(dt)
             self.play_button.update(dt)
 
             self.update_heroes(dt)
@@ -405,6 +406,7 @@ class MainMenu(object):
             # self.backdropMovable.update(dt)
             # self.buttons.update(dt)
             self.play_button.update(dt)
+            self.vs_text.update(dt)
 
             self.update_select_text(dt)
             self.update_heroes(dt)
@@ -412,9 +414,16 @@ class MainMenu(object):
             self.player_imgmov.update(dt)
             self.player2_imgmov.update(dt)
             if currentTime - self.phase_start_time >= 500:
-                print("Changing Phase to START_SCREEN")
+                print("Changing Phase READY UP")
                 print("Player 1 has selected ", self.player_hero)
                 print("Player 2 has selected ", self.player2_hero)
+
+                self.player_text.set_absolute((Globals.RESOLUTION_X * 0.5 - 1000, Globals.RESOLUTION_Y * 0.6 + 150))
+                self.player_text.set_destination(Globals.RESOLUTION_X * 0.5 - 300, Globals.RESOLUTION_Y * 0.5 + 150)
+                self.player2_text.set_absolute((Globals.RESOLUTION_X * 0.5 + 1000, Globals.RESOLUTION_Y * 0.6 + 150))
+                self.player2_text.set_destination(Globals.RESOLUTION_X * 0.5 + 300, Globals.RESOLUTION_Y * 0.5 + 150)
+
+                self.vs_text.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
 
                 # if self.player_hero == "Billy":
                 # elif self.player_hero == "King":
@@ -478,7 +487,7 @@ class MainMenu(object):
             self.backdropMovable.draw(screen)
 
             self.draw_select_text(screen)
-
+            self.vs_text.draw(screen)
             self.draw_heroes(screen)
             self.player_imgmov.draw(screen)
             self.player2_imgmov.draw(screen)
@@ -493,12 +502,15 @@ class MainMenu(object):
             self.draw_heroes(screen)
 
         elif self.phase == Phase.READY_UP:
+            self.vs_text.draw(screen)
             self.play_button.draw(screen)
 
             self.player_imgmov.draw(screen)
             self.player2_imgmov.draw(screen)
+            self.draw_select_text(screen)
 
         elif self.phase == Phase.TO_READY:
+            self.vs_text.draw(screen)
             self.select_text.draw(screen)
             self.player2_text.draw(screen)
             self.play_button.draw(screen)
@@ -507,6 +519,7 @@ class MainMenu(object):
 
             self.player_imgmov.draw(screen)
             self.player2_imgmov.draw(screen)
+            self.draw_select_text(screen)
 
         elif self.phase == Phase.TO_GAME:
             self.player_imgmov.draw(screen)
@@ -556,6 +569,10 @@ class MainMenu(object):
             self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.14)
     def getevt_readyup_esc(self):
         self.heroes_to_default()
+        self.vs_text.back_to_default()
+        self.player_text.set_absolute((-900, 100))
+        self.player_text.destination = None
+        self.player2_text.set_absolute((Globals.RESOLUTION_X *0.8, -900))
         self.select_text.set_destination(*self.select_text_pos2)
         self.player2_text.back_to_default()
 

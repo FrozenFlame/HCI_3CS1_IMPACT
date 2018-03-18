@@ -31,7 +31,7 @@ class DeckCatalogue(object):
 
         blackMarket = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK], hero_name)
         pickPocket = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK], hero_name)
-        strangeGravedigger = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK], hero_name)
+        strangeGravedigger = Card("Gravedigger", 5, None, [Type.PERSON, Type.BLACK], hero_name)
         robinHood = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK], hero_name)
         slums = Card("Slums", 0, None, [Type.STRUCTURE], hero_name)
         kingpin = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK], hero_name)
@@ -42,7 +42,7 @@ class DeckCatalogue(object):
 
         blackMarket2 = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK], hero_name)
         pickPocket2 = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK], hero_name)
-        strangeGravedigger2 = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK], hero_name)
+        strangeGravedigger2 = Card("Gravedigger", 5, None, [Type.PERSON, Type.BLACK], hero_name)
         robinHood2 = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK], hero_name)
         slums2 = Card("Slums", 0, None, [Type.STRUCTURE], hero_name)
         kingpin2 = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK], hero_name)
