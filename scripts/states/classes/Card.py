@@ -41,7 +41,7 @@ class Card(object):
             x, y = pos
             for line in words:
                 for word in line:
-                    word_surface = font.render(word, 100, color)
+                    word_surface = font.render(word, 14, color)
                     word_width, word_height = word_surface.get_size()
                     if x + word_width >= max_width*0.95:
                         x = pos[0]  # Reset the x.
@@ -62,7 +62,7 @@ class Card(object):
         self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
 
         # self.frontImg.blit(self.effect_surf, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60))
-        blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + fontChoice, 15))
+        blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + fontChoice, 20))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
