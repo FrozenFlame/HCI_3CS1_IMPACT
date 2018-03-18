@@ -3,7 +3,7 @@ from enum import Enum, auto
 from .FontObj import FontObj
 
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect=None, type=None, heroOwner="Generic"):
+    def __init__(self, name="Generic", base_val = 0, effect=None, type=None, heroOwner="Generic", card_art_path= "assets\\cards\\card_art\\chicken.png"):
 
         if type is None:
             self.type = []
@@ -23,12 +23,13 @@ class Card(object):
 
         self.owner = heroOwner      #owner of the card
 
+
         self.fontDictionary = {"King": 'POORICH.TTF',
                           "Billy": 'POORICH.TTF',
                           "Victoria": 'big_noodle_titling_oblique.ttf',
                           "Generic": 'OLDENGL.TTF'}
         fontChoice = self.fontDictionary[self.owner]
-
+        self.card_art = pygame.image.load(card_art_path).convert_alpha()
         self.name_surf = FontObj.surface_factory(str(self.name), fontChoice, 34, (0, 0, 0))
         self.currval_surf = FontObj.surface_factory(str(self.current_val), fontChoice, 50, (0, 0, 0))
         self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
@@ -38,6 +39,7 @@ class Card(object):
         self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
         self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.76,self.frontImg.get_rect().size[1] *0.52))
         self.frontImg.blit(self.baseval_surf, (self.frontImg.get_rect().size[0] *0.86,self.frontImg.get_rect().size[1] *0.74))
+        self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.08, self.frontImg.get_rect().size[1] * 0.025))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen

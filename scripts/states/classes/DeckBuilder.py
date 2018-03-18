@@ -86,6 +86,7 @@ class DeckCatalogue(object):
         return deck
     get_deck_victoria = staticmethod(get_deck_victoria)
 
+
     def get_deck_billy(hero_name):
         slaughterHouse = Card("Slaughter House", 0, None, [Type.STRUCTURE], hero_name)
         cropDuster = Card("Crop Duster", 10, None, [Type.VEHICLE], hero_name)
@@ -93,7 +94,7 @@ class DeckCatalogue(object):
         farmBoy = Card("Farm Boy", 5, None, [Type.PERSON], hero_name)
         barn = Card("Barn", 0, None, [Type.STRUCTURE], hero_name)
         cow = Card("Cow", 7, None, [Type.ANIMAL], hero_name)
-        chicken = Card("Chicken", 5, None, [Type.ANIMAL], hero_name)
+        chicken = Card("Chicken", 5, None, [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog = Card("Farm Dog", 3, None, [Type.ANIMAL], hero_name)
         reap = Card("Reap", 0, None, [Type.SPELL], hero_name)
         drought = Card("Drought", 0, None, [Type.SPELL], hero_name)
@@ -105,11 +106,12 @@ class DeckCatalogue(object):
         farmBoy2 = Card("Farm Boy", 5, None, [Type.PERSON], hero_name)
         barn2 = Card("Barn", 0, None, [Type.STRUCTURE], hero_name)
         cow2 = Card("Cow", 7, None, [Type.ANIMAL], hero_name)
-        chicken2 = Card("Chicken", 5, None, [Type.ANIMAL], hero_name)
+        chicken2 = Card("Chicken", 5, None, [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog2 = Card("Farm Dog", 3, None, [Type.ANIMAL], hero_name)
         reap2 = Card("Reap", 0, None, [Type.SPELL], hero_name)
         drought2 = Card("Drought", 0, None, [Type.SPELL], hero_name)
         waterPurifier2 = Card("Water Purifier", 5, None, [Type.OBJECT], hero_name)
+
 
         deck = [slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier,
                 slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2]
