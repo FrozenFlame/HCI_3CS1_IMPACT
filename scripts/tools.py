@@ -80,6 +80,7 @@ class Coordinator(object):
             pygame.display.update()
             # FPS
             pygame.display.set_caption("Avarice - A Greed-Based Card Game - FPS: {0:.2f}".format(self.clock.get_fps()))
+            pygame.display.set_icon(pygame.image.load("assets\\logo\\C avaricev2.png"))
 
 
 class State(object):

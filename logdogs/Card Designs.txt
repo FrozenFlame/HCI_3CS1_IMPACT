@@ -18,36 +18,47 @@ REMEMBER: "Special" cards which are made by other cards (ie. not in deck)
 // cards w/ effect/s
 
 1) Loan Slip [Spell]
-	- Effect: Draw 2 cards, after 2 turns lose 15C
+	- Effect: (old)Draw 2 cards, after 2 turns lose 15C
+		  (new)Draw 2 cards, lose 15C
 
 2) Lemonade Stand [5C]
-	- Effect: Increase C value by 3 per start of turn.
+	- Effect: (old)Increase C value by 3 per start of turn.
+		  (new)Increase C value by 3 per Person on same boardfield
 
 3) Credit Card [Spell] //could be opaf BUT ITS GWENT
-	- Effect: Play as many cards as you can this turn. Gold values increasingly 	diminish by 2. e.g. -2 -> -4 -> -6 ...
+	- Effect: (old)Play as many cards as you can this turn. Gold values increasingly diminish by 2. e.g. -2 -> -4 -> -6 ...
+		  (new)All PERSON on same board +2, all OBJECT on same board -1
 
 4) Butler [10C]
-	- Effect: Adjacent cards increase in value by 5C
+	- Effect: (old)Adjacent cards increase in value by 5C
+		  (new)Card to its left increase in value by 5C
+
 5) Arsonist [0C] <Black> <Person>
 	- Effect: Destroy Opposing Column's Structures
 6) Saboteur [Spell] <Black>
-	- Effect: 1 bomb card is placed into each player's deck. The first player that draws this card, discards one card from their hand.
+	- Effect: (old) 1 bomb card is placed into each player's deck. The first player that draws this card, discards one card from their hand.
+		  (new) Destroy 1 random opponent card
 7) Maid [5C]
 	- Effect: Increases your Mansion cards by 3C.
 8) Police Officer [15C]
-	- Effect: Silences 1 random black card (illegal activity cards).
+	- Effect:(old) Silences 1 random black card (illegal activity cards).
+		  (new) SEND 1 ENEMY BLACK + PERSON CARD TO GRAVE (sorry not sorry lol jk im not racist trust me)
 9) Parking Lot [5C]
-	- Effect: Increase self value by 2 per Vehicle on board (all).
+	- Effect:(old) Increase self value by 2 per Vehicle on board (all).
+		 (new)Increase self value by 2 per Vehicle on same boardfield.
 10) Impound Lot [5C]
 	- Effect: Decrease <vehicle> card values by 2 on board (all).
+		 (new)Decrease <vehicle> card values by 2 on enemy board
 11) Junkyard [5C]
-	- Effect: Destroy all <Vehicle> cards in both player's grave, increase self value by 3.
+	- Effect:(old) Destroy all <Vehicle> cards in both player's grave, increase self value by 3.
+		 (new)Increase self value by 2 per Vehicle on both graveyards.
 12) Resurrect [Spell]
 	- Effect: Restore 1 <Person> card from your grave.
 13) Rebuild [Spell]
 	- Effect: Restore 1 <Structure> or <Vehicle> from your grave.
 14) Gangsters [3C] <Black>
-	- Effect: Selects 2 random cards from both sides, only one card survives.
+	- Effect:(old) Selects 2 random cards from both sides, only one card survives.
+		 (new) NONE lol
 
 [Unique Cards]
 Ruling:

@@ -125,6 +125,7 @@ class MainMenu(object):
         # timings
         self.phase_start_time = None
         self.delay_to_hero = 800
+        self.isHovering = False
 
         # READY SCREEN OBJECTS - forced to default for now*
         self.player_img = self.victoria_img
@@ -151,11 +152,16 @@ class MainMenu(object):
         self.faded = False
         self.buttons.set_image(self.buttons.startButtonNormal)
         self.has_faded_out = False
-        self.fadeInSound = pygame.mixer.Sound("assets\\sounds\\waterdrop_short.ogg")
-        self.readyToPlay = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
-        self.fadeInSound.set_volume(0.10)
-        self.readyToPlay.set_volume(0.30)
+        self.playing_sound = False
 
+        ###Sound Clips######
+        self.fadeInSound = pygame.mixer.Sound("assets\\sounds\\waterdrop_short.ogg")
+        self.fadeInSound.set_volume(0.10)
+        self.pickedHero = pygame.mixer.Sound("assets\\sounds\\Clicking sound.ogg")
+        self.readyToPlay = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
+        self.readyToPlay.set_volume(0.30)
+        self.hoverSound = pygame.mixer.Sound("assets\\sounds\\hovering.ogg")
+        self.cancelSound = pygame.mixer.Sound("assets\\sounds\\cancel.ogg")
     def fadeIn(self):
         alpha = 0
         while alpha <= 255:
@@ -212,10 +218,21 @@ class MainMenu(object):
             if self.billy.is_pointed(*mouse):
                 # print("Billy moused over")
                 self.hero_hover = "Billy"
+                # self.hoverSound.play()
+
+
+
             elif self.king.is_pointed(*mouse):
                 # print("King moused over")
+                # self.hoverSound.play()
+
                 self.hero_hover = "King"
             elif self.victoria.is_pointed(*mouse):
+
+                # if self.hovered:
+                #
+                #     self.hoverSound.play()
+                #     self.hovered = False
                 # print("Victoria moused over")
                 self.hero_hover = "Victoria"
             else:  # no one is moused over
@@ -236,6 +253,7 @@ class MainMenu(object):
             if event.type == pygame.MOUSEBUTTONUP:
 
                 if click[0] == 0 and self.heroPrime and (self.hero_selected == self.hero_hover):
+
                     if not self.player2_picking:
                         print("Player 1 has chosen ", self.hero_selected)
                         self.player_hero = self.hero_selected
@@ -243,12 +261,14 @@ class MainMenu(object):
                         self.player_text.set_destination(self.player_text.posX - 350, self.player_text.posY)
                         self.player2_text.back_to_default()
                         self.select_text.set_destination(*self.select_text_pos2)
-
+                        self.pickedHero.play()
                         self.player2_picking = True
                     else:
-                        self.readyToPlay.play()
+
                         print("Player 2 has chosen ", self.hero_selected)
                         self.player2_hero = self.hero_selected
+                        self.pickedHero.play()
+                        self.readyToPlay.play()
                         self.select_text.set_destination(self.player2_text.posX, self.select_text.posY - 1000)
                         self.player2_text.set_destination(self.player2_text.posX , self.player2_text.posY - 1000)
                         self.billy.set_destination(self.billy.posX,self.billy.posY - 1000)
@@ -329,7 +349,6 @@ class MainMenu(object):
         elif self.phase == Phase.READY_UP:
 
             self.play_button.get_evt(click,event,mouse)
-            print("It is nnow ready") ##########################3
             if self.play_button.has_message:
                 self.play_button.has_message = False
                 # usera = User("Player", 99, 0)
@@ -469,6 +488,7 @@ class MainMenu(object):
         self.usera = User(p, 99, 0)
         if self.player_hero == "Billy":
             self.heroa = Hero(self.player_hero, self.billy_img)
+            self.heroa = Hero(self.player_hero, self.billy_img)
         elif self.player_hero == "King":
             self.heroa = Hero(self.player_hero, self.king_img)
         else:
@@ -549,6 +569,7 @@ class MainMenu(object):
     '''
     # get_event
     def getevt_heroselect_esc(self):
+        self.cancelSound.play()
         if not self.player2_picking:
             pygame.mixer.music.fadeout(600)
             self.phase = Phase.TO_START
@@ -580,6 +601,7 @@ class MainMenu(object):
             self.player_text.back_to_default()
             self.player2_text.set_destination(self.player2_text.rect.center[0] + 400, Globals.RESOLUTION_Y * 0.14)
     def getevt_readyup_esc(self):
+        self.cancelSound.play()
         self.heroes_to_default()
         self.vs_text.back_to_default()
         self.player_text.set_absolute((-900, 100))
