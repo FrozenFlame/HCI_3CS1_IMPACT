@@ -3,7 +3,7 @@ from enum import Enum, auto
 from .FontObj import FontObj
 
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect=None, type=None, heroOwner="Generic", card_art_path= "assets\\cards\\card_art\\chicken.png"):
+    def __init__(self, name="Generic", base_val = 0, effect="", type=None, heroOwner="Generic", card_art_path= "assets\\cards\\card_art\\chicken.png"):
 
         if type is None:
             self.type = []
@@ -31,15 +31,38 @@ class Card(object):
         fontChoice = self.fontDictionary[self.owner]
         self.card_art = pygame.image.load(card_art_path).convert_alpha()
         self.name_surf = FontObj.surface_factory(str(self.name), fontChoice, 34, (0, 0, 0))
-        self.currval_surf = FontObj.surface_factory(str(self.current_val), fontChoice, 50, (0, 0, 0))
-        self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), fontChoice, 40, (0, 0, 0))
+        # self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
+
+        def blit_text(surface, text, pos, font, color=pygame.Color('black')):
+            words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+            space = font.size(' ')[0]  # The width of a space.
+            max_width, max_height = surface.get_size()
+            x, y = pos
+            for line in words:
+                for word in line:
+                    word_surface = font.render(word, 100, color)
+                    word_width, word_height = word_surface.get_size()
+                    if x + word_width >= max_width*0.95:
+                        x = pos[0]  # Reset the x.
+                        y += word_height  # Start on new row.
+                    surface.blit(word_surface, (x, y))
+                    x += word_width + space
+                x = pos[0]  # Reset the x.
+                y += word_height  # Start on new row.
+        # effSurf = FontObj.surface_factory(self.effect, fontChoice, 15, (0, 0, 0))
+        # self.effect_surf = pygame.Surface((210, 70), 0, effSurf)
+        # self.effect_surf.blit(effSurf, (0, 0))
         # self.name_surf = FontObj.surface_factory(name, "assets\\fonts\\GARABD.TTF", 14, (0, 0, 0))
 
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
-        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.76,self.frontImg.get_rect().size[1] *0.52))
-        self.frontImg.blit(self.baseval_surf, (self.frontImg.get_rect().size[0] *0.86,self.frontImg.get_rect().size[1] *0.74))
+        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.80,self.frontImg.get_rect().size[1] *0.48))
+        # self.frontImg.blit(self.baseval_surf, (self.frontImg.get_rect().size[0] *0.86,self.frontImg.get_rect().size[1] *0.74))
         self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
+
+        # self.frontImg.blit(self.effect_surf, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60))
+        blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + fontChoice, 15))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
