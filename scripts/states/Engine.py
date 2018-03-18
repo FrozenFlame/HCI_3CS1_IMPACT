@@ -188,6 +188,7 @@ class Engine(object):
         self.fadeScreen.fill((0,0,0)) #black
         self.faded = False
         self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
+        self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -882,8 +883,9 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
-            if self.hero_cutscene:  # TODO Cutscene
+            if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
+                    s
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     # these two set destination codes below are actually triggered in the get_evt block
@@ -895,6 +897,7 @@ class Engine(object):
                         self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5))
                         self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5 +200))
                 elif self.hero_cutscene_flyout:
+                    self.flyOutEffect.play()
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     if currentTime - self.waitTick >= 800:  # timeout before players can start clicking around again
