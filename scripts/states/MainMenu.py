@@ -152,6 +152,7 @@ class MainMenu(object):
         self.buttons.set_image(self.buttons.startButtonNormal)
         self.has_faded_out = False
         self.fadeInSound = pygame.mixer.Sound("assets\\sounds\\waterdrop_short.ogg")
+        self.readyToPlay = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
         self.fadeInSound.set_volume(0.10)
 
     def fadeIn(self):
@@ -244,6 +245,7 @@ class MainMenu(object):
 
                         self.player2_picking = True
                     else:
+                        self.readyToPlay.play()
                         print("Player 2 has chosen ", self.hero_selected)
                         self.player2_hero = self.hero_selected
                         self.select_text.set_destination(self.player2_text.posX, self.select_text.posY - 1000)
@@ -254,6 +256,7 @@ class MainMenu(object):
                         self.billy_font.set_destination(self.billy.posX, self.billy.posY - 1000)
                         self.king_font.set_destination(self.king.posX, self.king.posY - 1000)
                         self.victoria_font.set_destination(self.victoria.posX, self.victoria.posY - 1000)
+
 
                         if self.player_hero == "Billy":
                             self.player_img = self.billy_img
@@ -278,6 +281,7 @@ class MainMenu(object):
                         self.player2_imgmov.set_destination(Globals.RESOLUTION_X * 0.5+300, Globals.RESOLUTION_Y * 0.5-100)
                         self.play_button.set_destination(Globals.RESOLUTION_X*0.50-(self.play_button.width/2), Globals.RESOLUTION_Y *0.90-(self.play_button.height/2))
                         self.phase = Phase.TO_READY
+
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -322,7 +326,9 @@ class MainMenu(object):
                     # allow coins to get moving
                     # reset wait timer
         elif self.phase == Phase.READY_UP:
+
             self.play_button.get_evt(click,event,mouse)
+            print("It is nnow ready") ##########################3
             if self.play_button.has_message:
                 self.play_button.has_message = False
                 # usera = User("Player", 99, 0)

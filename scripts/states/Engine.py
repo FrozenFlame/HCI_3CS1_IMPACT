@@ -185,6 +185,7 @@ class Engine(object):
         self.fadeScreen = pygame.Surface((1280, 720))
         self.fadeScreen.fill((0,0,0)) #black
         self.faded = False
+        self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -207,6 +208,7 @@ class Engine(object):
 
     def fadeOut(self):
         alpha = 250
+        self.inGame.play()
         while alpha >= 0:
             self.fadeScreen.set_alpha(alpha)
             self.draw(self.screen)
