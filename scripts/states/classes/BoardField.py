@@ -72,4 +72,11 @@ class BoardField(object):
             c.set_destination(*c.defaultPos)
             self.boardx += 80
 
+    def count_cardType(self, type):
+        counter = 0
+        for card in self.cardList:
+            if type in card.type:
+                counter += 1
+        return counter
+
     # make this class draw its cards within this class in order to have them render below non-board cards.

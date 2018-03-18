@@ -2,6 +2,7 @@ import pygame, math, time, random
 from enum import Enum, auto
 from .classes.BoardField import BoardField
 from .classes.Card import Card
+from .classes.Card import Type
 from .classes.Board import Board
 from .classes.Movable import Movable
 from .classes.FontObj import FontObj
@@ -432,19 +433,77 @@ class Engine(object):
                 self.player.cash += c.current_val
         print("[Engine] After recalculation cash: ", self.player.cash)
 
-    def apply_effects(self): #f this sh
-        for boardCard in self.boardField.cardList and not boardCard.effectActivated:
-            if boardCard.name == "Parking Lot":
-                count = 0
-                for c in self.boardField.cardList and c.type == "Type.VEHICLE":
-                    count+=1
-                boardCard += 2*count
-                boardCard.effectActivated = True
-                continue
+    def apply_effects(self, boardField): #f this sh
+        vehicleCounter = boardField.count_cardType(Type.VEHICLE)
+        blackCounter = boardField.count_cardType(Type.BLACK)
+        personCounter = boardField.count_cardType(Type.PERSON)
+        print (vehicleCounter, blackCounter, personCounter)
+        effectActivated = False
 
-            if boardCard.name == "Saboteur":
-                pass
+        for boardCard in boardField.cardList:
+            print(boardCard.name)
+            if not boardCard.effectActivated:
+                if boardCard.name is "Parking Lot":
+                    boardCard.current_val += (2*vehicleCounter)
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
 
+                if boardCard.name is "Loan Slip":
+                    self.draw_cards(2, self.deck, self.hand)
+                    self.player.cash -= 15
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Lemonade Stand":
+                    boardCard.current_val += (3*personCounter)
+                    print (boardCard.current_val)
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Credit Card":
+                    for card in boardField.cardList:
+                        if Type.PERSON in card.type:
+                            card.current_val += 2
+                        elif Type.OBJECT in card.type:
+                            card.current_val -= 1
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Butler":
+                    if boardField.cardList.index(boardCard) != 0:
+                        boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Arsonist":    #WORKING POGCHAMP
+                    arsonIndex = boardField.cardList.index(boardCard)
+                    if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
+                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
+                    if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
+                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Saboteur":
+                    boardRandom = random.randrange(2)
+                    cardRandom = random.randrange(len(self.boardFieldListOpp[boardRandom]))
+                    self.sendToGraveyard(self.boardFieldListOpp[boardRandom].cardList[cardRandom])
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+        if effectActivated:
+            self.recalculate_score(self.boardFieldList)
+            for a in self.boardField.cardList:
+                a.draw(self.screen)
+            for a in self.boardField2.cardList:
+                a.draw(self.screen)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
@@ -492,7 +551,7 @@ class Engine(object):
         (__)  \_)(_/\_/\_/(____/(____)(____/
         
         '''
-        if self.phase == Phase.PLAY:
+        if self.phase == Phase.PLAY and not self.hero_cutscene:
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
@@ -531,26 +590,14 @@ class Engine(object):
                             for bF in self.boardFieldList:
                                 if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
                                     bF.take_card(self.clickedCard[0])
-
-                                    # bF.cardList.append(self.clickedCard[0])
                                     self.clickedCard[0].onBoard = True
-                                    # print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
-                                    # print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card(self.clickedCard[0], self.boardFieldList)
-                                    # self.end_turn()
                         elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
                             for bF in self.boardFieldListOpp:
                                 if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
                                     bF.take_card(self.clickedCard[0])
-
-                                    # bF.cardList.append(self.clickedCard[0])
                                     self.clickedCard[0].onBoard = True
-                                    # print("Card({0}) placed into BoardField({1})".format(self.clickedCard[0].name, bF.owner))
-                                    # print("This is BoardFieldCoordinates: {0}".format(bF.boardy))
                                     self.play_card(self.clickedCard[0], self.boardFieldListOpp)
-
-                                    # self.end_turn()
-
 
 
                         # # OPPONENT Board placement/collision logic
@@ -569,12 +616,7 @@ class Engine(object):
 
 
             if event.type == pygame.MOUSEBUTTONDOWN and not self.opening and not self.hero_cutscene:
-                # print("AllCardsList: {0}HandsList: {1}BoardCardList:{2}".format(len(self.allCardsList), len(self.hand), len(self.boardCardList)))
-
-                # print("Pos: {0} , {1}".format(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
                 click = pygame.mouse.get_pressed()
-                # print("Clicked: {0}".format(click))
-
                 if click[0] == 1:
 
                     for s in self.allCardsList:
@@ -728,6 +770,10 @@ class Engine(object):
                         newX += 80
 
         if self.phase == Phase.PLAY:
+            if len(self.boardField.cardList) != 0:
+                self.apply_effects(self.boardField)
+            if len(self.boardField2.cardList) != 0:
+                self.apply_effects(self.boardField2)
             if self.hero_cutscene:  # TODO Cutscene
                 if self.hero_cutscene_flyin:
                     self.hero_turn_obj.update(deltaTime)
