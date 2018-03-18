@@ -104,6 +104,10 @@ class FontObj(object):
     def back_to_default(self):
         self.set_destination(*self.defaultPos)
 
+    def change_font_size(self, newsize):
+        self.surface = self.surface_factory(self.text, self.font, newsize, self.color)
+        self.rect = self.surface.get_rect()
+
     def go(self):   # 'orders' object to proceed to next destination
         pass
     def draw(self, screen):

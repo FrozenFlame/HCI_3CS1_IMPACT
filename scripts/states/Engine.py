@@ -113,7 +113,9 @@ class Engine(object):
         # self.boardCardList = list()
 
         self.bplayer_img = None
+        self.bplayer_font = None
         self.bplayer2_img = None
+        self.bplayer2_font = None
         self.hero_turn_obj = None
         self.font_turn_obj = None
 
@@ -260,10 +262,23 @@ class Engine(object):
         if self.player1heads:
             self.bplayer_img.set_absolute(self.top_slot)
             self.bplayer2_img.set_absolute(self.bottom_slot)
+
+            globs = self.bottom_slot
+            globs2 = self.top_slot
+            self.bplayer2_font.set_absolute((globs[0] - 85, globs[1] -16))
+            self.bplayer_font.set_absolute((globs2[0] - 85, globs2[1] -18))
+
             self.player1heads = False
+
         else:
             self.bplayer2_img.set_absolute(self.top_slot)
             self.bplayer_img.set_absolute(self.bottom_slot)
+
+            globs = self.bottom_slot
+            globs2 = self.top_slot
+            self.bplayer_font.set_absolute((globs[0] - 85, globs[1] -16))
+            self.bplayer2_font.set_absolute((globs2[0] - 85, globs2[1] -18))
+
             self.player1heads = True
 
 
@@ -1248,6 +1263,13 @@ class Engine(object):
                     self.boardFieldOpp.owner = self.persist['playerB'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerB'].user.username
                     self.player1heads = True
+
+                    globs = self.bottom_slot
+                    globs2 = self.top_slot
+                    self.bplayer_font.change_font_size(40)
+                    self.bplayer_font.set_destination(globs[0]-85, globs[1]-16)
+                    self.bplayer2_font.change_font_size(40)
+                    self.bplayer2_font.set_destination(globs2[0]-85, globs2[1]-18)
                 else:
                     print("LANDED TAILS")
                     self.deck = self.persist['playerB'].deck
@@ -1265,6 +1287,12 @@ class Engine(object):
                     self.boardFieldOpp.owner = self.persist['playerA'].user.username
                     self.boardFieldOpp2.owner = self.persist['playerA'].user.username
                     self.player1heads = False
+                    globs = self.bottom_slot
+                    globs2 = self.top_slot
+                    self.bplayer2_font.change_font_size(40)
+                    self.bplayer2_font.set_destination(globs[0]-85, globs[1]-16)
+                    self.bplayer_font.change_font_size(40)
+                    self.bplayer_font.set_destination(globs2[0]-85, globs2[1] -18)
 
                 self.first_player_set = True
 
@@ -1276,6 +1304,8 @@ class Engine(object):
                 self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
 
             # graphical representation of card giving (hands are already pre determined by get_first_cards)
+            self.bplayer_font.update(deltaTime)
+            self.bplayer2_font.update(deltaTime)
             if currentTick - self.waitTick >= self.drawCardWait:
                 if self.openingIndex < 10:
                     self.waitTick = currentTick
@@ -1343,14 +1373,17 @@ class Engine(object):
                         else:
                             print("Coin pointing right")
                             self.board.coin.point_right()
-                            # set bplayer2img to bottom left slot
+                            self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
 
+                            # set bplayer2img to bottom left slot
                             self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.505, self.bplayer_img.original_surface.get_rect().size[1] * 0.505))
+                            self.bplayer_img.set_destination(*self.top_slot)
+
                             self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.505, self.bplayer2_img.original_surface.get_rect().size[1] * 0.505))
                             self.bplayer2_img.set_destination(*self.bottom_slot)
-                            self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
                             # set bplayerimg to top left slot
-                            self.bplayer_img.set_destination(*self.top_slot)
+                    self.bplayer_font.set_destination(-600, self.bplayer_font.exact_position[1])
+                    self.bplayer2_font.set_destination(-600, self.bplayer2_font.exact_position[1])
 
 
                 elif self.notif_pause:  # time paused to notify who goes first
@@ -1364,6 +1397,8 @@ class Engine(object):
                     self.board.coin.set_destination(*self.coin_slot)
                     self.bplayer_img.update(deltaTime)  # these two will take their place
                     self.bplayer2_img.update(deltaTime)
+                    self.bplayer_font.update(deltaTime)
+                    self.bplayer2_font.update(deltaTime)
                     self.bplayer_img.scaleanim(self.waitTick)
                     self.bplayer2_img.scaleanim(self.waitTick)
                     if currentTime - self.waitTick >= 2000:
@@ -1408,6 +1443,8 @@ class Engine(object):
         if self.big_portraits_visible:
             self.bplayer_img.draw(screen)
             self.bplayer2_img.draw(screen)
+            self.bplayer_font.draw(screen)
+            self.bplayer2_font.draw(screen)
         onTopCard = None
         for a in self.allCardsList:
             if not a.onTop:
@@ -1491,8 +1528,14 @@ class Engine(object):
 
         self.bplayer_img = persistent['portraitA']
         self.bplayer_img.set_absolute((Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45))
+        self.bplayer_font = persistent['fontA']
+        self.bplayer_font.set_absolute((Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45+140))
+
         self.bplayer2_img = persistent['portraitB']
         self.bplayer2_img.set_absolute((Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45))
+        self.bplayer2_font = persistent['fontB']
+        self.bplayer2_font.set_absolute((Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45+140))
+
         self.big_portraits_visible = True
 
     def cleanup(self):
