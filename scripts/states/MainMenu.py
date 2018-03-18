@@ -347,7 +347,6 @@ class MainMenu(object):
         elif self.phase == Phase.READY_UP:
 
             self.play_button.get_evt(click,event,mouse)
-            print("It is nnow ready") ##########################3
             if self.play_button.has_message:
                 self.play_button.has_message = False
                 # usera = User("Player", 99, 0)

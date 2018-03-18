@@ -120,6 +120,7 @@ class Engine(object):
         self.font_turn_obj = None
 
 
+
         self.allCardsList = list()
 
         self.clickedCard = list()
@@ -187,6 +188,8 @@ class Engine(object):
         self.fadeScreen = pygame.Surface((1280, 720))
         self.fadeScreen.fill((0,0,0)) #black
         self.faded = False
+        self.flewOut = False
+
         self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
         self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -885,7 +888,6 @@ class Engine(object):
                 self.apply_effects(self.boardField2)
             if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
-                    s
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     # these two set destination codes below are actually triggered in the get_evt block
@@ -894,18 +896,23 @@ class Engine(object):
                     if currentTime - self.waitTick >= 2500:
                         self.hero_cutscene_flyin = False
                         self.waitTick = currentTime
-                        self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5))
-                        self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y*0.5 +200))
+                        self.hero_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y*0.5))
+                        self.font_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y*0.5 +200))
+                        self.flyOutEffect.play()
                 elif self.hero_cutscene_flyout:
-                    self.flyOutEffect.play()
+
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
+
                     if currentTime - self.waitTick >= 800:  # timeout before players can start clicking around again
+
                         self.waitTick = currentTime
+
                         self.hero_cutscene_flyout = False
                         # self.control_enabled = True     actually non-factor I think
                         self.may_see_hero_cutscene = False
                         self.hero_cutscene = False
+
 
 
 
