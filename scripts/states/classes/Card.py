@@ -3,7 +3,7 @@ from enum import Enum, auto
 from .FontObj import FontObj
 
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect=None, type=None):
+    def __init__(self, name="Generic", base_val = 0, effect=None, type=None, card_art_path= "assets\\cards\\card_art\\chicken.png"):
 
         if type is None:
             self.type = []
@@ -20,8 +20,7 @@ class Card(object):
         self.constants = []
         self.effect = effect
 
-
-        self
+        self.card_art = pygame.image.load(card_art_path).convert_alpha()
         self.name_surf = FontObj.surface_factory(str(self.name),"GARABD.TTF", 25, (0, 0, 0))
         self.currval_surf = FontObj.surface_factory(str(self.current_val), "GARABD.TTF", 50, (0, 0, 0))
         # self.name_surf = FontObj.surface_factory(name, "assets\\fonts\\GARABD.TTF", 14, (0, 0, 0))
@@ -31,6 +30,7 @@ class Card(object):
         # self.frontImg.blit(self.name_surf, (self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)))
         self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.02, self.frontImg.get_rect().size[1] *0.55))
         self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.02,self.frontImg.get_rect().size[1] *0.8))
+        self.frontImg.blit(self.card_art,(self.frontImg.get_rect().size[0] *0.01, self.frontImg.get_rect().size[1] *0.01))
         # self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
