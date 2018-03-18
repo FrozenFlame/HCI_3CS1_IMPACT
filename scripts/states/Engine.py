@@ -618,12 +618,12 @@ class Engine(object):
                 if click[0] == 0:
                     if self.mouseOnShowHandButton and self.showHandButton:
                         print("[Engine]Showing cards")
+                        self.showHandButton = False
                         if self.faded:
                             self.board.coin.show_pass()
                             self.fadeOut()
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
-                        self.showHandButton = False
                         if not self.passed:
                             self.showPassTurnButton = True
                             self.board.coin.show_pass()
