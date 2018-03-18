@@ -655,6 +655,8 @@ class MainMenu(object):
             self.persist['playerB'] = self.playerb
             self.persist['portraitA'] = self.player_imgmov
             self.persist['portraitB'] = self.player2_imgmov
+            self.persist['fontA'] = self.player_text
+            self.persist['fontB'] = self.player2_text
             self.persist['STARTED'] = False  # this is a flag that Engine will use to determine it to set down the pieces in place.
             Globals.gameStart = True
             self.usera = None
