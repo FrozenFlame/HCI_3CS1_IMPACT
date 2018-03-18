@@ -25,7 +25,7 @@ class Card(object):
 
 
         self.fontDictionary = {"King": 'POORICH.TTF',
-                          "Billy": 'GARABD.TTF',
+                          "Billy": 'GARA.TTF',
                           "Victoria": 'big_noodle_titling_oblique.ttf',
                           "Generic": 'OLDENGL.TTF'}
         fontChoice = self.fontDictionary[self.owner]
@@ -39,7 +39,7 @@ class Card(object):
         self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
         self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.76,self.frontImg.get_rect().size[1] *0.52))
         self.frontImg.blit(self.baseval_surf, (self.frontImg.get_rect().size[0] *0.86,self.frontImg.get_rect().size[1] *0.74))
-        self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.08, self.frontImg.get_rect().size[1] * 0.0255))
+        self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen

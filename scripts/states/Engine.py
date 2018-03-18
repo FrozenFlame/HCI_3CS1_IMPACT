@@ -155,7 +155,7 @@ class Engine(object):
         self.showHandButton = False
         self.endTurnImg = pygame.image.load("assets\\buttons\\end_turn.bmp").convert_alpha()
         self.passTurnImg = pygame.image.load("assets\\buttons\\pass_turn.bmp").convert_alpha()
-        self.showHandImg = pygame.image.load("assets\\buttons\\show_hand.bmp").convert_alpha()
+        self.showHandImg = pygame.image.load("assets\\buttons\\show_hand.png").convert_alpha()
         self.mouseOnEndTurnButton = False
         self.mouseOnPassTurnButton = False
         self.mouseOnShowHandButton = False
