@@ -533,11 +533,13 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Police Officer":
+                    sent = False
                     for a in self.boardFieldOpp.cardList:
                         if Type.BLACK and Type.PERSON in a.type:
                             self.sendToGraveyard(a)
+                            sent = True
                     for a in self.boardFieldOpp2.cardList:
-                        if Type.BLACK and Type.PERSON in a.type:
+                        if not sent and Type.BLACK and Type.PERSON in a.type:
                             self.sendToGraveyard(a)
 
                     boardCard.effectActivated = True
