@@ -54,6 +54,8 @@ class Buttons(object):
         self.vector = None
         self.move_type = "distance"
         self.navigatingSound = pygame.mixer.Sound("assets\\sounds\\navigating again_trimmed.ogg")
+        self.clickSound = pygame.mixer.Sound("assets\\sounds\\Clicking sound.ogg")
+        self.clickSound.set_volume(0.75)
 
         # end
 
@@ -103,6 +105,7 @@ class Buttons(object):
 
         if event.type == pygame.MOUSEBUTTONUP:
             if click[0] == 0 and self.startPrime and (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY:
+                self.clickSound.play()
                 self.image = self.startButtonNormal
                 self.has_message = True
                 # old code, direct hotwire to game

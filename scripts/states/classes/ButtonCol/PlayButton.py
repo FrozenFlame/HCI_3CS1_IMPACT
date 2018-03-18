@@ -54,6 +54,11 @@ class PlayButton(object):
         self.move_type = "distance"
         # end
 
+        self.playing_sound = False
+        self.navigatingSound = pygame.mixer.Sound("assets\\sounds\\navigating again_trimmed.ogg")
+        self.clickSound = pygame.mixer.Sound("assets\\sounds\\Clicking sound.ogg")
+        self.clickSound.set_volume(0.75)
+
         self.finished = False  # context specific for changing state
 
     def draw(self, screen):
@@ -69,6 +74,9 @@ class PlayButton(object):
         # mouse over
         if (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY and not self.startPrime:
             self.image = self.startButtonHover
+            if not self.playing_sound:
+                self.playing_sound = True
+                self.navigatingSound.play()
             self.startButton = self.image.convert_alpha()
 
         # mouse back on while held start button
@@ -80,6 +88,9 @@ class PlayButton(object):
         # mouse off
         elif not (self.posX + self.width) >= mouse[0] >= self.posX or not (self.posY + self.height) >= mouse[1] >= self.posY:
             self.image = self.startButtonNormal
+            if self.playing_sound:
+                self.playing_sound = False
+                self.navigatingSound.stop()
             self.startButton = self.image.convert_alpha()
 
         #for changing states button
@@ -94,6 +105,7 @@ class PlayButton(object):
         if event.type == pygame.MOUSEBUTTONUP:
             if click[0] == 0 and self.startPrime and (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY:
                 self.image = self.startButtonNormal
+                self.clickSound.play()
                 self.has_message = True
                 # old code, direct hotwire to game
                 # Globals.state = "AVARICE"
