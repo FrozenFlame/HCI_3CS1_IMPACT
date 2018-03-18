@@ -62,6 +62,7 @@ class MainMenu(object):
         self.player2_hero = None
         self.phase = Phase.START_SCREEN
 
+
         '''
             ___          _                     _     _           _       
            /   \___  ___(_) __ _ _ __     ___ | |__ (_) ___  ___| |_ ___ 
@@ -73,6 +74,7 @@ class MainMenu(object):
 
         pygame.mixer.music.load("assets\\music\\game\\hero_select.ogg")
         pygame.mixer.music.set_volume(0.12)
+        self.navigating = pygame.mixer.Sound("\\Avarice Soundtracks\\navigating again.ogg")
 
         # logo
         self.logo = pygame.image.load("assets/logo/Avarice-Logo-final.png").convert_alpha()
@@ -148,6 +150,7 @@ class MainMenu(object):
         self.faded = False
         self.buttons.set_image(self.buttons.startButtonNormal)
         self.has_faded_out = False
+        self.fadeInSound = pygame.mixer.Sound("\\Avarice Soundtracks\\waterdrop.ogg")
 
     def fadeIn(self):
         alpha = 0
@@ -158,7 +161,10 @@ class MainMenu(object):
             pygame.display.update()
             pygame.time.delay(1)
             alpha += 5
+
+
         self.faded = True
+
 
     def fadeOut(self):
         alpha = 250
@@ -169,6 +175,7 @@ class MainMenu(object):
             pygame.display.update()
             pygame.time.delay(1)
             alpha -= 5
+            self.fadeInSound.play()
         self.faded = False
 
     def get_evt(self,event):
@@ -277,12 +284,14 @@ class MainMenu(object):
 
         elif self.phase == Phase.START_SCREEN:
             self.buttons.get_evt(click, event, mouse)
+
             if self.buttons.has_message:  # start button
                 self.buttons.has_message = False
                 message = self.buttons.get_message()
                 if message["phase"] == "TO_HERO":
                     self.phase = Phase.TO_HERO
                     # play hero select music
+
                     pygame.mixer.music.play(-1)
                     # send MAIN elements flying to left (set destination x by -1100)
                     self.backdropMovable.set_destination(self.backdropMovable.rect.center[0]-1200, self.backdropMovable.rect.center[1])

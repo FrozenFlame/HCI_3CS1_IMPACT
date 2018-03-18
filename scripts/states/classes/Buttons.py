@@ -52,6 +52,8 @@ class Buttons(object):
         self.destination = None
         self.vector = None
         self.move_type = "distance"
+        self.navigatingSound = pygame.mixer.Sound("\\Avarice Soundtracks\\navigating again.ogg")
+
         # end
 
         self.finished = False  # context specific for changing state
@@ -69,7 +71,9 @@ class Buttons(object):
         # mouse over
         if (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY and not self.startPrime:
             self.image = self.startButtonHover
+            self.navigatingSound.play()
             self.startButton = self.image.convert_alpha()
+
 
         # mouse back on while held start button
         elif self.startPrime and (self.posX + self.width) >= mouse[0] >= self.posX and (self.posY + self.height) >= mouse[1] >= self.posY:
