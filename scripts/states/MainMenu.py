@@ -154,6 +154,7 @@ class MainMenu(object):
         self.fadeInSound = pygame.mixer.Sound("assets\\sounds\\waterdrop_short.ogg")
         self.readyToPlay = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
         self.fadeInSound.set_volume(0.10)
+        self.readyToPlay.set_volume(0.30)
 
     def fadeIn(self):
         alpha = 0
@@ -365,6 +366,7 @@ class MainMenu(object):
                 self.has_faded_out = True
                 self.fadeOut()
 
+
         elif self.phase == Phase.TO_HERO:
             self.backdropMovable.update(dt)
             self.buttons.update(dt)
@@ -448,6 +450,7 @@ class MainMenu(object):
 
             self.update_heroes(dt)
             pygame.mixer.music.fadeout(1000)
+            pygame.mixer.music.stop()
 
             if currentTime - self.phase_start_time >= 300:
                 self.setup_players(Globals.user1name, Globals.user2name)

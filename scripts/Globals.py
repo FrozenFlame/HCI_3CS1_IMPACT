@@ -12,5 +12,7 @@ class Globals:
 
     mixer_volume = 0.5
 
+    music_volume = 0.12
+
     user1name = "Vex"
     user2name = "Slasher399"

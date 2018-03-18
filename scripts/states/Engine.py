@@ -62,11 +62,10 @@ class Engine(object):
         self.player = None
         self.player2 = None
         self.first_player = None  # does not change after coin toss
-        self.opponent = None
         self.winning_player = None
         self.cards_played = 0  # counter to determine how many cards you've played that turn
         self.phase = Phase.COIN_TOSS
-
+        self.musicplayer = None
         '''
         CUTSCENE BOOLEANS
         '''
@@ -94,6 +93,7 @@ class Engine(object):
         self.big_portraits_visible = False
         self.player1heads = False
         self.declared_winner = False
+        self.music_loaded = False
         # self.opening = True
 
         # objects
@@ -210,7 +210,6 @@ class Engine(object):
 
     def fadeOut(self):
         alpha = 250
-        self.inGame.play()
         while alpha >= 0:
             self.fadeScreen.set_alpha(alpha)
             self.draw(self.screen)
@@ -266,7 +265,7 @@ class Engine(object):
             globs = self.bottom_slot
             globs2 = self.top_slot
             self.bplayer2_font.set_absolute((globs[0] - 85, globs[1] -16))
-            self.bplayer_font.set_absolute((globs2[0] - 85, globs2[1] -18))
+            self.bplayer_font.set_absolute((globs2[0] - 85, globs2[1] -22))
 
             self.player1heads = False
 
@@ -277,7 +276,7 @@ class Engine(object):
             globs = self.bottom_slot
             globs2 = self.top_slot
             self.bplayer_font.set_absolute((globs[0] - 85, globs[1] -16))
-            self.bplayer2_font.set_absolute((globs2[0] - 85, globs2[1] -18))
+            self.bplayer2_font.set_absolute((globs2[0] - 85, globs2[1] -22))
 
             self.player1heads = True
 
@@ -778,6 +777,8 @@ class Engine(object):
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
                     if self.mouseOnShowHandButton and self.showHandButton:
+                        self.musicplayer.prep_song_hero(self.player.hero.name)
+                        self.musicplayer.play()
                         print("[Engine]Showing cards")
                         self.showHandButton = False
                         if self.faded:
@@ -785,6 +786,7 @@ class Engine(object):
                             self.fadeOut()
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
+                        self.music_loaded = False
                         if not self.passed:
                             self.showPassTurnButton = True
                             self.board.coin.show_pass()
@@ -1255,7 +1257,8 @@ class Engine(object):
                     self.player = self.persist['playerA']
                     self.first_player = self.persist['playerA']
                     self.player2 = self.persist['playerB']
-                    self.opponent = self.persist['playerB']
+
+                    self.musicplayer = MusicPlayer(self.player.hero.name, self.player2.hero.name)
 
                     self.boardField.owner = self.persist['playerA'].user.username
                     self.boardField2.owner = self.persist['playerA'].user.username
@@ -1269,7 +1272,7 @@ class Engine(object):
                     self.bplayer_font.change_font_size(40)
                     self.bplayer_font.set_destination(globs[0]-85, globs[1]-16)
                     self.bplayer2_font.change_font_size(40)
-                    self.bplayer2_font.set_destination(globs2[0]-85, globs2[1]-18)
+                    self.bplayer2_font.set_destination(globs2[0]-85, globs2[1]-22)
                 else:
                     print("LANDED TAILS")
                     self.deck = self.persist['playerB'].deck
@@ -1277,9 +1280,12 @@ class Engine(object):
                     self.hand = self.get_first_cards(self.deck, self.persist['playerB'].user.username)
                     self.opponent_hand = self.get_first_cards(self.opponent_deck, self.persist['playerA'].user.username)
 
+
                     self.player = self.persist['playerB']
                     self.first_player = self.persist['playerB']
                     self.player2 = self.persist['playerA']
+                    self.musicplayer = MusicPlayer(self.player2.hero.name, self.player.hero.name)
+
 
                     self.boardField.owner = self.persist['playerB'].user.username
                     self.boardField2.owner = self.persist['playerB'].user.username
@@ -1292,7 +1298,7 @@ class Engine(object):
                     self.bplayer2_font.change_font_size(40)
                     self.bplayer2_font.set_destination(globs[0]-85, globs[1]-16)
                     self.bplayer_font.change_font_size(40)
-                    self.bplayer_font.set_destination(globs2[0]-85, globs2[1] -18)
+                    self.bplayer_font.set_destination(globs2[0]-85, globs2[1] -22)
 
                 self.first_player_set = True
 
@@ -1341,6 +1347,7 @@ class Engine(object):
             if not self.has_faded_tossed_coin:
                 self.board.coin.is_visible = False
                 self.board.coin.set_absolute((Globals.RESOLUTION_X * 0.5, -300))
+                self.inGame.play()
                 self.fadeOut()
                 self.has_faded_tossed_coin = True
 
@@ -1351,6 +1358,7 @@ class Engine(object):
                 self.toss_coin()
                 self.waitTick = currentTime
                 self.has_tossed_coin = True
+
             if self.has_tossed_coin:
                 if self.first_toss_animating:
                     #animate coin?
@@ -1560,6 +1568,184 @@ class Engine(object):
 #  \___/_| |_|_| |_|\___|_|     \____/_|\__,_|___/___/\___||___/
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class MusicPlayer(object):
+    def __init__(self,hero,hero2):
+        self.hero = hero
+        self.hero2 = hero2
+        self.music_list = []
+        self.victory = None
+        self.music_list2 = []
+        self.victory2 = None
+        self.is_mirror = False
+        self.last_played_index = random.randrange(0,4)
+        self.last_played_index2 = random.randrange(0,4)
+        self.to_play_hero2 = False
+        self.last_hero = None
+        self.mc = pygame.mixer.music
+        self.mc2 = pygame.mixer.music
+        if self.hero == self.hero2:
+            self.is_mirror = True
+
+        if not self.is_mirror:
+            if self.hero == "Billy":
+                self.music_list = [
+                    "\\billy\\billy_theme01.ogg",
+                    "\\billy\\billy_theme02.ogg",
+                    "\\billy\\billy_theme03.ogg",
+                    "\\billy\\billy_theme04.ogg",
+                ]
+                self.victory = "\\billy\\billy_victory.ogg"
+            elif self.hero == "King":
+                self.music_list = [
+                    "\\king\\king_theme01.ogg",
+                    "\\king\\king_theme02.ogg",
+                    "\\king\\king_theme03.ogg",
+                    "\\king\\king_theme04.ogg",
+                ]
+                self.victory = "\\king\\king_victory.ogg"
+            else:
+                self.music_list = [
+                "\\victoria\\victoria_theme01.ogg",
+                "\\victoria\\victoria_theme02.ogg",
+                "\\victoria\\victoria_theme03.ogg",
+                "\\victoria\\victoria_theme04.ogg",
+                ]
+                self.victory = "\\victoria\\victoria_victory.ogg"
+
+            # FOR HERO 2 #
+            if self.hero2 == "Billy":
+                self.music_list2 = [
+                    "\\billy\\billy_theme01.ogg",
+                    "\\billy\\billy_theme02.ogg",
+                    "\\billy\\billy_theme03.ogg",
+                    "\\billy\\billy_theme04.ogg",
+                ]
+                self.victory2 = "\\billy\\billy_victory.ogg"
+            elif self.hero2 == "King":
+                self.music_list2 = [
+                    "\\king\\king_theme01.ogg",
+                    "\\king\\king_theme02.ogg",
+                    "\\king\\king_theme03.ogg",
+                    "\\king\\king_theme04.ogg",
+                ]
+                self.victory2 = "\\king\\king_victory.ogg"
+            else:
+                self.music_list2 = [
+                "\\victoria\\victoria_theme01.ogg",
+                "\\victoria\\victoria_theme02.ogg",
+                "\\victoria\\victoria_theme03.ogg",
+                "\\victoria\\victoria_theme04.ogg",
+                ]
+                self.victory2 = "\\victoria\\victoria_victory.ogg"
+        else:
+            if self.hero == "Billy":
+                self.music_list = [
+                    "\\billy\\billy_theme01.ogg",
+                    "\\billy\\billy_theme02.ogg",
+                    "\\billy\\billy_theme03.ogg",
+                    "\\billy\\billy_theme04.ogg",
+                ]
+                self.victory = "\\billy\\billy_victory.ogg"
+            elif self.hero == "King":
+                self.music_list = [
+                    "\\king\\king_theme01.ogg",
+                    "\\king\\king_theme02.ogg",
+                    "\\king\\king_theme03.ogg",
+                    "\\king\\king_theme04.ogg",
+                ]
+                self.victory = "\\king\\king_victory.ogg"
+            else:
+                self.music_list = [
+                "\\victoria\\victoria_theme01.ogg",
+                "\\victoria\\victoria_theme02.ogg",
+                "\\victoria\\victoria_theme03.ogg",
+                "\\victoria\\victoria_theme04.ogg",
+                ]
+                self.victory = "\\victoria\\victoria_victory.ogg"
+
+    def swap(self):  # change track after track has ended already
+        pass
+
+    def stop(self):
+        pygame.mixer.music.stop()
+        pass
+    def prep_song(self):
+        if not self.is_mirror:
+            if not self.to_play_hero2:
+                index = random.randrange(0,4)
+                while index == self.last_played_index:
+                    index = random.randrange(0,4)
+
+                pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list[index])
+                pygame.mixer.music.set_volume(Globals.music_volume)
+                # pygame.mixer.music.play()
+                self.to_play_hero2 = True
+
+            elif self.to_play_hero2:
+                index = random.randrange(0,4)
+                while index == self.last_played_index2:
+                    index = random.randrange(0,4)
+                pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list2[index])
+                pygame.mixer.music.set_volume(Globals.music_volume)
+                # pygame.mixer.music.play()
+                self.to_play_hero2 = False
+    def prep_song_hero(self,hero):
+        print("stop_music")
+
+
+        if not self.last_hero == hero:
+            if hero == self.hero:
+                index = random.randrange(0, 4)
+                while index == self.last_played_index:
+                    index = random.randrange(0, 4)
+                self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
+                self.mc2.set_volume(Globals.music_volume)
+                self.last_hero = hero
+
+                self.to_play_hero2 = False
+            elif hero == self.hero2:
+                index = random.randrange(0, 4)
+                while index == self.last_played_index2:
+                    index = random.randrange(0, 4)
+                self.mc.load("assets\\music\\heroes\\" + self.music_list2[index])
+                self.mc.set_volume(Globals.music_volume)
+                self.last_hero = hero
+
+                self.to_play_hero2 = True
+        else:
+            index = random.randrange(0, 4)
+            while index == self.last_played_index:
+                index = random.randrange(0, 4)
+            self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
+            self.mc2.set_volume(Globals.music_volume)
+            self.last_hero = hero
+
+        # self.play()
+    def play(self):
+        # if not self.is_mirror:
+        #     if not self.to_play_hero2:
+        #         index = random.randrange(0,4)
+        #         while index == self.last_played_index:
+        #             index = random.randrange(0,4)
+        #
+        #         # pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list[index])
+        #         pygame.mixer.music.set_volume(Globals.music_volume)
+        #         pygame.mixer.music.play()
+        #         self.to_play_hero2 = True
+        #
+        #     elif self.to_play_hero2:
+        #         index = random.randrange(0,4)
+        #         while index == self.last_played_index2:
+        #             index = random.randrange(0,4)
+        #         # pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list2[index])
+        #         pygame.mixer.music.set_volume(Globals.music_volume)
+        #         pygame.mixer.music.play()
+        #         self.to_play_hero2 = False
+        if not self.to_play_hero2:
+            self.mc.play()
+        else:
+            self.mc2.play()
 
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
