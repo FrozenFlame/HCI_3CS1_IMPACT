@@ -20,7 +20,19 @@ class Card(object):
         self.constants = []
         self.effect = effect
 
+
+        self
+        self.name_surf = FontObj.surface_factory(str(self.name),"GARABD.TTF", 25, (0, 0, 0))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), "GARABD.TTF", 50, (0, 0, 0))
+        # self.name_surf = FontObj.surface_factory(name, "assets\\fonts\\GARABD.TTF", 14, (0, 0, 0))
+
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
+        # self.frontImg.blit(self.currval_surf, (self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72)))
+        # self.frontImg.blit(self.name_surf, (self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)))
+        self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.02, self.frontImg.get_rect().size[1] *0.55))
+        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.02,self.frontImg.get_rect().size[1] *0.8))
+        # self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)
+
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
         self.width = self.img.get_rect().size[0]  # img's initial width

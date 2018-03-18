@@ -118,6 +118,11 @@ class FontObj(object):
         return FontObj(text, posx, posy, font, fontsize, textSurf, textRect,color)
     factory = staticmethod(factory)
 
+    def surface_factory(text, font, fontsize, color):
+        largeText = pygame.font.Font('assets/fonts/' + font, fontsize)
+        textSurf = largeText.render(text, True, color)
+        return textSurf
+    surface_factory = staticmethod(surface_factory)
     #
     # def display_text(self, text, screen):
     #     largeText = pygame.font.Font('freesansbold.ttf', 115)
