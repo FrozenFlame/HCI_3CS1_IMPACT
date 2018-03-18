@@ -673,7 +673,8 @@ class MainMenu(object):
         # end for persists #
         self.phase = Phase.START_SCREEN
         self.buttons.set_image(self.buttons.startButtonNormal)
-
+        pygame.mixer.music.load("assets\\music\\game\\hero_select.ogg")
+        pygame.mixer.music.set_volume(0.12)
     def cleanup(self):  # state is finished
         self.done = False
 

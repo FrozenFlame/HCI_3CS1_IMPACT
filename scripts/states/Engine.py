@@ -192,6 +192,7 @@ class Engine(object):
 
         self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
         self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
+        self.flyOutEffect.set_volume(0.20)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -1040,17 +1041,24 @@ class Engine(object):
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
+                        self.musicplayer.prep_victory(self.player.hero.name)
+
                         self.hero_turn_obj.surface = self.player.hero.img
                         self.font_turn_obj = FontObj.factory(self.player.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
                         self.font_turn_obj.distancespeed = 3.5
                         self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
 
-                        self.hero_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y * 0.5))
-                        self.font_turn_obj.set_destination(*(-400, Globals.RESOLUTION_Y * 0.5 + 200))
+                        self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
+                self.player.cash = 0
+                self.player2.cash = 0
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
+                self.player.cash = 0
+                self.player2.cash = 0
                 self.phase = Phase.ROUND_DRAW
+
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
@@ -1059,6 +1067,7 @@ class Engine(object):
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
+                        self.musicplayer.prep_victory(self.player2.hero.name)
                         self.hero_turn_obj.surface = self.player2.hero.img
                         self.font_turn_obj = FontObj.factory(self.player2.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
                         self.font_turn_obj.distancespeed = 3.5
@@ -1066,6 +1075,9 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
+
+                self.player.cash = 0
+                self.player2.cash = 0
 
             # play appropriate animations
             # check if it was the winning blow
@@ -1133,8 +1145,11 @@ class Engine(object):
                 self.declared_winner = True
                 print("[Engine] Match Complete!")
                 self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
+
                 print("{0} wins!".format(self.winning_player.user.username))
+                self.musicplayer.play()
                 self.may_see_hero_cutscene = True
+
             else:
                 self.hero_turn_obj.update(deltaTime)
                 self.font_turn_obj.update(deltaTime)
@@ -1557,6 +1572,7 @@ class Engine(object):
         self.big_portraits_visible = True
 
     def cleanup(self):
+        pygame.mixer.music.fadeout(1000)
         self.board = None
         self.boardField = None
         self.deck = None
@@ -1592,8 +1608,10 @@ class MusicPlayer(object):
         self.last_played_index2 = random.randrange(0,4)
         self.to_play_hero2 = False
         self.last_hero = None
+        self.has_victor = False
+        self.bottom_win = False
         self.mc = pygame.mixer.music
-        self.mc2 = pygame.mixer.music
+        # self.mc2 = pygame.mixer.music
         if self.hero == self.hero2:
             self.is_mirror = True
 
@@ -1701,61 +1719,66 @@ class MusicPlayer(object):
                 # pygame.mixer.music.play()
                 self.to_play_hero2 = False
     def prep_song_hero(self,hero):
-        print("stop_music")
+        print("stop music")
 
+        # if not self.last_hero == hero:
+        #     if hero == self.hero:
+        #         index = random.randrange(0, 4)
+        #         while index == self.last_played_index:
+        #             index = random.randrange(0, 4)
+        #         self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
+        #         self.mc2.set_volume(Globals.music_volume)
+        #         self.last_hero = hero
+        #
+        #         self.to_play_hero2 = False
+        #     elif hero == self.hero2:
+        #         index = random.randrange(0, 4)
+        #         while index == self.last_played_index2:
+        #             index = random.randrange(0, 4)
+        #         self.mc.load("assets\\music\\heroes\\" + self.music_list2[index])
+        #         self.mc.set_volume(Globals.music_volume)
+        #         self.last_hero = hero
+        #
+        #         self.to_play_hero2 = True
+        # else:
+        #     index = random.randrange(0, 4)
+        #     while index == self.last_played_index:
+        #         index = random.randrange(0, 4)
+        #     self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
+        #     self.mc2.set_volume(Globals.music_volume)
+        #     self.last_hero = hero
 
-        if not self.last_hero == hero:
-            if hero == self.hero:
-                index = random.randrange(0, 4)
-                while index == self.last_played_index:
-                    index = random.randrange(0, 4)
-                self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
-                self.mc2.set_volume(Globals.music_volume)
-                self.last_hero = hero
-
-                self.to_play_hero2 = False
-            elif hero == self.hero2:
-                index = random.randrange(0, 4)
-                while index == self.last_played_index2:
-                    index = random.randrange(0, 4)
-                self.mc.load("assets\\music\\heroes\\" + self.music_list2[index])
-                self.mc.set_volume(Globals.music_volume)
-                self.last_hero = hero
-
-                self.to_play_hero2 = True
-        else:
+        if hero == self.hero:
             index = random.randrange(0, 4)
             while index == self.last_played_index:
                 index = random.randrange(0, 4)
-            self.mc2.load("assets\\music\\heroes\\" + self.music_list[index])
-            self.mc2.set_volume(Globals.music_volume)
+            self.mc.load("assets\\music\\heroes\\" + self.music_list[index])
+            self.last_played_index = index
+            self.mc.set_volume(Globals.music_volume)
             self.last_hero = hero
 
-        # self.play()
+        elif hero == self.hero2:
+            index = random.randrange(0, 4)
+            while index == self.last_played_index2:
+                index = random.randrange(0, 4)
+            self.mc.load("assets\\music\\heroes\\" + self.music_list2[index])
+            self.last_played_index2 = index
+            self.mc.set_volume(Globals.music_volume)
+            self.last_hero = hero
+
     def play(self):
-        # if not self.is_mirror:
-        #     if not self.to_play_hero2:
-        #         index = random.randrange(0,4)
-        #         while index == self.last_played_index:
-        #             index = random.randrange(0,4)
-        #
-        #         # pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list[index])
-        #         pygame.mixer.music.set_volume(Globals.music_volume)
-        #         pygame.mixer.music.play()
-        #         self.to_play_hero2 = True
-        #
-        #     elif self.to_play_hero2:
-        #         index = random.randrange(0,4)
-        #         while index == self.last_played_index2:
-        #             index = random.randrange(0,4)
-        #         # pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list2[index])
-        #         pygame.mixer.music.set_volume(Globals.music_volume)
-        #         pygame.mixer.music.play()
-        #         self.to_play_hero2 = False
-        if not self.to_play_hero2:
-            self.mc.play()
+        self.mc.play()
+
+
+    def prep_victory(self, hero):
+        if hero == "Billy":
+            self.victory = "\\billy\\billy_victory.ogg"
+        elif hero == "King":
+
+            self.victory = "\\king\\king_victory.ogg"
         else:
-            self.mc2.play()
+            self.victory = "\\victoria\\victoria_victory.ogg"
+        self.mc.load("assets\\music\\heroes"+self.victory)
 
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
