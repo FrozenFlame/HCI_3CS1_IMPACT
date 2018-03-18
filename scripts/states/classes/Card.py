@@ -3,7 +3,7 @@ from enum import Enum, auto
 from .FontObj import FontObj
 
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect=None, type=None):
+    def __init__(self, name="Generic", base_val = 0, effect=None, type=None, heroOwner="Generic"):
 
         if type is None:
             self.type = []
@@ -19,19 +19,23 @@ class Card(object):
         self.debuffs = []
         self.constants = []
         self.effect = effect
+        self.owner = heroOwner      #owner of the card
 
+        self.fontDictionary = {"King": 'POORICH.TTF',
+                          "Billy": 'POORICH.TTF',
+                          "Victoria": 'big_noodle_titling_oblique.ttf',
+                          "Generic": 'OLDENGL.TTF'}
+        fontChoice = self.fontDictionary[self.owner]
 
-        self
-        self.name_surf = FontObj.surface_factory(str(self.name),"GARABD.TTF", 25, (0, 0, 0))
-        self.currval_surf = FontObj.surface_factory(str(self.current_val), "GARABD.TTF", 50, (0, 0, 0))
+        self.name_surf = FontObj.surface_factory(str(self.name), fontChoice, 34, (0, 0, 0))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), fontChoice, 50, (0, 0, 0))
+        self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
         # self.name_surf = FontObj.surface_factory(name, "assets\\fonts\\GARABD.TTF", 14, (0, 0, 0))
 
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
-        # self.frontImg.blit(self.currval_surf, (self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72)))
-        # self.frontImg.blit(self.name_surf, (self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)))
-        self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.02, self.frontImg.get_rect().size[1] *0.55))
-        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.02,self.frontImg.get_rect().size[1] *0.8))
-        # self.defaultPos[0] + (self.width * 0.5), self.defaultPos[1] + (self.height * 0.88)
+        self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
+        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.76,self.frontImg.get_rect().size[1] *0.52))
+        self.frontImg.blit(self.baseval_surf, (self.frontImg.get_rect().size[0] *0.86,self.frontImg.get_rect().size[1] *0.74))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
@@ -47,12 +51,6 @@ class Card(object):
 
         self.speed = 10  # movespeed on the screen
 
-        self.owner = ""  # the owner of the card
-
-        self.fontDictionary = {"King": 'POORICH.TTF',
-                          "Uncle Billy": 'POORICH.TTF',
-                          "Victoria": 'big_noodle_titling.ttf',
-                          "": 'OLDENGL.TTF'}
 
 
 
@@ -250,11 +248,11 @@ class Card(object):
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
 
-    def addTexts(self, hero):
-        fontChoice = self.fontDictionary[hero]
-        self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
-        self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
-        self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
+    # def addTexts(self, hero):
+    #     fontChoice = self.fontDictionary[hero]
+    #     self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
+    #     self.textBaseVal = FontObj.factory(str(self.base_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.72), fontChoice, 11, (0, 0, 0))
+    #     self.textName = FontObj.factory(self.name, self.defaultPos[0]+(self.width*0.5), self.defaultPos[1]+(self.height*0.88), fontChoice, 12, (0, 0, 0))
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
