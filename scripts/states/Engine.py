@@ -174,9 +174,10 @@ class Engine(object):
         self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
-        # aim for the center of the slot
+        # aim for the center of the slot # not center actually idk what's pygame doing with this part.
         self.top_slot = (Globals.RESOLUTION_X *0.145, Globals.RESOLUTION_Y *0.36)
         self.bottom_slot = (Globals.RESOLUTION_X *0.145, Globals.RESOLUTION_Y * 0.95)
+        self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -409,6 +410,7 @@ class Engine(object):
 
     def play_card(self, card, boardfieldlist):  # initial concept, listener type thing.
         print("PLAYED BY: ", self.player.user.username)
+        self.board.coin.show_end()
         self.showPassTurnButton = False
         self.showEndTurnButton = True
         self.cards_played += 1
@@ -617,14 +619,17 @@ class Engine(object):
                     if self.mouseOnShowHandButton and self.showHandButton:
                         print("[Engine]Showing cards")
                         if self.faded:
+                            self.board.coin.show_pass()
                             self.fadeOut()
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
                         self.showHandButton = False
                         if not self.passed:
                             self.showPassTurnButton = True
+                            self.board.coin.show_pass()
                         else:
                             self.showEndTurnButton = True
+                            self.board.coin.show_end()
 
                         #cutscene prep:
                         self.waitTick = pygame.time.get_ticks()  # this is so that fly in doesn't end instantly
@@ -1151,44 +1156,57 @@ class Engine(object):
         elif self.phase == Phase.COIN_TOSS:
             # note : timings below have been adjusted to allow faster debugging
             # additional animation updates
+            self.board.coin.update(deltaTime)
+
             if not self.has_faded_tossed_coin:
+                self.board.coin.is_visible = False
+                self.board.coin.set_absolute((Globals.RESOLUTION_X * 0.5, -300))
                 self.fadeOut()
                 self.has_faded_tossed_coin = True
+
             elif not self.has_tossed_coin and currentTime - self.waitTick >= 1000:  # wait 2 seconds
                 print("COIN TOSSED")
+                self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
+                self.board.coin.is_visible = True
                 self.toss_coin()
                 self.waitTick = currentTime
                 self.has_tossed_coin = True
             if self.has_tossed_coin:
                 if self.first_toss_animating:
+
                     #animate coin?
-                    if currentTime - self.waitTick <= 1000:  # how long we want the coin to be spinning before stopping it
+                    if currentTime - self.waitTick <= 3000:  # how long we want the coin to be spinning before stopping it
                         self.waitTick = currentTime
                         self.board.coin.animating = False
                         self.first_toss_animating = False
                         if self.coin_side() == 0:
                             print("Coin pointing left")
                             self.board.coin.point_left()
+                            self.board.coin.set_destination(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5)
+
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
+
                         else:
                             print("Coin pointing right")
                             self.board.coin.point_right()
                             # set bplayer2img to bottom left slot
                             self.bplayer2_img.set_destination(*self.bottom_slot)
+                            self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
                             # set bplayerimg to top left slot
                             self.bplayer_img.set_destination(*self.top_slot)
 
                 elif self.notif_pause:  # time paused to notify who goes first
-                    if currentTime - self.waitTick >= 1000:
+                    if currentTime - self.waitTick >= 3000:
+                        self.board.coin.show_pass()
                         self.notif_pause = False
                         self.may_see_first = True
                         #self.first_fontobj absolute position below first player card
                         self.waitTick = currentTime
                 elif self.getting_in_place:
-                    self.board.coin.update(deltaTime)  # probably heading to the coin slot to the left
+                    self.board.coin.set_destination(*self.coin_slot)
                     self.bplayer_img.update(deltaTime)  # these two will take their place
                     self.bplayer2_img.update(deltaTime)
                     if not self.bplayer_img.destination:
@@ -1236,6 +1254,8 @@ class Engine(object):
         #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
         #     self.card.blitted = True
         # self.card.draw(screen)
+
+
         if self.big_portraits_visible:
             self.bplayer_img.draw(screen)
             self.bplayer2_img.draw(screen)
@@ -1265,10 +1285,12 @@ class Engine(object):
         self.deckImgHolderOpp2.draw(screen)
         self.deckImgHolderOpp3.draw(screen)
 
-        if self.showEndTurnButton:
-            screen.blit(self.endTurnImg, (self.endTurnImgX, self.endTurnImgY))
-        elif self.showPassTurnButton:
-            screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
+        # if self.showEndTurnButton:
+        #     screen.blit(self.endTurnImg, (self.endTurnImgX, self.endTurnImgY))
+        # elif self.showPassTurnButton:
+        #     screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
+
+        self.board.coin.draw(screen)
 
         if self.faded:
             self.screen.blit(self.fadeScreen, (0, 0))

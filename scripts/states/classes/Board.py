@@ -48,8 +48,15 @@ class Board(object):
 
     class Coin(object):
         def __init__(self):
-            self.left = pygame.image.load("assets\\board\\coinleft.png").convert_alpha()
-            self.right = pygame.image.load("assets\\board\\coinleft.png").convert_alpha()
+            self.left_img = pygame.image.load("assets\\board\\coinleft.png").convert_alpha()
+            self.right_img = pygame.image.load("assets\\board\\coinright.png").convert_alpha()
+            self.end_img = pygame.image.load("assets\\board\\coinend.png").convert_alpha()
+            self.pass_img = pygame.image.load("assets\\board\\coinpass.png").convert_alpha()
+
+            self.left = pygame.transform.smoothscale(self.left_img, (round(self.left_img.get_rect().size[0]*0.66), round(self.left_img.get_rect().size[1]*0.66)))
+            self.right = pygame.transform.smoothscale(self.right_img, (round(self.right_img.get_rect().size[0]*0.66), round(self.right_img.get_rect().size[1]*0.66)))
+            self.coinend = pygame.transform.smoothscale(self.end_img, (round(self.end_img.get_rect().size[0]*0.66), round(self.end_img.get_rect().size[1]*0.66)))
+            self.coinpass = pygame.transform.smoothscale(self.pass_img, (round(self.pass_img.get_rect().size[0]*0.66), round(self.pass_img.get_rect().size[1]*0.66)))
             self.img = self.left  # image visible to the people
             self.rect = self.img.get_rect()
             self.side = 0  # 0 and 1 for point left and point right
@@ -65,8 +72,8 @@ class Board(object):
             self.is_visible = True
 
             self.exact_position = list(self.rect.center)
-            self.speed = 1000
-            self.dspeed = 7
+            self.speed = 2000
+            self.dspeed = 10
             self.distance = None
             self.destination = None
             self.vector = None
@@ -88,7 +95,10 @@ class Board(object):
             self.img = self.left
         def point_right(self):
             self.img = self.right
-
+        def show_pass(self):
+            self.img = self.coinpass
+        def show_end(self):
+            self.img = self.coinend
 
         def update(self, dTime):
             if self.destination:
@@ -158,6 +168,7 @@ class Board(object):
 
 
         def draw(self, screen):
-            screen.blit(self.img, self.rect)
+            if self.is_visible:
+                screen.blit(self.img, self.rect)
 
 
