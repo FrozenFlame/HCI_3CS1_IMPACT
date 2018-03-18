@@ -1,11 +1,11 @@
 import pygame, math, time, random
 from enum import Enum, auto
 from .classes.BoardField import BoardField
-from .classes.Card import Card
-from .classes.Card import Type
+from .classes.Card import Card, Type
 from .classes.Board import Board
 from .classes.Movable import Movable
 from .classes.FontObj import FontObj
+from.classes.Buff_Factory import Kind, Operation, BuffFactory
 from .. import tools
 
 from ..Globals import Globals
@@ -481,9 +481,9 @@ class Engine(object):
                 if boardCard.name is "Arsonist":    #WORKING POGCHAMP
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
+                        self.sendToGraveyardOpp(self.boardFieldOpp.cardList[arsonIndex])
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
+                        self.sendToGraveyardOpp(self.boardFieldOpp2.cardList[arsonIndex])
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -500,7 +500,9 @@ class Engine(object):
                 if boardCard.name is "Maid":
                     for a in self.boardField.cardList:
                         if a is "Mansion":
+                            print(a.current_val)
                             a.current_val += 3
+                            print(a.current_val)
                     for a in self.boardField2.cardList:
                         if a is "Mansion":
                             a.current_val += 3
@@ -556,7 +558,7 @@ class Engine(object):
                         r = random.randrange(len(personInGraveList))
                         c = personInGraveList[r]
                         self.boardField.take_card(c)
-                        self.play_card(c, self.boardFieldList)
+                        self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -576,7 +578,7 @@ class Engine(object):
                         r = random.randrange(len(graveList))
                         c = graveList[r]
                         self.boardField.take_card(c)
-                        self.play_card(c, self.boardFieldList)
+                        self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
