@@ -437,11 +437,9 @@ class Engine(object):
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         blackCounter = boardField.count_cardType(Type.BLACK)
         personCounter = boardField.count_cardType(Type.PERSON)
-        print (vehicleCounter, blackCounter, personCounter)
         effectActivated = False
 
         for boardCard in boardField.cardList:
-            print(boardCard.name)
             if not boardCard.effectActivated:
                 if boardCard.name is "Parking Lot":
                     boardCard.current_val += (2*vehicleCounter)
@@ -449,7 +447,7 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Loan Slip":
+                if boardCard.name is "Loan Slip":   #cmon bruddah just draw the freakin cards
                     self.draw_cards(2, self.deck, self.hand)
                     self.player.cash -= 15
                     boardCard.effectActivated = True
@@ -498,6 +496,97 @@ class Engine(object):
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
+
+                if boardCard.name is "Maid":
+                    for a in self.boardField.cardList:
+                        if a is "Mansion":
+                            a.current_val += 3
+                    for a in self.boardField2.cardList:
+                        if a is "Mansion":
+                            a.current_val += 3
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Police Officer":
+                    for a in self.boardFieldOpp.cardList:
+                        if Type.BLACK and Type.PERSON in a.type:
+                            self.sendToGraveyard(a)
+                    for a in self.boardFieldOpp2.cardList:
+                        if Type.BLACK and Type.PERSON in a.type:
+                            self.sendToGraveyard(a)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Impound Lot":
+                    for a in self.boardFieldOpp.cardList:
+                        if Type.VEHICLE in a.type:
+                            a.current_val -= 2
+                    for a in self.boardFieldOpp2.cardList:
+                        if Type.VEHICLE in a.type:
+                            a.current_val -= 2
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Junkyard":
+                    count = 0
+                    for a in self.graveYardList:
+                        if Type.VEHICLE in a.type:
+                            count += 1
+                    for a in self.graveYardListOpp:
+                        if Type.VEHICLE in a.type:
+                            count += 1
+                    boardCard.current_val += (2*count)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Resurrect":
+                    personInGraveList = list()
+                    for a in self.graveYardList:
+                        if Type.PERSON in a.type:
+                            personInGraveList.append(a)
+                    if len(personInGraveList) > 0:
+                        r = random.randrange(len(personInGraveList))
+                        c = personInGraveList[r]
+                        self.boardField.take_card(c)
+                        self.play_card(c, self.boardFieldList)
+                        self.graveYardList.pop(self.graveYardList.index(c))
+                        c.flip()
+                        c.disabled = False
+                        c.resting = False
+                        c.set_destination(*c.defaultPos)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.name is "Rebuild":
+                    graveList = list()
+                    for a in self.graveYardList:
+                        if Type.VEHICLE or Type.STRUCTURE in a.type:
+                            graveList.append(a)
+                    if len(graveList) > 0:
+                        r = random.randrange(len(graveList))
+                        c = graveList[r]
+                        self.boardField.take_card(c)
+                        self.play_card(c, self.boardFieldList)
+                        self.graveYardList.pop(self.graveYardList.index(c))
+                        c.flip()
+                        c.disabled = False
+                        c.resting = False
+                        c.set_destination(*c.defaultPos)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
         if effectActivated:
             self.recalculate_score(self.boardFieldList)
             for a in self.boardField.cardList:
@@ -892,8 +981,8 @@ class Engine(object):
             # here we compare scores, decide which hero to damage, and give score.
             self.empty_field_to_grave(self.boardField, self.graveYardList)
             self.empty_field_to_grave(self.boardField2, self.graveYardList)
-            self.empty_field_to_grave(self.boardFieldOpp, self.graveYardList)
-            self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardList)
+            self.empty_field_to_grave(self.boardFieldOpp, self.graveYardListOpp)
+            self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardListOpp)
             # for boardCard in self.boardField.cardList:
             #     # self.sendToGraveyard(boardCard)
             #     print("Trashing some dogs1")
