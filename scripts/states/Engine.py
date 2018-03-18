@@ -1196,21 +1196,23 @@ class Engine(object):
 
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
-                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect()[0]*0.5, self.bplayer_img.original_surface.get_rect()[1]*0.5))
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0]*0.505, self.bplayer_img.original_surface.get_rect().size[1]*0.505))
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
-                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect()[0]*0.5, self.bplayer2_img.original_surface.get_rect()[1]*0.5))
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0]*0.505, self.bplayer2_img.original_surface.get_rect().size[1]*0.505))
 
                         else:
                             print("Coin pointing right")
                             self.board.coin.point_right()
                             # set bplayer2img to bottom left slot
-                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect()[0] * 0.2, self.bplayer_img.original_surface.get_rect()[1] * 0.2))
-                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect()[0] * 0.2, self.bplayer2_img.original_surface.get_rect()[1] * 0.2))
+
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.505, self.bplayer_img.original_surface.get_rect().size[1] * 0.505))
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.505, self.bplayer2_img.original_surface.get_rect().size[1] * 0.505))
                             self.bplayer2_img.set_destination(*self.bottom_slot)
                             self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
                             # set bplayerimg to top left slot
                             self.bplayer_img.set_destination(*self.top_slot)
+
 
                 elif self.notif_pause:  # time paused to notify who goes first
                     if currentTime - self.waitTick >= 3000:
@@ -1223,7 +1225,8 @@ class Engine(object):
                     self.board.coin.set_destination(*self.coin_slot)
                     self.bplayer_img.update(deltaTime)  # these two will take their place
                     self.bplayer2_img.update(deltaTime)
-
+                    self.bplayer_img.scaleanim(self.waitTick)
+                    self.bplayer2_img.scaleanim(self.waitTick)
                     if currentTime - self.waitTick >= 2000:
                         self.getting_in_place = False
                 else:

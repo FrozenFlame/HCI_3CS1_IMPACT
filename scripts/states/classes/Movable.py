@@ -19,8 +19,6 @@ class Movable(object):
         self.rect.center = self.posX, self.posY
         self.is_visible = True
 
-
-
         self.exact_position = list(self.rect.center)
         self.speed = speed
         self.dspeed = dspeed
@@ -36,8 +34,10 @@ class Movable(object):
         self.new_width = 0
         self.new_height = 0
         self.scalespeed = 10  # more of a tick delay
-        self.scalexfactor = 5
+        self.scalexfactor = 4
+        self.scalexstack = 0  # a separate tracker
         self.scaleyfactor = 5
+        self.scaleystack = 0
         self.scalevec = None  # proportional grow/shrink maybe?
 
     def update(self, dTime):
@@ -75,26 +75,7 @@ class Movable(object):
                     self.posY += self.vector[1] * dTime
                     self.rect.center = self.posX, self.posY
                     self.exact_position = self.rect.center
-        if self.is_scaling:
-            print("Scaling like a dog")
-            if self.surface.get_rect().size[0] > self.new_width:  # shrinking block
-                if not self.surface.get_rect().size[0] - self.scalexfactor < 10:
-                    self.surface = pygame.transform.smoothscale(self.surface, (self.surface.get_rect().size[0] - self.scalexfactor, self.surface.get_rect().size[1]))
-                else:
-                    print("done scaling X!")
-                    self.xdone = True
 
-            if self.surface.get_rect().size[1] > self.new_height:  # shrinking block
-                if not self.surface.get_rect().size[1] - self.scaleyfactor < 10:
-                    self.surface = pygame.transform.smoothscale(self.surface, (self.surface.get_rect().size[0], self.surface.get_rect().size[1] - self.scaleyfactor))
-                else:
-                    print("done scaling Y!")
-                    self.ydone = True
-            if self.xdone and self.ydone:
-                print("is scaling set to false!")
-                self.is_scaling = False
-                self.xdone = False
-                self.ydone = False
 
 
     def draw(self, screen):
@@ -161,10 +142,18 @@ class Movable(object):
 
     def scaleanim(self, waitTick):
         currentTick = pygame.time.get_ticks()
-        if self.scalexfactor > 0:
-            if currentTick - waitTick >= self.scalespeed:
-                waitTick = currentTick
-                self.surface = pygame.transform.smoothscale(self.surface, (round(self.surface.get_rect().size[0] - self.scalexfactor), round(self.new_height)))
+        if currentTick - waitTick >= self.scalespeed:
+            waitTick = currentTick
+            if self.is_scaling:
+                # print("Scaling like a dog")
+                # self.surface = pygame.transform.smoothscale(self.surface, (round(50), round(50))).convert_alpha()
+                if self.surface.get_rect().size[0] > self.new_width or self.surface.get_rect().size[1] > self.new_height:  # shrinking block
+                    self.scalexstack = (self.scalexstack + self.scalexfactor) if self.surface.get_rect().size[0] > self.new_width else 0
+                    self.scaleystack = (self.scaleystack + self.scaleyfactor) if self.surface.get_rect().size[1] > self.new_height else 0
+                    self.surface = pygame.transform.smoothscale(self.original_surface, (self.original_surface.get_rect().size[0] - self.scalexstack, self.original_surface.get_rect().size[1] - self.scaleystack)).convert_alpha()
+                else:
+                    self.is_scaling = False
+
 
 
     def instascale(self, width, height):
