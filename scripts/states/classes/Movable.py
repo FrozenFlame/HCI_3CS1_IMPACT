@@ -29,8 +29,6 @@ class Movable(object):
 
         # scale factors
         self.is_scaling = False
-        self.xdone = False
-        self.ydone = False
         self.new_width = 0
         self.new_height = 0
         self.scalespeed = 10  # more of a tick delay
@@ -38,7 +36,6 @@ class Movable(object):
         self.scalexstack = 0  # a separate tracker
         self.scaleyfactor = 5
         self.scaleystack = 0
-        self.scalevec = None  # proportional grow/shrink maybe?
 
     def update(self, dTime):
         if self.destination:
@@ -135,7 +132,6 @@ class Movable(object):
         self.is_scaling = True
         self.new_width = newxy[0]
         self.new_height = newxy[1]
-        # self.scalevec = math.hypot((self.surface.get_rect().size[0] - self.new_width),(self.surface.get_rect().size[1] - self.new_width))
 
     def scaleanim(self, waitTick):
         currentTick = pygame.time.get_ticks()
