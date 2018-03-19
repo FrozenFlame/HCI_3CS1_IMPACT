@@ -198,6 +198,9 @@ class Engine(object):
         self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
 
         self.flyOutEffect.set_volume(0.20)
+
+        self.spellPlayed = False
+        self.playedSpell = None
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -469,7 +472,7 @@ class Engine(object):
             if not boardCard.effectActivated:
                 if boardCard.id is "parkinglot":
                     print("Parking Lot Effect")
-                    boardCard.current_val += (2*vehicleCounter)
+                    boardCard.current_val += (3*vehicleCounter)
                     boardCard.recalculate()
                     print("Parking Lot Current Val: " , boardCard.current_val)
 
@@ -585,7 +588,7 @@ class Engine(object):
                                 self.sendToGraveyard(target)
                                 sent = True
                         if not sent:
-                            self.sendToGraveyard(targetList(0))
+                            self.sendToGraveyard(targetList[0])
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -667,12 +670,12 @@ class Engine(object):
             self.recalculate_score(self.boardFieldList)
             for bf in self.boardFieldList:
                 for a in bf.cardList:
-                    if Type.SPELL in a.type:
-                        pygame.time.delay(1000)
-                        self.sendToGraveyard(a)
-                    else:
-                        a.draw(self.screen)
-                        print(a.name, "redrawn")
+                    # if Type.SPELL in a.type:
+                    #     pygame.time.delay(1000)
+                    #     self.sendToGraveyard(a)
+                    # else:
+                    a.draw(self.screen)
+                    print(a.name, "redrawn")
                 bf.rearrange()
                 print(bf, " cardlist size: ", len(bf.cardList))
                 print(bf, "rearranged")
@@ -790,6 +793,9 @@ class Engine(object):
                                 bF.take_card(self.clickedCard[0])
                                 self.clickedCard[0].onBoard = True
                                 self.play_card(self.clickedCard[0], self.boardFieldList)
+                                if Type.SPELL in self.clickedCard[0].type:
+                                    self.spellPlayed = True
+                                    self.playedSpell = self.clickedCard[0]
 
                         # TODO erase these boardfield card play below, they are obsolete.
                         # if self.player == self.first_player:
@@ -986,6 +992,11 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
+            if self.spellPlayed:
+                if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
+                    self.waitTick = currentTime                 # delete this comments when done
+                    self.sendToGraveyard(self.playedSpell)
+                    self.spellPlayed = False
             if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
                     self.hero_turn_obj.update(deltaTime)
@@ -1137,7 +1148,7 @@ class Engine(object):
                     self.cracksmall.play()
                     crackimg = pygame.image.load("assets\\heroes\\crack small.png")
                     rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj = FontObj.factory(self.player.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                     self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
                         self.bplayer2_img.surface.blit(rcrackimg,(0,0))
@@ -1189,7 +1200,7 @@ class Engine(object):
                     self.cracksmall.play()
                     crackimg = pygame.image.load("assets\\heroes\\crack small.png")
                     rcrackimg = pygame.transform.smoothscale(crackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    self.font_decide_obj = FontObj.factory(self.player2.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj = FontObj.factory(self.player2.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                     self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
                         self.bplayer_img.surface.blit(rcrackimg,(0,0))
