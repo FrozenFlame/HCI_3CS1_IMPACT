@@ -46,6 +46,7 @@ Rough code estimate would be like:
 (end of phase, repeat)
 <victory animation> - a player gets crowned victorious
 '''
+green = (0, 128, 0)
 # class which holds the game flow
 class Engine(object):
     # def __init__(self): we're gonna create
@@ -115,10 +116,8 @@ class Engine(object):
 
         self.bplayer_img = None
         self.bplayer_font = None
-        self.bplayer_fcash = None
         self.bplayer2_img = None
         self.bplayer2_font = None
-        self.bplayer2_fcash = None
         self.hero_turn_obj = None
         self.font_turn_obj = None
         self.font_decide_obj = None  # the object which shows who won the previous round
@@ -184,6 +183,12 @@ class Engine(object):
         self.top_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y *0.36)
         self.bottom_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y * 0.95)
         self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
+
+        # cash points
+        self.botcash_coords = (self.bottom_slot[0] - 125, self.bottom_slot[1] - 80)
+        self.bot_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
+        self.topcash_coords = (self.top_slot[0] - 125, self.top_slot[1] - 80)
+        self.top_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -463,7 +468,11 @@ class Engine(object):
             for c in bF.cardList:
                 self.player.cash += c.current_val
         print("[Engine] After recalculation cash: ", self.player.cash)
-
+        # TODO lazy, no algorithm. Make a better algorithm in the future
+        self.refresh_cash(self.player)
+    def refresh_cash(self, player):
+        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"cash currency.ttf",45,green)
+        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"cash currency.ttf",45,green)
     def apply_effects(self, boardField): #f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         blackCounter = boardField.count_cardType(Type.BLACK)
@@ -889,7 +898,11 @@ class Engine(object):
                         self.showHandButton = False
                         if self.faded:
                             self.board.coin.show_pass()
+                            self.board.hasPreviewCard = False
+                            self.refresh_cash(self.player)
+
                             self.fadeOut()
+
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
                         self.music_loaded = False
@@ -1116,6 +1129,7 @@ class Engine(object):
             self.swap_player(self.player)
             self.phase = Phase.PREP
             self.done_turn = False
+
             self.fadeIn()
             self.swap_portrait()
 
@@ -1622,6 +1636,8 @@ class Engine(object):
 
         self.board.draw(screen)
 
+
+
         self.board.coin.draw(screen)
         if self.big_portraits_visible:
             self.bplayer_img.draw(screen)
@@ -1629,6 +1645,11 @@ class Engine(object):
             self.bplayer_font.draw(screen)
             self.bplayer2_font.draw(screen)
         onTopCard = None
+        # cash draw
+        if self.bot_cash_surf and self.top_cash_surf and not self.phase == Phase.COIN_TOSS:
+            screen.blit(self.top_cash_surf, self.topcash_coords)
+            screen.blit(self.bot_cash_surf, self.botcash_coords)
+
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
