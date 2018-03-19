@@ -1069,6 +1069,21 @@ class Engine(object):
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
+                if self.player2.hitpoints == 1:
+                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
+                    rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer2_img.surface.blit(rcrackimg,(0,0))
+                    else:
+                        self.bplayer_img.surface.blit(rcrackimg, (0, 0))
+                elif self.player2.hitpoints == 0:
+                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
+                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
+                    else:
+                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
+
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
                 else:
@@ -1095,6 +1110,20 @@ class Engine(object):
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
+                if self.player.hitpoints == 1:
+                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
+                    rcrackimg = pygame.transform.smoothscale(crackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer_img.surface.blit(rcrackimg,(0,0))
+                    else:
+                        self.bplayer2_img.surface.blit(rcrackimg, (0, 0))
+                elif self.player.hitpoints == 0:
+                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
+                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
+                    else:
+                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
                 else:
