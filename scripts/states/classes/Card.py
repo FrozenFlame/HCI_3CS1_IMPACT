@@ -3,7 +3,7 @@ from enum import Enum, auto
 from .FontObj import FontObj
 
 class Card(object):
-    def __init__(self, name="Generic", base_val = 0, effect="", type=None, heroOwner="Generic", card_art_path= "assets\\cards\\card_art\\chicken.png"):
+    def __init__(self, id="", name="Generic", base_val = 0, effect="", type=None, heroOwner="Generic", card_art_path= "assets\\cards\\card_art\\chicken.png"):
 
         if type is None:
             self.type = []
@@ -20,6 +20,7 @@ class Card(object):
         self.constants = []
         self.effect = effect
         self.effectActivated = False
+        self.id = id
 
         self.owner = heroOwner      #owner of the card
 
@@ -28,32 +29,11 @@ class Card(object):
                           "Billy": 'GARA.TTF',
                           "Victoria": 'big_noodle_titling_oblique.ttf',
                           "Generic": 'OLDENGL.TTF'}
-        fontChoice = self.fontDictionary[self.owner]
+        self.fontChoice = self.fontDictionary[self.owner]
         self.card_art = pygame.image.load(card_art_path).convert_alpha()
-        self.name_surf = FontObj.surface_factory(str(self.name), fontChoice, 34, (0, 0, 0))
-        self.currval_surf = FontObj.surface_factory(str(self.current_val), fontChoice, 40, (0, 0, 0))
+        self.name_surf = FontObj.surface_factory(str(self.name), self.fontChoice, 34, (0, 0, 0))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, (0, 0, 0))
         # self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
-
-        def blit_text(surface, text, pos, font, color=pygame.Color('black')):
-            words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
-            space = font.size(' ')[0]  # The width of a space.
-            max_width, max_height = surface.get_size()
-            x, y = pos
-            for line in words:
-                for word in line:
-                    word_surface = font.render(word, 14, color)
-                    word_width, word_height = word_surface.get_size()
-                    if x + word_width >= max_width*0.95:
-                        x = pos[0]  # Reset the x.
-                        y += word_height  # Start on new row.
-                    surface.blit(word_surface, (x, y))
-                    x += word_width + space
-                x = pos[0]  # Reset the x.
-                y += word_height  # Start on new row.
-        # effSurf = FontObj.surface_factory(self.effect, fontChoice, 15, (0, 0, 0))
-        # self.effect_surf = pygame.Surface((210, 70), 0, effSurf)
-        # self.effect_surf.blit(effSurf, (0, 0))
-        # self.name_surf = FontObj.surface_factory(name, "assets\\fonts\\GARABD.TTF", 14, (0, 0, 0))
 
         self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
@@ -62,7 +42,7 @@ class Card(object):
         self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
 
         # self.frontImg.blit(self.effect_surf, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60))
-        blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + fontChoice, 20))
+        self.blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, 20))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
@@ -275,6 +255,23 @@ class Card(object):
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
 
+    def blit_text(self, surface, text, pos, font, color=pygame.Color('black')):
+        words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+        space = font.size(' ')[0]  # The width of a space.
+        max_width, max_height = surface.get_size()
+        x, y = pos
+        for line in words:
+            for word in line:
+                word_surface = font.render(word, 14, color)
+                word_width, word_height = word_surface.get_size()
+                if x + word_width >= max_width * 0.95:
+                    x = pos[0]  # Reset the x.
+                    y += word_height  # Start on new row.
+                surface.blit(word_surface, (x, y))
+                x += word_width + space
+            x = pos[0]  # Reset the x.
+            y += word_height  # Start on new row.
+
     # def addTexts(self, hero):
     #     fontChoice = self.fontDictionary[hero]
     #     self.textCurrVal = FontObj.factory(str(self.current_val), self.defaultPos[0]+(self.width*0.82), self.defaultPos[1]+(self.height*0.4), fontChoice, 14, (0, 0, 0))
@@ -300,151 +297,25 @@ class Card(object):
     def receive_debuff(self, debuff):
         self.debuffs.append(debuff)
 
-    def recalculate(self, card):
-        self.current_val = card.current_val
+    def recalculate(self):
+        color = pygame.Color('black')
+        if self.current_val > self.base_val:
+            color = pygame.Color('green')
+        elif self.current_val < self.base_val:
+            color = pygame.Color('red')
+        newFrontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
+        newFrontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, (0, 0, 0))
+        newFrontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] * 0.80, self.frontImg.get_rect().size[1] * 0.48))
+        newFrontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
+        self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, color))
 
+
+
+        self.frontImg = newFrontImg
     def apply_buff(self, target):
         target.receive_buff(self.effect)
-'''
-    def createKingOfBeggarsCollection(self, deckCardList, allCardList):
-        buffFactory = BuffFactory()
-        #blackMarketEffect = buffFactory.factory(buffFactory.Kind.CONSTANT,buffFactory.Operation.ADD, "COUNT OBJECTS PLAYED IN YOUR FIELD")
 
-        blackMarket = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
-        #blackMarket.receive_buff(blackMarketEffect)
-
-        pickPocket = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
-        strangeGravedigger = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
-        robinHood = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
-        slums = Card("Slums", 0, None, [Type.STRUCTURE])
-        kingpin = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
-        bodyDouble = Card("Body Double", 15, None, [Type.PERSON])
-        junker = Card("Junker", 7, None, [Type.VEHICLE])
-        beg = Card("Beg", 0, None, [Type.SPELL])
-        scam = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
-
-        blackMarket2 = Card("Black Market", 15, None, [Type.STRUCTURE, Type.BLACK])
-        pickPocket2 = Card("Pick Pocket", 2, None, [Type.PERSON, Type.BLACK])
-        strangeGravedigger2 = Card("Strange Gravedigger", 5, None, [Type.PERSON, Type.BLACK])
-        robinHood2 = Card("Robin Hood", 10, None, [Type.PERSON, Type.BLACK])
-        slums2 = Card("Slums", 0, None, [Type.STRUCTURE])
-        kingpin2 = Card("Kingpin", 10, None, [Type.PERSON, Type.BLACK])
-        bodyDouble2 = Card("Body Double", 15, None, [Type.PERSON])
-        junker2 = Card("Junker", 7, None, [Type.VEHICLE])
-        beg2 = Card("Beg", 0, None, [Type.SPELL])
-        scam2 = Card("Scam", 0, None, [Type.SPELL, Type.BLACK])
-
-        deckCardList.extend([blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam])
-        deckCardList.extend([blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2])
-        allCardList.extend([blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam])
-        allCardList.extend([blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2])
-
-
-    def createUncleBillyCollection(self, deckCardList, allCardList):
-        buffFactory = BuffFactory()
-
-        slaughterHouse = Card("Slaughter House", 0, None, [Type.STRUCTURE])
-        cropDuster = Card("Crop Duster", 10, None, [Type.VEHICLE])
-        farm = Card("Farm", 15, None, [Type.STRUCTURE])
-        farmBoy = Card("Farm Boy", 5, None, [Type.PERSON])
-        barn = Card("Barn", 0, None, [Type.STRUCTURE])
-        cow = Card("Cow", 7, None, [Type.ANIMAL])
-        chicken = Card("Chicken", 5, None, [Type.ANIMAL])
-        farmDog = Card("Farm Dog", 3, None, [Type.ANIMAL])
-        reap = Card("Reap", 0, None, [Type.SPELL])
-        drought = Card("Drought", 0, None, [Type.SPELL])
-        waterPurifier = Card("Water Purifier", 5, None, [Type.OBJECT])
-
-        slaughterHouse2 = Card("Slaughter House", 0, None, [Type.STRUCTURE])
-        cropDuster2 = Card("Crop Duster", 10, None, [Type.VEHICLE])
-        farm2 = Card("Farm", 15, None, [Type.STRUCTURE])
-        farmBoy2 = Card("Farm Boy", 5, None, [Type.PERSON])
-        barn2 = Card("Barn", 0, None, [Type.STRUCTURE])
-        cow2 = Card("Cow", 7, None, [Type.ANIMAL])
-        chicken2 = Card("Chicken", 5, None, [Type.ANIMAL])
-        farmDog2 = Card("Farm Dog", 3, None, [Type.ANIMAL])
-        reap2 = Card("Reap", 0, None, [Type.SPELL])
-        drought2 = Card("Drought", 0, None, [Type.SPELL])
-        waterPurifier2 = Card("Water Purifier", 5, None, [Type.OBJECT])
-
-        deckCardList.extend([slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier])
-        deckCardList.extend([slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2])
-        allCardList.extend([slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier])
-        allCardList.extend([slaughterHouse2, cropDuster2, farm2, farmBoy2, barn2, cow2, chicken2, farmDog2, reap2, drought2, waterPurifier2])
-
-
-    def createVictoriaCollection(self, deckCardList, allCardList):
-        buffFactory = BuffFactory()
-
-        insurance = Card("Insurance", 0, None, [Type.OBJECT])
-        shareHolder = Card("Share Holder", 10, None, [Type.PERSON])
-        superstar = Card("Superstar", 15, None, [Type.PERSON])
-        hacker = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
-        university = Card("University", 15, None, [Type.STRUCTURE])
-        skyscraper = Card("Skyscraper", 3, None, [Type.STRUCTURE])
-        supplyTruck = Card("Supply Truck", 8, None, [Type.VEHICLE])
-        riotResponseVehicle = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
-        innovate = Card("Innovate", 0, None, [Type.SPELL])
-        solidWorkforce = Card("Solid Workforce", 0, None, [Type.SPELL])
-
-        insurance2 = Card("Insurance", 0, None, [Type.OBJECT])
-        shareHolder2 = Card("Share Holder", 10, None, [Type.PERSON])
-        superstar2 = Card("Superstar", 15, None, [Type.PERSON])
-        hacker2 = Card("Hacker", 15, None, [Type.PERSON, Type.BLACK])
-        university2 = Card("University", 15, None, [Type.STRUCTURE])
-        skyscraper2 = Card("Skyscraper", 3, None, [Type.STRUCTURE])
-        supplyTruck2 = Card("Supply Truck", 8, None, [Type.VEHICLE])
-        riotResponseVehicle2 = Card("Riot Response Vehicle", 10, None, [Type.VEHICLE])
-        innovate2 = Card("Innovate", 0, None, [Type.SPELL])
-        solidWorkforce2 = Card("Solid Workforce", 0, None, [Type.SPELL])
-
-        deckCardList.extend([insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce])
-        deckCardList.extend([insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2])
-        allCardList.extend([insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce])
-        allCardList.extend([insurance2, shareHolder2, superstar2, hacker2, university2, skyscraper2, supplyTruck2, riotResponseVehicle2, innovate2, solidWorkforce2])
-
-    def createCommonCollection(self, deckCardList, allCardList):
-        bagOfCash = Card("Bag of Cash", 10, None, [Type.OBJECT])
-        bigBagOfCash = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
-        deed = Card("Deed", 25, None, [Type.OBJECT])
-        dollaDollaBills = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
-        mansion = Card("Mansion", 30, None, [Type.STRUCTURE])
-        student = Card("Student", 5, None, [Type.PERSON])
-        car = Card("Car", 15, None, [Type.VEHICLE])
-
-        bagOfCash2 = Card("Bag of Cash", 10, None, [Type.OBJECT])
-        bigBagOfCash2 = Card("Big Bag of Cash", 20, None, [Type.OBJECT])
-        deed2 = Card("Deed", 25, None, [Type.OBJECT])
-        dollaDollaBills2 = Card("Dolla Dolla Bills", 7, None, [Type.OBJECT])
-        mansion2 = Card("Mansion", 30, None, [Type.STRUCTURE])
-        student2 = Card("Student", 5, None, [Type.PERSON])
-        car2 = Card("Car", 15, None, [Type.VEHICLE])
-
-        deckCardList.extend([bagOfCash, bigBagOfCash, deed, dollaDollaBills, mansion, student, car])
-        deckCardList.extend([bagOfCash2, bigBagOfCash2, deed2, dollaDollaBills2, mansion2, student2, car2])
-        allCardList.extend([bagOfCash, bigBagOfCash, deed, dollaDollaBills, mansion, student, car])
-        allCardList.extend([bagOfCash2, bigBagOfCash2, deed2, dollaDollaBills2, mansion2, student2, car2])
-
-        #### COMMON WITH EFFECTS ###
-
-        butler = Card("Butler", 10, None, [Type.PERSON])
-        maid = Card("Maid", 5, None, [Type.PERSON])
-        policeOfficer = Card("Police Officer", 15, None, [Type.PERSON])
-        gangsters = Card("Gangsters", 3, None, [Type.PERSON, Type.BLACK])
-        arsonist = Card("Arsonist", 0, None, [Type.PERSON, Type.BLACK])
-        lemonadeStand = Card("Lemonade Stand", 5, None, [Type.STRUCTURE])
-        parkingLot = Card("Parking Lot", 5, None, [Type.STRUCTURE])
-        impoundLot = Card("Impound Lot", 5, None, [Type.STRUCTURE])
-        junkyard = Card("Junkyard", 5, None, [Type.STRUCTURE])
-        loanSlip = Card("Loan Slip", 0, None, [Type.SPELL])
-        creditCard = Card("Credit Card", 0, None, [Type.SPELL])
-        resurrect = Card("Resurrect", 0, None, [Type.SPELL])
-        rebuild = Card("Rebuild", 0, None, [Type.SPELL])
-        saboteur = Card("Saboteur", 0, None, [Type.SPELL])
-
-        deckCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
-        allCardList.extend([butler, maid, policeOfficer, gangsters, arsonist, lemonadeStand, parkingLot, impoundLot, junkyard, loanSlip, creditCard, resurrect, rebuild, saboteur])
-'''
 class Type(Enum):
     SPELL = auto()
     BLACK = auto()

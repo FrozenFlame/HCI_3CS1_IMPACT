@@ -79,4 +79,11 @@ class BoardField(object):
                 counter += 1
         return counter
 
+    def find_card(self, cardname):
+        foundList = list()
+        for card in self.cardList:
+            if cardname is card.name:
+                foundList.append(card)
+        return foundList
+
     # make this class draw its cards within this class in order to have them render below non-board cards.

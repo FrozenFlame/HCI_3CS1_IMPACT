@@ -467,17 +467,17 @@ class Engine(object):
 
         for boardCard in boardField.cardList:
             if not boardCard.effectActivated:
-                if boardCard.name is "Parking Lot":
+                if boardCard.id is "parkinglot":
                     print("Parking Lot Effect")
                     boardCard.current_val += (2*vehicleCounter)
-                    boardCard.recalculate(boardCard)
+                    boardCard.recalculate()
                     print("Parking Lot Current Val: " , boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Loan Slip":   #cmon bruddah just draw the freakin cards
+                if boardCard.id is "loanslip":   #cmon bruddah just draw the freakin cards
                     print("Self hand before Loan:", len(self.hand))
                     self.done_drawing = False
                     self.draw_cards(2, self.deck, self.hand)
@@ -489,46 +489,53 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Lemonade Stand":
+                if boardCard.id is "lemonadestand":
                     print("Lemonade Stand Effect")
                     boardCard.current_val += (3*personCounter)
+                    boardCard.recalculate()
                     print ("Lemonade Current Val:",boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Credit Card":
+                if boardCard.id is "creditcard":
                     print("Credit Card Effect")
                     for card in boardField.cardList:
                         if Type.PERSON in card.type:
                             card.current_val += 2
+                            card.recalculate()
                         elif Type.OBJECT in card.type:
-                            card.current_val -= 1
+                            card.current_val -= 3
+                            card.recalculate()
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Butler":
+                if boardCard.id is "butler":
                     print("Butler Effect")
                     if boardField.cardList.index(boardCard) != 0:
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
+                        boardField.cardList[boardField.cardList.index(boardCard) - 1].recalculate()
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Arsonist":    #WORKING POGCHAMP
+                if boardCard.id is "arsonist":    #WORKING POGCHAMP
                     print("Arsonist Effect")
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Saboteur":
+                if boardCard.id is "saboteur":
                     print("Saboteur Effect")
                     boardRandom = random.randrange(0, 2)
                     cardRandom = random.randrange(0, len(self.boardFieldListOpp[boardRandom].cardList))
@@ -538,22 +545,19 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Maid":
+                if boardCard.id is "maid":
                     print("Maid Effect")
-                    for a in self.boardField.cardList:
-                        if a is "Mansion":
-                            print(a.current_val)
-                            a.current_val += 3
-                            print(a.current_val)
-                    for a in self.boardField2.cardList:
-                        if a is "Mansion":
-                            a.current_val += 3
+                    for bF in self.boardFieldList:
+                        for a in bF.cardList:
+                            if a.id is "mansion":
+                                a.current_val += 3
+                                a.recalculate()
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Police Officer":
+                if boardCard.id is "policeofficer":
                     print("Police Officer Effect")
                     sent = False
                     for a in self.boardFieldOpp.cardList:
@@ -568,21 +572,21 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Impound Lot":
+                if boardCard.id is "impoundlot":
                     print("Impound Lot Effect")
-                    for a in self.boardFieldOpp.cardList:
-                        if Type.VEHICLE in a.type:
-                            a.current_val -= 2
-                    for a in self.boardFieldOpp2.cardList:
-                        if Type.VEHICLE in a.type:
-                            a.current_val -= 2
+                    for bF in self.boardFieldListOpp:
+                        for a in bF.cardList:
+                            if Type.VEHICLE in a.type:
+                                a.current_val -= 2
+                                a.recalculate()
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Junkyard":
+                if boardCard.id is "junkyard":
                     print("Junkyard Effect")
+                    print("Old Junkyard Value: ", boardCard.current_val)
                     count = 0
                     for a in self.graveYardList:
                         if Type.VEHICLE in a.type:
@@ -591,12 +595,14 @@ class Engine(object):
                         if Type.VEHICLE in a.type:
                             count += 1
                     boardCard.current_val += (2*count)
+                    boardCard.recalculate()
+                    print("New Junkyard Value: ", boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Resurrect":
+                if boardCard.id is "resurrect":
                     print("Resurrect Effect")
                     personInGraveList = list()
                     for a in self.graveYardList:
@@ -606,7 +612,7 @@ class Engine(object):
                         r = random.randrange(0, len(personInGraveList))
                         c = personInGraveList[r]
                         self.boardField.take_card(c)
-                        self.recalculate_score(self.boardFieldList)
+                        # self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -617,17 +623,17 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Rebuild":
+                if boardCard.id is "rebuild":
                     print("Rebuild Effect")
                     graveList = list()
                     for a in self.graveYardList:
-                        if Type.VEHICLE or Type.STRUCTURE in a.type:
+                        if Type.VEHICLE in a.type or Type.STRUCTURE in a.type:
                             graveList.append(a)
                     if len(graveList) > 0:
                         r = random.randrange(0, len(graveList))
                         c = graveList[r]
                         self.boardField.take_card(c)
-                        self.recalculate_score(self.boardFieldList)
+                        # self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -639,11 +645,15 @@ class Engine(object):
                     continue
 
         if effectActivated:
+            pygame.time.delay(500)
             self.recalculate_score(self.boardFieldList)
-            for a in self.boardField.cardList:
-                a.draw(self.screen)
-            for a in self.boardField2.cardList:
-                a.draw(self.screen)
+            for bf in self.boardFieldList:
+                for a in bf.cardList:
+                    if Type.SPELL in a.type:
+                        self.sendToGraveyard(a)
+                    a.draw(self.screen)
+                bf.rearrange()
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
