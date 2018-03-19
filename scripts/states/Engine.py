@@ -1085,12 +1085,8 @@ class Engine(object):
                     self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                     self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
-                        # self.font_decide_obj = FontObj.factory(self.player2.user.username +" round won",Globals.RESOLUTION_X *0.5, -200,"cash currency.ttf",40, (255,255,255))
-                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X*0.5, 200)
                         self.bplayer2_img.surface.blit(rcrackimg,(0,0))
                     else:
-                        # self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer_img.surface.blit(rcrackimg, (0, 0))
                     self.is_showing_decide = True
                 elif self.player2.hitpoints == 0:
@@ -1141,12 +1137,8 @@ class Engine(object):
                     self.font_decide_obj = FontObj.factory(self.player2.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                     self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
-                        # self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer_img.surface.blit(rcrackimg,(0,0))
                     else:
-                        # self.font_decide_obj = FontObj.factory(self.player2.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer2_img.surface.blit(rcrackimg, (0, 0))
                     self.is_showing_decide = True
                 elif self.player.hitpoints == 0:
