@@ -115,8 +115,10 @@ class Engine(object):
 
         self.bplayer_img = None
         self.bplayer_font = None
+        self.bplayer_fcash = None
         self.bplayer2_img = None
         self.bplayer2_font = None
+        self.bplayer2_fcash = None
         self.hero_turn_obj = None
         self.font_turn_obj = None
         self.font_decide_obj = None  # the object which shows who won the previous round
