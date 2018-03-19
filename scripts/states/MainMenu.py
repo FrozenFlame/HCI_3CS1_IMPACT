@@ -386,7 +386,6 @@ class MainMenu(object):
 
     def update(self, screen, keys, currentTime, dt):
         if self.c_may_move:
-
             for c in self.backCs:
                 c.update(dt)
                 if c.exact_position[1] >= self.y_termination:
