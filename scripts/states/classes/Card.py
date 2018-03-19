@@ -121,15 +121,21 @@ class Card(object):
         self.vector = None
         self.flipDisplace = 0
 
+        # scale factors
+        self.is_scaling = False
+        self.new_width = 0
+        self.new_height = 0
+        self.scalespeed = 10  # more of a tick delay
+        self.scalexfactor = 4
+        self.scalexstack = 0  # a separate tracker
+        self.scaleyfactor = 5
+        self.scaleystack = 0
 
 
     # rename method soon
     # def decider(self):
     #     if not self.resting:
     #         pass
-
-
-
 
     # change of position on screen (calculation)
     def update(self, dTime, mouseX, mouseY):
@@ -153,6 +159,25 @@ class Card(object):
         else:
             self.posX = mouseX
             self.posY = mouseY
+
+    def scale_to(self, newxy):
+        self.is_scaling = True
+        self.new_width = newxy[0]
+        self.new_height = newxy[1]
+
+    def scaleanim(self, waitTick):
+        currentTick = pygame.time.get_ticks()
+        if currentTick - waitTick >= self.scalespeed:
+            waitTick = currentTick
+            if self.is_scaling:
+                # print("Scaling like a dog")
+                # self.surface = pygame.transform.smoothscale(self.surface, (round(50), round(50))).convert_alpha()
+                if self.surface.get_rect().size[0] > self.new_width or self.surface.get_rect().size[1] > self.new_height:  # shrinking block
+                    self.scalexstack = (self.scalexstack + self.scalexfactor) if self.surface.get_rect().size[0] > self.new_width else 0
+                    self.scaleystack = (self.scaleystack + self.scaleyfactor) if self.surface.get_rect().size[1] > self.new_height else 0
+                    self.surface = pygame.transform.smoothscale(self.original_surface, (self.original_surface.get_rect().size[0] - self.scalexstack, self.original_surface.get_rect().size[1] - self.scaleystack)).convert_alpha()
+                else:
+                    self.is_scaling = False
 
     # setting of destination, or the relative vector to location
     def set_destination(self, x, y):
