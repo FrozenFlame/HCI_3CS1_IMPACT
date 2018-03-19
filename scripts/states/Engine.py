@@ -672,10 +672,17 @@ class Engine(object):
             self.recalculate_score(self.boardFieldList)
             for bf in self.boardFieldList:
                 for a in bf.cardList:
-                    # if Type.SPELL in a.type:
-                    #     pygame.time.delay(1000)
-                    #     self.sendToGraveyard(a)
-                    # else:
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
+                    a.draw(self.screen)
+                    print(a.name, "redrawn")
+                bf.rearrange()
+                print(bf, " cardlist size: ", len(bf.cardList))
+                print(bf, "rearranged")
+
+            self.recalculate_score(self.boardFieldListOpp)
+            for bf in self.boardFieldListOpp:
+                for a in bf.cardList:
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
                     a.draw(self.screen)
                     print(a.name, "redrawn")
                 bf.rearrange()
@@ -1632,7 +1639,6 @@ class Engine(object):
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-
             else:
                 onTopCard = a
         if onTopCard != None:
