@@ -75,8 +75,6 @@ class Movable(object):
                     self.rect.center = self.posX, self.posY
                     self.exact_position = self.rect.center
 
-
-
     def draw(self, screen):
         if self.is_visible:
             screen.blit(self.surface, self.rect)

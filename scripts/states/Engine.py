@@ -592,6 +592,7 @@ class Engine(object):
                             if Type.BLACK in a.type and Type.PERSON in a.type:
                                 targetList.append(a)
 
+
                     if len(targetList) != 0:
                         for target in targetList:
                             r = random.randrange(0, 2)
@@ -600,9 +601,12 @@ class Engine(object):
                                 sent = True
                         if not sent:
                             self.sendToGraveyard(targetList[0])
-
+                    for bF in self.boardFieldListOpp:
+                        bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
+                    self.refresh_cash(self.player2)
+                    self.refresh_cash(self.player2)
                     continue
 
                 if boardCard.id is "impoundlot":
