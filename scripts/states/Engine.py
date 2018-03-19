@@ -531,6 +531,8 @@ class Engine(object):
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
 
+                    for bF in self.boardFieldListOpp:
+                        bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
