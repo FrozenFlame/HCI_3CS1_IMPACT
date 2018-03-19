@@ -208,6 +208,8 @@ class Engine(object):
 
         self.spellPlayed = False
         self.playedSpell = None
+
+        self.cashNegatives = list()
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -328,15 +330,16 @@ class Engine(object):
         boardField.rearrange()
 
 
-    def send_to_grave_fromboard(self, card, boardField, graveYardList):  # lite version? no cardstack difference though
+    def send_to_grave_fromboard(self, card, boardField):  # lite version? no cardstack difference though
         # print("Index to be tossed to grave: ",boardField.cardList.index(card))
         boardField.cardList.pop(boardField.cardList.index(card))
-        graveYardList.append(card)
         if boardField.owner == self.player.user.username:
             # print("My boardfield")
             card.defaultPos = self.graveYardX, self.graveYardY
+            self.graveYardList.append(card)
         else:
             card.defaultPos = self.graveYardOppX, self.graveYardOppY
+            self.graveYardListOpp.append(card)
 
         card.flip()
         card.onBoard = False
@@ -385,30 +388,26 @@ class Engine(object):
             self.graveYardOppX += 5
             self.graveYardOppY -= 1
 
-        for boardCard in self.boardField.cardList:
-            if card == boardCard:
-                self.boardField.cardList.pop(self.boardField.cardList.index(boardCard))
-                self.graveYardList.append(card)
-                card.defaultPos = self.graveYardX, self.graveYardY
+        for card in self.boardField.cardList:
+            self.boardField.cardList.pop(self.boardField.cardList.index(card))
+            self.graveYardList.append(card)
+            card.defaultPos = self.graveYardX, self.graveYardY
 
-        for boardCard in self.boardField2.cardList:
-            if card == boardCard:
-                self.boardField2.cardList.pop(self.boardField2.cardList.index(boardCard))
-                self.graveYardList.append(card)
-                card.defaultPos = self.graveYardX, self.graveYardY
+        for card in self.boardField2.cardList:
+            self.boardField2.cardList.pop(self.boardField2.cardList.index(card))
+            self.graveYardList.append(card)
+            card.defaultPos = self.graveYardX, self.graveYardY
 
 
-        for boardCard in self.boardFieldOpp.cardList:
-            if card == boardCard:
-                self.boardFieldOpp.cardList.pop(self.boardFieldOpp.cardList.index(boardCard))
-                self.graveYardListOpp.append(card)
-                card.defaultPos = self.graveYardOppX, self.graveYardOppY
+        for card in self.boardFieldOpp.cardList:
+            self.boardFieldOpp.cardList.pop(self.boardFieldOpp.cardList.index(card))
+            self.graveYardListOpp.append(card)
+            card.defaultPos = self.graveYardOppX, self.graveYardOppY
 
-        for boardCard in self.boardFieldOpp2.cardList:
-            if card == boardCard:
-                self.boardFieldOpp2.cardList.pop(self.boardFieldOpp2.cardList.index(boardCard))
-                self.graveYardListOpp.append(card)
-                card.defaultPos = self.graveYardOppX, self.graveYardOppY
+        for card in self.boardFieldOpp2.cardList:
+            self.boardFieldOpp2.cardList.pop(self.boardFieldOpp2.cardList.index(card))
+            self.graveYardListOpp.append(card)
+            card.defaultPos = self.graveYardOppX, self.graveYardOppY
 
 
         card.flip()
@@ -450,7 +449,7 @@ class Engine(object):
         self.showEndTurnButton = True
         self.cards_played += 1
         # print(self.cards_played)
-        self.recalculate_score(boardfieldlist)
+        self.recalculate_score(self.player, boardfieldlist)
 
         if self.cards_played == 2 and not self.passed:
             self.may_drag = False
@@ -461,15 +460,17 @@ class Engine(object):
         self.showEndTurnButton = False
         self.cards_played = 0
 
-    def recalculate_score(self, bFList):
+    def recalculate_score(self, player, bFList):
         print("[Engine] recalculate score Previous cash: ", self.player.cash)
-        self.player.cash = 0
+        player.cash = 0
         for bF in bFList:
             for c in bF.cardList:
-                self.player.cash += c.current_val
+                player.cash += c.current_val
+        for utang in self.cashNegatives:
+            player.cash -= utang
         print("[Engine] After recalculation cash: ", self.player.cash)
         # TODO lazy, no algorithm. Make a better algorithm in the future
-        self.refresh_cash(self.player)
+        self.refresh_cash(player)
     def refresh_cash(self, player):
         self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"cash currency.ttf",45,green)
         self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"cash currency.ttf",45,green)
@@ -496,7 +497,7 @@ class Engine(object):
                     self.done_drawing = False
                     self.draw_cards(2, self.deck, self.hand)
                     self.done_drawing = True
-                    self.player.cash -= 15
+                    self.cashNegatives.append(15)
                     print("Self hand after Loan:", len(self.hand))
 
                     boardCard.effectActivated = True
@@ -545,8 +546,8 @@ class Engine(object):
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
 
-                    for bF in self.boardFieldListOpp:
-                        bF.rearrange()
+                    # for bF in self.boardFieldListOpp:
+                    #     bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -678,7 +679,6 @@ class Engine(object):
                     continue
 
         if effectActivated:
-            self.recalculate_score(self.boardFieldList)
             for bf in self.boardFieldList:
                 for a in bf.cardList:
                     a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
@@ -688,7 +688,6 @@ class Engine(object):
                 print(bf, " cardlist size: ", len(bf.cardList))
                 print(bf, "rearranged")
 
-            self.recalculate_score(self.boardFieldListOpp)
             for bf in self.boardFieldListOpp:
                 for a in bf.cardList:
                     a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
@@ -697,6 +696,8 @@ class Engine(object):
                 bf.rearrange()
                 print(bf, " cardlist size: ", len(bf.cardList))
                 print(bf, "rearranged")
+            self.recalculate_score(self.player, self.boardFieldList)
+            self.recalculate_score(self.player2, self.boardFieldListOpp)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1146,6 +1147,10 @@ class Engine(object):
             self.empty_field_to_grave(self.boardField2, self.graveYardList)
             self.empty_field_to_grave(self.boardFieldOpp, self.graveYardListOpp)
             self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardListOpp)
+            while len(self.cashNegatives) > 0:
+                self.cashNegatives.pop(0)
+            self.player.cash = 0
+            self.player2.cash = 0
             # for boardCard in self.boardField.cardList:
             #     # self.sendToGraveyard(boardCard)
             #     print("Trashing some dogs1")

@@ -329,6 +329,7 @@ class Card(object):
         newFrontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
         self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, color)
         newFrontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] * 0.80, self.frontImg.get_rect().size[1] * 0.48))
+        newFrontImg.blit(self.typeText_surf, (self.frontImg.get_rect().size[0] *0.05,self.frontImg.get_rect().size[1] *0.50))
         newFrontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
         self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, self.fontSizeChoice))
 

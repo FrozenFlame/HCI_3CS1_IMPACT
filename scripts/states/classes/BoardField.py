@@ -1,4 +1,5 @@
 import pygame
+from .Card import Type
 class BoardField(object):
     def __init__(self,x1=0,y1=0,x2=0,y2=0, owner = "Nobody"):
         # x1,2 y1,2 are the dimensions of each point
@@ -70,7 +71,8 @@ class BoardField(object):
             c.resting = False
             c.defaultPos = self.boardx, self.boardy
             c.set_destination(*c.defaultPos)
-            self.boardx += 80
+            if Type.SPELL not in c.type:
+                self.boardx += 80
 
     def count_cardType(self, type):
         counter = 0
