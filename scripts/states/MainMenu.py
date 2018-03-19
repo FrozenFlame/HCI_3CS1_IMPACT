@@ -386,16 +386,23 @@ class MainMenu(object):
 
     def update(self, screen, keys, currentTime, dt):
         if self.c_may_move:
+
             for c in self.backCs:
                 c.update(dt)
                 if c.exact_position[1] >= self.y_termination:
-                    c.set_absolute((random.randrange(0,1250),-random.randrange(30,200)))
+                    scale = random.randrange(100, 170)
+                    cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"), (scale, scale)).convert_alpha()
+                    c.surface = cimg
+                    c.set_absolute((random.randrange(-10,1250),-random.randrange(80,500)))
                     c.set_destination(c.exact_position[0], 1200)
 
             for c2 in self.frontCs:
                 c2.update(dt)
                 if c2.exact_position[1] >= self.y_termination:
-                    c2.set_absolute((random.randrange(0,1250),-random.randrange(30,200)))
+                    scale = random.randrange(100, 300)
+                    cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - dark.png"), (scale, scale)).convert_alpha()
+                    c2.surface = cimg
+                    c2.set_absolute((random.randrange(-10,1250),-random.randrange(80,500)))
                     c2.set_destination(c2.exact_position[0], 1200)
 
 
@@ -680,21 +687,20 @@ class MainMenu(object):
         self.victoria_font.back_to_default()
 
     def generate_c(self, is_background=True):
-
         if is_background:
-            scale = random.randrange(50,160)
             c = []
             for x in range(0, 30):
+                scale = random.randrange(100, 170)
                 cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"),(scale,scale)).convert_alpha()
-                c.append(Movable(cimg, random.randrange(400,800), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
+                c.append(Movable(cimg, random.randrange(200,500), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
                 c[x].set_destination(c[x].exact_position[0], 820)
             return c
         else:
-            scale = random.randrange(130, 350)
             c = []
             for x in range(0, 20):
+                scale = random.randrange(100, 300)
                 cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - dark.png"),(scale,scale)).convert_alpha()
-                c.append(Movable(pygame.image.load("assets\\logo\\Avarice C asset - dark.png").convert_alpha(), random.randrange(800, 1600), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
+                c.append(Movable(cimg, random.randrange(300, 900), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
                 c[x].set_destination(c[x].exact_position[0], 820)
             return c
 
