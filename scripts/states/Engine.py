@@ -94,6 +94,7 @@ class Engine(object):
         self.player1heads = False
         self.declared_winner = False
         self.music_loaded = False
+        self.is_showing_decide = False
         # self.opening = True
 
         # objects
@@ -118,8 +119,7 @@ class Engine(object):
         self.bplayer2_font = None
         self.hero_turn_obj = None
         self.font_turn_obj = None
-
-
+        self.font_decide_obj = None  # the object which shows who won the previous round
 
         self.allCardsList = list()
 
@@ -191,7 +191,12 @@ class Engine(object):
         self.flewOut = False
 
         self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
+        self.cracksmall = pygame.mixer.Sound("assets\\sounds\\glass breaking small.ogg")
+        self.cracksmall.set_volume(0.30)
+        self.crackbig = pygame.mixer.Sound("assets\\sounds\\glass breaking.ogg")
+        self.crackbig.set_volume(0.20)
         self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
+
         self.flyOutEffect.set_volume(0.20)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
@@ -866,6 +871,10 @@ class Engine(object):
         if self.board.coin.animating:
             self.board.coin.flipAnim()
 
+
+        if self.is_showing_decide:
+            self.font_decide_obj.update(deltaTime)
+
         ''' UPDATE
          ____  _  _   __   ____  ____  ____
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
@@ -1060,13 +1069,22 @@ class Engine(object):
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
                 if self.player2.hitpoints == 1:
+                    self.cracksmall.play()
                     crackimg = pygame.image.load("assets\\heroes\\crack small.png")
                     rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
+                        # self.font_decide_obj = FontObj.factory(self.player2.user.username +" round won",Globals.RESOLUTION_X *0.5, -200,"cash currency.ttf",40, (255,255,255))
+                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X*0.5, 200)
                         self.bplayer2_img.surface.blit(rcrackimg,(0,0))
                     else:
+                        # self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer_img.surface.blit(rcrackimg, (0, 0))
+                    self.is_showing_decide = True
                 elif self.player2.hitpoints == 0:
+                    self.crackbig.play()
                     bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
                     rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
                     if self.player1heads:
@@ -1074,8 +1092,11 @@ class Engine(object):
                     else:
                         self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
 
+                    self.is_showing_decide = True
+
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
+                    self.is_showing_decide = True
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
@@ -1093,29 +1114,44 @@ class Engine(object):
                 self.player2.cash = 0
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
+                self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.phase = Phase.ROUND_DRAW
+                self.is_showing_decide = True
 
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
                 if self.player.hitpoints == 1:
+                    self.cracksmall.play()
                     crackimg = pygame.image.load("assets\\heroes\\crack small.png")
                     rcrackimg = pygame.transform.smoothscale(crackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    self.font_decide_obj = FontObj.factory(self.player2.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
+                        # self.font_decide_obj = FontObj.factory(self.player.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer_img.surface.blit(rcrackimg,(0,0))
                     else:
+                        # self.font_decide_obj = FontObj.factory(self.player2.user.username + " round won", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                        # self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                         self.bplayer2_img.surface.blit(rcrackimg, (0, 0))
+                    self.is_showing_decide = True
                 elif self.player.hitpoints == 0:
+                    self.crackbig.play()
+
                     bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
                     rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
                     if self.player1heads:
                         self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
                     else:
                         self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
+                    self.is_showing_decide = True
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
+                    self.is_showing_decide = True
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
@@ -1137,6 +1173,7 @@ class Engine(object):
 
             # else enter next round, draw appropriate num of cards
         elif self.phase == Phase.ROUND_TWO:
+
             print("[Engine] Entering Round Two!")
             num_of_cards = 2
             if not self.done_drawing:
@@ -1187,6 +1224,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X* 0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1258,6 +1296,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1314,6 +1353,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X*0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1528,6 +1568,9 @@ class Engine(object):
         if onTopCard != None:
             onTopCard.draw(screen)
             onTopCard.onTop = False
+
+        if self.is_showing_decide:
+            self.font_decide_obj.draw(screen)
 
         self.deckImgHolder1.draw(screen)
         self.deckImgHolder2.draw(screen)
