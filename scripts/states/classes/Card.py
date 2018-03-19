@@ -300,10 +300,8 @@ class Card(object):
     def receive_debuff(self, debuff):
         self.debuffs.append(debuff)
 
-    def recalculate(self):
-        # consider computation order
-        # affect and renew current_val
-        pass
+    def recalculate(self, card):
+        self.current_val = card.current_val
 
     def apply_buff(self, target):
         target.receive_buff(self.effect)

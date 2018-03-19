@@ -463,26 +463,38 @@ class Engine(object):
         for boardCard in boardField.cardList:
             if not boardCard.effectActivated:
                 if boardCard.name is "Parking Lot":
+                    print("Parking Lot Effect")
                     boardCard.current_val += (2*vehicleCounter)
+                    boardCard.recalculate(boardCard)
+                    print("Parking Lot Current Val: " , boardCard.current_val)
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
                 if boardCard.name is "Loan Slip":   #cmon bruddah just draw the freakin cards
+                    print("Self hand before Loan:", len(self.hand))
+                    self.done_drawing = False
                     self.draw_cards(2, self.deck, self.hand)
+                    self.done_drawing = True
                     self.player.cash -= 15
+                    print("Self hand after Loan:", len(self.hand))
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
                 if boardCard.name is "Lemonade Stand":
+                    print("Lemonade Stand Effect")
                     boardCard.current_val += (3*personCounter)
-                    print (boardCard.current_val)
+                    print ("Lemonade Current Val:",boardCard.current_val)
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
                 if boardCard.name is "Credit Card":
+                    print("Credit Card Effect")
                     for card in boardField.cardList:
                         if Type.PERSON in card.type:
                             card.current_val += 2
@@ -493,6 +505,7 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Butler":
+                    print("Butler Effect")
                     if boardField.cardList.index(boardCard) != 0:
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
                     boardCard.effectActivated = True
@@ -500,18 +513,20 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Arsonist":    #WORKING POGCHAMP
+                    print("Arsonist Effect")
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
-                        self.sendToGraveyardOpp(self.boardFieldOpp.cardList[arsonIndex])
+                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
-                        self.sendToGraveyardOpp(self.boardFieldOpp2.cardList[arsonIndex])
+                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
                 if boardCard.name is "Saboteur":
-                    boardRandom = random.randrange(2)
-                    cardRandom = random.randrange(len(self.boardFieldListOpp[boardRandom]))
+                    print("Saboteur Effect")
+                    boardRandom = random.randrange(0, 2)
+                    cardRandom = random.randrange(0, len(self.boardFieldListOpp[boardRandom].cardList))
                     self.sendToGraveyard(self.boardFieldListOpp[boardRandom].cardList[cardRandom])
 
                     boardCard.effectActivated = True
@@ -519,6 +534,7 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Maid":
+                    print("Maid Effect")
                     for a in self.boardField.cardList:
                         if a is "Mansion":
                             print(a.current_val)
@@ -533,6 +549,7 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Police Officer":
+                    print("Police Officer Effect")
                     sent = False
                     for a in self.boardFieldOpp.cardList:
                         if Type.BLACK and Type.PERSON in a.type:
@@ -547,6 +564,7 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Impound Lot":
+                    print("Impound Lot Effect")
                     for a in self.boardFieldOpp.cardList:
                         if Type.VEHICLE in a.type:
                             a.current_val -= 2
@@ -559,6 +577,7 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Junkyard":
+                    print("Junkyard Effect")
                     count = 0
                     for a in self.graveYardList:
                         if Type.VEHICLE in a.type:
@@ -573,12 +592,13 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Resurrect":
+                    print("Resurrect Effect")
                     personInGraveList = list()
                     for a in self.graveYardList:
                         if Type.PERSON in a.type:
                             personInGraveList.append(a)
                     if len(personInGraveList) > 0:
-                        r = random.randrange(len(personInGraveList))
+                        r = random.randrange(0, len(personInGraveList))
                         c = personInGraveList[r]
                         self.boardField.take_card(c)
                         self.recalculate_score(self.boardFieldList)
@@ -593,12 +613,13 @@ class Engine(object):
                     continue
 
                 if boardCard.name is "Rebuild":
+                    print("Rebuild Effect")
                     graveList = list()
                     for a in self.graveYardList:
                         if Type.VEHICLE or Type.STRUCTURE in a.type:
                             graveList.append(a)
                     if len(graveList) > 0:
-                        r = random.randrange(len(graveList))
+                        r = random.randrange(0, len(graveList))
                         c = graveList[r]
                         self.boardField.take_card(c)
                         self.recalculate_score(self.boardFieldList)
@@ -1483,14 +1504,6 @@ class Engine(object):
             # else:
             #     self.phase = Phase.SWAP
 
-
-
-
-        # for a in self.allCardsList:
-        #     if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
-        #         # a.addTexts(self.player.hero.name)
-        #     elif a.front:
-        #         # a.addTexts(self.player2.hero.name)
         self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
@@ -1498,10 +1511,6 @@ class Engine(object):
         screen.fill((255, 255, 255))
 
         self.board.draw(screen)
-        # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
-        #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
-        #     self.card.blitted = True
-        # self.card.draw(screen)
 
         self.board.coin.draw(screen)
         if self.big_portraits_visible:
@@ -1513,18 +1522,11 @@ class Engine(object):
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-                # if a.front:
-                #     a.textBaseVal.draw(screen)
-                #     a.textCurrVal.draw(screen)
-                #     a.textName.draw(screen)
+
             else:
                 onTopCard = a
         if onTopCard != None:
             onTopCard.draw(screen)
-            # if onTopCard.front:
-            #     onTopCard.textBaseVal.draw(screen)
-            #     onTopCard.textCurrVal.draw(screen)
-            #     onTopCard.textName.draw(screen)
             onTopCard.onTop = False
 
         self.deckImgHolder1.draw(screen)
