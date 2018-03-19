@@ -687,6 +687,30 @@ class Engine(object):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def get_evt(self, event):
+        # for bf in self.boardFieldList:
+        #     for a in bf.cardList:
+        #         if Type.SPELL in a.type:
+        #             pygame.time.delay(1000)
+        #             self.sendToGraveyard(a)
+        #         else:
+        #             a.draw(self.screen)
+        #             print(a.name, "redrawn")
+        #     bf.rearrange()
+        #     print(bf, " cardlist size: ", len(bf.cardList))
+        #     print(bf, "rearranged")
+        #
+        # for bf in self.boardFieldListOpp:
+        #     for a in bf.cardList:
+        #         if Type.SPELL in a.type:
+        #             pygame.time.delay(1000)
+        #             self.sendToGraveyard(a)
+        #         else:
+        #             a.draw(self.screen)
+        #             print(a.name, "redrawn")
+        #     bf.rearrange()
+        #     print(bf, " cardlistopp size: ", len(bf.cardList))
+        #     print(bf, "rearrangedopp")
+
         if event.type == pygame.QUIT:
             self.done = True
         #if self.board.hasPreviewCard:
@@ -756,20 +780,28 @@ class Engine(object):
                         # if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                         #     self.boardCardList.append(self.clickedCard[0])
                         #     self.clickedCard[0].onBoard = True
+                        #
 
-                        if self.player == self.first_player:
-                            for bF in self.boardFieldList:
-                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                                    bF.take_card(self.clickedCard[0])
-                                    self.clickedCard[0].onBoard = True
-                                    self.play_card(self.clickedCard[0], self.boardFieldList)
-                        elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
-                            for bF in self.boardFieldListOpp:
-                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
-                                    bF.take_card(self.clickedCard[0])
-                                    self.clickedCard[0].onBoard = True
-                                    self.play_card(self.clickedCard[0], self.boardFieldListOpp)
 
+                        for bF in self.boardFieldList:
+                            if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                                bF.take_card(self.clickedCard[0])
+                                self.clickedCard[0].onBoard = True
+                                self.play_card(self.clickedCard[0], self.boardFieldList)
+
+                        # TODO erase these boardfield card play below, they are obsolete.
+                        # if self.player == self.first_player:
+                        #     for bF in self.boardFieldList:
+                        #         if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                        #             bF.take_card(self.clickedCard[0])
+                        #             self.clickedCard[0].onBoard = True
+                        #             self.play_card(self.clickedCard[0], self.boardFieldList)
+                        # elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
+                        #     for bF in self.boardFieldListOpp:
+                        #         if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
+                        #             bF.take_card(self.clickedCard[0])
+                        #             self.clickedCard[0].onBoard = True
+                        #             self.play_card(self.clickedCard[0], self.boardFieldListOpp)
 
                         # # OPPONENT Board placement/collision logic
                         # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
@@ -1047,7 +1079,7 @@ class Engine(object):
             self.opponent_deck = tempDeck
             self.boardFieldOpp = tempFrontRow
             self.boardFieldOpp2 = tempBackRow
-            self.boardFieldList = tempBoardFieldList
+            self.boardFieldListOpp = tempBoardFieldList
 
 
             '''
