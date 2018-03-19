@@ -537,9 +537,19 @@ class Engine(object):
 
                 if boardCard.id is "saboteur":
                     print("Saboteur Effect")
-                    boardRandom = random.randrange(0, 2)
-                    cardRandom = random.randrange(0, len(self.boardFieldListOpp[boardRandom].cardList))
-                    self.sendToGraveyard(self.boardFieldListOpp[boardRandom].cardList[cardRandom])
+                    sent = False
+                    targetList = list()
+                    for bF in self.boardFieldListOpp:
+                        targetList.extend(bF.cardList)
+
+                    if len(targetList) != 0:
+                        for target in targetList:
+                            r = random.randrange(0, 2)
+                            if r == 1:
+                                self.sendToGraveyard(target)
+                                sent = True
+                        if not sent:
+                            self.sendToGraveyard(targetList[0])
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -560,13 +570,20 @@ class Engine(object):
                 if boardCard.id is "policeofficer":
                     print("Police Officer Effect")
                     sent = False
-                    for a in self.boardFieldOpp.cardList:
-                        if Type.BLACK and Type.PERSON in a.type:
-                            self.sendToGraveyard(a)
-                            sent = True
-                    for a in self.boardFieldOpp2.cardList:
-                        if not sent and Type.BLACK and Type.PERSON in a.type:
-                            self.sendToGraveyard(a)
+                    targetList = list()
+                    for bF in self.boardFieldListOpp:
+                        for a in bF.cardList:
+                            if Type.BLACK in a.type and Type.PERSON in a.type:
+                                targetList.append(a)
+
+                    if len(targetList) != 0:
+                        for target in targetList:
+                            r = random.randrange(0, 2)
+                            if r == 1:
+                                self.sendToGraveyard(target)
+                                sent = True
+                        if not sent:
+                            self.sendToGraveyard(targetList(0))
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -645,14 +662,18 @@ class Engine(object):
                     continue
 
         if effectActivated:
-            pygame.time.delay(500)
             self.recalculate_score(self.boardFieldList)
             for bf in self.boardFieldList:
                 for a in bf.cardList:
                     if Type.SPELL in a.type:
+                        pygame.time.delay(1000)
                         self.sendToGraveyard(a)
-                    a.draw(self.screen)
+                    else:
+                        a.draw(self.screen)
+                        print(a.name, "redrawn")
                 bf.rearrange()
+                print(bf, " cardlist size: ", len(bf.cardList))
+                print(bf, "rearranged")
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

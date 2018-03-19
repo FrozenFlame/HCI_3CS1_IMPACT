@@ -255,7 +255,7 @@ class Card(object):
         self.resting = False
         self.set_destination(self.defaultPos[0],self.defaultPos[1])
 
-    def blit_text(self, surface, text, pos, font, color=pygame.Color('black')):
+    def blit_text(self, surface, text, pos, font, color=(0, 0, 0)):
         words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
         space = font.size(' ')[0]  # The width of a space.
         max_width, max_height = surface.get_size()
@@ -298,17 +298,17 @@ class Card(object):
         self.debuffs.append(debuff)
 
     def recalculate(self):
-        color = pygame.Color('black')
+        color = (0, 0, 0) #black
         if self.current_val > self.base_val:
-            color = pygame.Color('green')
+            color = (0, 128, 0) #green
         elif self.current_val < self.base_val:
-            color = pygame.Color('red')
+            color = (255, 0, 0) #red
         newFrontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
         newFrontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
-        self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, (0, 0, 0))
+        self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, color)
         newFrontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] * 0.80, self.frontImg.get_rect().size[1] * 0.48))
         newFrontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
-        self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, color))
+        self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, 20))
 
 
 
