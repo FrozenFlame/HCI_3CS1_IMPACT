@@ -46,6 +46,7 @@ Rough code estimate would be like:
 (end of phase, repeat)
 <victory animation> - a player gets crowned victorious
 '''
+green = (0, 128, 0)
 # class which holds the game flow
 class Engine(object):
     # def __init__(self): we're gonna create
@@ -94,6 +95,7 @@ class Engine(object):
         self.player1heads = False
         self.declared_winner = False
         self.music_loaded = False
+        self.is_showing_decide = False
         # self.opening = True
 
         # objects
@@ -118,8 +120,7 @@ class Engine(object):
         self.bplayer2_font = None
         self.hero_turn_obj = None
         self.font_turn_obj = None
-
-
+        self.font_decide_obj = None  # the object which shows who won the previous round
 
         self.allCardsList = list()
 
@@ -183,6 +184,12 @@ class Engine(object):
         self.bottom_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y * 0.95)
         self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
 
+        # cash points
+        self.botcash_coords = (self.bottom_slot[0] - 125, self.bottom_slot[1] - 80)
+        self.bot_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
+        self.topcash_coords = (self.top_slot[0] - 125, self.top_slot[1] - 80)
+        self.top_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
+
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
         self.fadeScreen = pygame.Surface((1280, 720))
@@ -191,8 +198,16 @@ class Engine(object):
         self.flewOut = False
 
         self.inGame = pygame.mixer.Sound("assets\\sounds\\mysterious sound.ogg")
+        self.cracksmall = pygame.mixer.Sound("assets\\sounds\\glass breaking small.ogg")
+        self.cracksmall.set_volume(0.30)
+        self.crackbig = pygame.mixer.Sound("assets\\sounds\\glass breaking.ogg")
+        self.crackbig.set_volume(0.20)
         self.flyOutEffect = pygame.mixer.Sound("assets\\sounds\\showHero.ogg")
+
         self.flyOutEffect.set_volume(0.20)
+
+        self.spellPlayed = False
+        self.playedSpell = None
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -453,7 +468,11 @@ class Engine(object):
             for c in bF.cardList:
                 self.player.cash += c.current_val
         print("[Engine] After recalculation cash: ", self.player.cash)
-
+        # TODO lazy, no algorithm. Make a better algorithm in the future
+        self.refresh_cash(self.player)
+    def refresh_cash(self, player):
+        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"cash currency.ttf",45,green)
+        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"cash currency.ttf",45,green)
     def apply_effects(self, boardField): #f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         blackCounter = boardField.count_cardType(Type.BLACK)
@@ -462,103 +481,149 @@ class Engine(object):
 
         for boardCard in boardField.cardList:
             if not boardCard.effectActivated:
-                if boardCard.name is "Parking Lot":
-                    boardCard.current_val += (2*vehicleCounter)
+                if boardCard.id is "parkinglot":
+                    print("Parking Lot Effect")
+                    boardCard.current_val += (3*vehicleCounter)
+                    boardCard.recalculate()
+                    print("Parking Lot Current Val: " , boardCard.current_val)
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Loan Slip":   #cmon bruddah just draw the freakin cards
+                if boardCard.id is "loanslip":   #cmon bruddah just draw the freakin cards
+                    print("Self hand before Loan:", len(self.hand))
+                    self.done_drawing = False
                     self.draw_cards(2, self.deck, self.hand)
+                    self.done_drawing = True
                     self.player.cash -= 15
+                    print("Self hand after Loan:", len(self.hand))
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Lemonade Stand":
+                if boardCard.id is "lemonadestand":
+                    print("Lemonade Stand Effect")
                     boardCard.current_val += (3*personCounter)
-                    print (boardCard.current_val)
+                    boardCard.recalculate()
+                    print ("Lemonade Current Val:",boardCard.current_val)
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Credit Card":
+                if boardCard.id is "creditcard":
+                    print("Credit Card Effect")
                     for card in boardField.cardList:
                         if Type.PERSON in card.type:
                             card.current_val += 2
+                            card.recalculate()
                         elif Type.OBJECT in card.type:
-                            card.current_val -= 1
+                            card.current_val -= 3
+                            card.recalculate()
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Butler":
+                if boardCard.id is "butler":
+                    print("Butler Effect")
                     if boardField.cardList.index(boardCard) != 0:
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
+                        boardField.cardList[boardField.cardList.index(boardCard) - 1].recalculate()
+
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Arsonist":    #WORKING POGCHAMP
+                if boardCard.id is "arsonist":    #WORKING POGCHAMP
+                    print("Arsonist Effect")
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
-                        self.sendToGraveyardOpp(self.boardFieldOpp.cardList[arsonIndex])
+                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
-                        self.sendToGraveyardOpp(self.boardFieldOpp2.cardList[arsonIndex])
+                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
+
+                    for bF in self.boardFieldListOpp:
+                        bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Saboteur":
-                    boardRandom = random.randrange(2)
-                    cardRandom = random.randrange(len(self.boardFieldListOpp[boardRandom]))
-                    self.sendToGraveyard(self.boardFieldListOpp[boardRandom].cardList[cardRandom])
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.name is "Maid":
-                    for a in self.boardField.cardList:
-                        if a is "Mansion":
-                            print(a.current_val)
-                            a.current_val += 3
-                            print(a.current_val)
-                    for a in self.boardField2.cardList:
-                        if a is "Mansion":
-                            a.current_val += 3
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.name is "Police Officer":
+                if boardCard.id is "saboteur":
+                    print("Saboteur Effect")
                     sent = False
-                    for a in self.boardFieldOpp.cardList:
-                        if Type.BLACK and Type.PERSON in a.type:
-                            self.sendToGraveyard(a)
-                            sent = True
-                    for a in self.boardFieldOpp2.cardList:
-                        if not sent and Type.BLACK and Type.PERSON in a.type:
-                            self.sendToGraveyard(a)
+                    targetList = list()
+                    for bF in self.boardFieldListOpp:
+                        targetList.extend(bF.cardList)
+
+                    if len(targetList) != 0:
+                        for target in targetList:
+                            r = random.randrange(0, 2)
+                            if r == 1:
+                                self.sendToGraveyard(target)
+                                sent = True
+                        if not sent:
+                            self.sendToGraveyard(targetList[0])
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Impound Lot":
-                    for a in self.boardFieldOpp.cardList:
-                        if Type.VEHICLE in a.type:
-                            a.current_val -= 2
-                    for a in self.boardFieldOpp2.cardList:
-                        if Type.VEHICLE in a.type:
-                            a.current_val -= 2
+                if boardCard.id is "maid":
+                    print("Maid Effect")
+                    for bF in self.boardFieldList:
+                        for a in bF.cardList:
+                            if a.id is "mansion":
+                                a.current_val += 3
+                                a.recalculate()
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Junkyard":
+                if boardCard.id is "policeofficer":
+                    print("Police Officer Effect")
+                    sent = False
+                    targetList = list()
+                    for bF in self.boardFieldListOpp:
+                        for a in bF.cardList:
+                            if Type.BLACK in a.type and Type.PERSON in a.type:
+                                targetList.append(a)
+
+
+                    if len(targetList) != 0:
+                        for target in targetList:
+                            r = random.randrange(0, 2)
+                            if r == 1:
+                                self.sendToGraveyard(target)
+                                sent = True
+                        if not sent:
+                            self.sendToGraveyard(targetList[0])
+                    for bF in self.boardFieldListOpp:
+                        bF.rearrange()
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    self.refresh_cash(self.player2)
+                    self.refresh_cash(self.player2)
+                    continue
+
+                if boardCard.id is "impoundlot":
+                    print("Impound Lot Effect")
+                    for bF in self.boardFieldListOpp:
+                        for a in bF.cardList:
+                            if Type.VEHICLE in a.type:
+                                a.current_val -= 2
+                                a.recalculate()
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "junkyard":
+                    print("Junkyard Effect")
+                    print("Old Junkyard Value: ", boardCard.current_val)
                     count = 0
                     for a in self.graveYardList:
                         if Type.VEHICLE in a.type:
@@ -567,21 +632,24 @@ class Engine(object):
                         if Type.VEHICLE in a.type:
                             count += 1
                     boardCard.current_val += (2*count)
+                    boardCard.recalculate()
+                    print("New Junkyard Value: ", boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Resurrect":
+                if boardCard.id is "resurrect":
+                    print("Resurrect Effect")
                     personInGraveList = list()
                     for a in self.graveYardList:
                         if Type.PERSON in a.type:
                             personInGraveList.append(a)
                     if len(personInGraveList) > 0:
-                        r = random.randrange(len(personInGraveList))
+                        r = random.randrange(0, len(personInGraveList))
                         c = personInGraveList[r]
                         self.boardField.take_card(c)
-                        self.recalculate_score(self.boardFieldList)
+                        # self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -592,16 +660,17 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.name is "Rebuild":
+                if boardCard.id is "rebuild":
+                    print("Rebuild Effect")
                     graveList = list()
                     for a in self.graveYardList:
-                        if Type.VEHICLE or Type.STRUCTURE in a.type:
+                        if Type.VEHICLE in a.type or Type.STRUCTURE in a.type:
                             graveList.append(a)
                     if len(graveList) > 0:
-                        r = random.randrange(len(graveList))
+                        r = random.randrange(0, len(graveList))
                         c = graveList[r]
                         self.boardField.take_card(c)
-                        self.recalculate_score(self.boardFieldList)
+                        # self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -614,10 +683,25 @@ class Engine(object):
 
         if effectActivated:
             self.recalculate_score(self.boardFieldList)
-            for a in self.boardField.cardList:
-                a.draw(self.screen)
-            for a in self.boardField2.cardList:
-                a.draw(self.screen)
+            for bf in self.boardFieldList:
+                for a in bf.cardList:
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
+                    a.draw(self.screen)
+                    print(a.name, "redrawn")
+                bf.rearrange()
+                print(bf, " cardlist size: ", len(bf.cardList))
+                print(bf, "rearranged")
+
+            self.recalculate_score(self.boardFieldListOpp)
+            for bf in self.boardFieldListOpp:
+                for a in bf.cardList:
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
+                    a.draw(self.screen)
+                    print(a.name, "redrawn")
+                bf.rearrange()
+                print(bf, " cardlist size: ", len(bf.cardList))
+                print(bf, "rearranged")
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____ _        _        ______                _   _
@@ -630,6 +714,30 @@ class Engine(object):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def get_evt(self, event):
+        # for bf in self.boardFieldList:
+        #     for a in bf.cardList:
+        #         if Type.SPELL in a.type:
+        #             pygame.time.delay(1000)
+        #             self.sendToGraveyard(a)
+        #         else:
+        #             a.draw(self.screen)
+        #             print(a.name, "redrawn")
+        #     bf.rearrange()
+        #     print(bf, " cardlist size: ", len(bf.cardList))
+        #     print(bf, "rearranged")
+        #
+        # for bf in self.boardFieldListOpp:
+        #     for a in bf.cardList:
+        #         if Type.SPELL in a.type:
+        #             pygame.time.delay(1000)
+        #             self.sendToGraveyard(a)
+        #         else:
+        #             a.draw(self.screen)
+        #             print(a.name, "redrawn")
+        #     bf.rearrange()
+        #     print(bf, " cardlistopp size: ", len(bf.cardList))
+        #     print(bf, "rearrangedopp")
+
         if event.type == pygame.QUIT:
             self.done = True
         #if self.board.hasPreviewCard:
@@ -699,20 +807,31 @@ class Engine(object):
                         # if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                         #     self.boardCardList.append(self.clickedCard[0])
                         #     self.clickedCard[0].onBoard = True
+                        #
 
-                        if self.player == self.first_player:
-                            for bF in self.boardFieldList:
-                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                                    bF.take_card(self.clickedCard[0])
-                                    self.clickedCard[0].onBoard = True
-                                    self.play_card(self.clickedCard[0], self.boardFieldList)
-                        elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
-                            for bF in self.boardFieldListOpp:
-                                if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
-                                    bF.take_card(self.clickedCard[0])
-                                    self.clickedCard[0].onBoard = True
-                                    self.play_card(self.clickedCard[0], self.boardFieldListOpp)
 
+                        for bF in self.boardFieldList:
+                            if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                                bF.take_card(self.clickedCard[0])
+                                self.clickedCard[0].onBoard = True
+                                self.play_card(self.clickedCard[0], self.boardFieldList)
+                                if Type.SPELL in self.clickedCard[0].type:
+                                    self.spellPlayed = True
+                                    self.playedSpell = self.clickedCard[0]
+
+                        # TODO erase these boardfield card play below, they are obsolete.
+                        # if self.player == self.first_player:
+                        #     for bF in self.boardFieldList:
+                        #         if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
+                        #             bF.take_card(self.clickedCard[0])
+                        #             self.clickedCard[0].onBoard = True
+                        #             self.play_card(self.clickedCard[0], self.boardFieldList)
+                        # elif self.player2 == self.first_player and not self.clickedCard[0].onBoard:
+                        #     for bF in self.boardFieldListOpp:
+                        #         if self.clickedCard[0].collide_rect(*bF.get_dimensions()):
+                        #             bF.take_card(self.clickedCard[0])
+                        #             self.clickedCard[0].onBoard = True
+                        #             self.play_card(self.clickedCard[0], self.boardFieldListOpp)
 
                         # # OPPONENT Board placement/collision logic
                         # for bF in self.boardFieldListOpp: # REMOVE THIS THIS IS JUST TO FIND THE RIGHT NUMBERS FOR BOARDFIELD
@@ -790,7 +909,11 @@ class Engine(object):
                         self.showHandButton = False
                         if self.faded:
                             self.board.coin.show_pass()
+                            self.board.hasPreviewCard = False
+                            self.refresh_cash(self.player)
+
                             self.fadeOut()
+
                         self.flip_hand(self.hand)
                         self.phase = Phase.PLAY
                         self.music_loaded = False
@@ -845,6 +968,10 @@ class Engine(object):
         if self.board.coin.animating:
             self.board.coin.flipAnim()
 
+
+        if self.is_showing_decide:
+            self.font_decide_obj.update(deltaTime)
+
         ''' UPDATE
          ____  _  _   __   ____  ____  ____
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
@@ -891,6 +1018,11 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
+            if self.spellPlayed:
+                if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
+                    self.waitTick = currentTime                 # delete this comments when done
+                    self.sendToGraveyard(self.playedSpell)
+                    self.spellPlayed = False
             if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
                     self.hero_turn_obj.update(deltaTime)
@@ -986,7 +1118,7 @@ class Engine(object):
             self.opponent_deck = tempDeck
             self.boardFieldOpp = tempFrontRow
             self.boardFieldOpp2 = tempBackRow
-            self.boardFieldList = tempBoardFieldList
+            self.boardFieldListOpp = tempBoardFieldList
 
 
             '''
@@ -1008,6 +1140,7 @@ class Engine(object):
             self.swap_player(self.player)
             self.phase = Phase.PREP
             self.done_turn = False
+
             self.fadeIn()
             self.swap_portrait()
 
@@ -1034,12 +1167,35 @@ class Engine(object):
             #     print("Trashing some dogs4")
             #     # self.sendToGraveyard(boardCard)
             #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp2, self.graveYardListOpp)
-
+            #
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
+                if self.player2.hitpoints == 1:
+                    self.cracksmall.play()
+                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
+                    rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    self.font_decide_obj = FontObj.factory(self.player.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
+                    if self.player1heads:
+                        self.bplayer2_img.surface.blit(rcrackimg,(0,0))
+                    else:
+                        self.bplayer_img.surface.blit(rcrackimg, (0, 0))
+                    self.is_showing_decide = True
+                elif self.player2.hitpoints == 0:
+                    self.crackbig.play()
+                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
+                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
+                    else:
+                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
+
+                    self.is_showing_decide = True
+
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
+                    self.is_showing_decide = True
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
@@ -1057,15 +1213,40 @@ class Engine(object):
                 self.player2.cash = 0
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
+                self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.phase = Phase.ROUND_DRAW
+                self.is_showing_decide = True
 
             else:
                 print("Opponent {0} has more cash".format(self.player2.user.username))
                 self.player.hitpoints -= 1
+                if self.player.hitpoints == 1:
+                    self.cracksmall.play()
+                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
+                    rcrackimg = pygame.transform.smoothscale(crackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    self.font_decide_obj = FontObj.factory(self.player2.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
+                    if self.player1heads:
+                        self.bplayer_img.surface.blit(rcrackimg,(0,0))
+                    else:
+                        self.bplayer2_img.surface.blit(rcrackimg, (0, 0))
+                    self.is_showing_decide = True
+                elif self.player.hitpoints == 0:
+                    self.crackbig.play()
+
+                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
+                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
+                    if self.player1heads:
+                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
+                    else:
+                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
+                    self.is_showing_decide = True
                 if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
                     self.phase = Phase.FINAL_ROUND
+                    self.is_showing_decide = True
                 else:
                     self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
                     if self.phase == Phase.MATCH_COMPLETE:
@@ -1087,6 +1268,7 @@ class Engine(object):
 
             # else enter next round, draw appropriate num of cards
         elif self.phase == Phase.ROUND_TWO:
+
             print("[Engine] Entering Round Two!")
             num_of_cards = 2
             if not self.done_drawing:
@@ -1137,6 +1319,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X* 0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1208,6 +1391,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1264,6 +1448,7 @@ class Engine(object):
 
                     self.openingIndex += 1
                 else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X*0.5, -300)
                     self.opening = False
                     self.done_drawing = False
                     self.openingIndex = 0
@@ -1454,14 +1639,6 @@ class Engine(object):
             # else:
             #     self.phase = Phase.SWAP
 
-
-
-
-        # for a in self.allCardsList:
-        #     if a.front and (a in self.hand or a in self.boardField.cardList or a in self.boardField2.cardList):
-        #         # a.addTexts(self.player.hero.name)
-        #     elif a.front:
-        #         # a.addTexts(self.player2.hero.name)
         self.draw(screen)  # last function of update. execute draw
 
     # orders individual elements to draw themselves in the correct order (your blits)
@@ -1469,10 +1646,8 @@ class Engine(object):
         screen.fill((255, 255, 255))
 
         self.board.draw(screen)
-        # if not self.card.blitted:               # another way of instantiating, compared to elif h.resting and not h.blitted in update method
-        #     self.card.posX, self.card.posY = self.boardField.xStart, self.boardField.yStart
-        #     self.card.blitted = True
-        # self.card.draw(screen)
+
+
 
         self.board.coin.draw(screen)
         if self.big_portraits_visible:
@@ -1481,22 +1656,22 @@ class Engine(object):
             self.bplayer_font.draw(screen)
             self.bplayer2_font.draw(screen)
         onTopCard = None
+        # cash draw
+        if self.bot_cash_surf and self.top_cash_surf and not self.phase == Phase.COIN_TOSS:
+            screen.blit(self.top_cash_surf, self.topcash_coords)
+            screen.blit(self.bot_cash_surf, self.botcash_coords)
+
         for a in self.allCardsList:
             if not a.onTop:
                 a.draw(screen)
-                # if a.front:
-                #     a.textBaseVal.draw(screen)
-                #     a.textCurrVal.draw(screen)
-                #     a.textName.draw(screen)
             else:
                 onTopCard = a
         if onTopCard != None:
             onTopCard.draw(screen)
-            # if onTopCard.front:
-            #     onTopCard.textBaseVal.draw(screen)
-            #     onTopCard.textCurrVal.draw(screen)
-            #     onTopCard.textName.draw(screen)
             onTopCard.onTop = False
+
+        if self.is_showing_decide:
+            self.font_decide_obj.draw(screen)
 
         self.deckImgHolder1.draw(screen)
         self.deckImgHolder2.draw(screen)

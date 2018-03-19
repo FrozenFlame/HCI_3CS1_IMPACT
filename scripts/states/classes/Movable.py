@@ -46,7 +46,6 @@ class Movable(object):
                 # self.set_destination(self.defaultPos[0], self.defaultPos[1])
                 travelled = math.hypot(self.vector[0] * dTime, self.vector[1] * dTime)
                 self.distance -= travelled
-                print("Distance, ", self.distance)
                 if self.distance <= 0:  # destination reached
                     # self.posX = self.defaultPos[0]  # * dTime
                     # self.posY = self.defaultPos[1]  # * dTime
@@ -75,8 +74,6 @@ class Movable(object):
                     self.posY += self.vector[1] * dTime
                     self.rect.center = self.posX, self.posY
                     self.exact_position = self.rect.center
-
-
 
     def draw(self, screen):
         if self.is_visible:
