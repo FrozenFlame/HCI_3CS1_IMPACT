@@ -143,7 +143,7 @@ class DeckCatalogue(object):
         gangsters = Card("gangsters", "Gangsters", 3, "", [Type.PERSON, Type.BLACK], hero_name)
         arsonist = Card("arsonist", "Arsonist", 0, "Destroy Opposing Column's STRUCTURE cards", [Type.PERSON, Type.BLACK], hero_name)
         lemonadeStand = Card("lemonadestand", "Lemonade Stand", 5, "+3C to SELF per PERSON card on this boardfield", [Type.STRUCTURE], hero_name)
-        parkingLot = Card("parkinglot", "Parking Lot", 5, "+2C to SELF per VEHICLE card on this boardfield.", [Type.STRUCTURE], hero_name)
+        parkingLot = Card("parkinglot", "Parking Lot", 10, "+3C to SELF per VEHICLE card on this boardfield.", [Type.STRUCTURE], hero_name)
         impoundLot = Card("impoundlot", "Impound Lot", 5, "-2C to VEHICLE cards on enemy board", [Type.STRUCTURE], hero_name)
         junkyard = Card("junkyard", "Junkyard", 5, "+2C to SELF per VEHICLE card on both graveyards.", [Type.STRUCTURE], hero_name)
         loanSlip = Card("loanslip", "Loan Slip", 0, "-15C to Player Bank; Draw 2 cards", [Type.SPELL], hero_name)
