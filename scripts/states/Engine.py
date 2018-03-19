@@ -1074,7 +1074,7 @@ class Engine(object):
             #     print("Trashing some dogs4")
             #     # self.sendToGraveyard(boardCard)
             #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp2, self.graveYardListOpp)
-
+            #
             if self.player.cash > self.player2.cash:
                 print("Player {0} has more cash".format(self.player.user.username))
                 self.player2.hitpoints -= 1
