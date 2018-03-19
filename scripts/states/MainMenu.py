@@ -40,7 +40,7 @@ class MainMenu(object):
            __             _          ___             _                      
           / /  ___   __ _(_) ___    / __\ ___   ___ | | ___  __ _ _ __  ___ 
          / /  / _ \ / _` | |/ __|  /__\/// _ \ / _ \| |/ _ \/ _` | '_ \/ __|
-        / /__| (_) | (_| | | (__  / \/  \ (_) | (_) | |  __/ (_| | | | \__ \
+        / /__| (_) | (_| | | (__  / \/  \ (_) | (_) | |  __/ (_| | | | \__ \ 
         \____/\___/ \__, |_|\___| \_____/\___/ \___/|_|\___|\__,_|_| |_|___/
                     |___/                                                   
         '''
@@ -67,7 +67,7 @@ class MainMenu(object):
             ___          _                     _     _           _       
            /   \___  ___(_) __ _ _ __     ___ | |__ (_) ___  ___| |_ ___ 
           / /\ / _ \/ __| |/ _` | '_ \   / _ \| '_ \| |/ _ \/ __| __/ __|
-         / /_//  __/\__ \ | (_| | | | | | (_) | |_) | |  __/ (__| |_\__ \
+         / /_//  __/\__ \ | (_| | | | | | (_) | |_) | |  __/ (__| |_\__ \ 
         /___,' \___||___/_|\__, |_| |_|  \___/|_.__// |\___|\___|\__|___/
                            |___/                  |__/                   
         '''
@@ -85,6 +85,13 @@ class MainMenu(object):
         self.backdropMovable = Movable(self.logo,1000,5,"distance", self.logo_pos)
         self.font = FontObj.factory("Team IMPACT", Globals.RESOLUTION_X/2,Globals.RESOLUTION_Y/2,'POORICH.ttf',115,silver)
         self.font.is_visible = False
+
+        # background Cs
+        self.backCs = self.generate_c(True)
+        self.frontCs = self.generate_c(False)
+        self.y_termination = 800
+        self.c_may_move = False
+
         # HERO SELECT HEADER #
         self.select_text = FontObj.factory("Select a Hero", Globals.RESOLUTION_X *0.35 +1000, Globals.RESOLUTION_Y *0.10, 'big_noodle_titling_oblique.ttf', 150, lightgrey)
         self.select_text_pos2 = Globals.RESOLUTION_X *0.65, Globals.RESOLUTION_Y *0.10
@@ -174,7 +181,6 @@ class MainMenu(object):
 
 
         self.faded = True
-
 
     def fadeOut(self):
         self.fadeInSound.play()
@@ -318,6 +324,7 @@ class MainMenu(object):
                 self.buttons.has_message = False
                 message = self.buttons.get_message()
                 if message["phase"] == "TO_HERO":
+                    self.c_may_move = True
                     self.phase = Phase.TO_HERO
                     # play hero select music
 
@@ -378,6 +385,19 @@ class MainMenu(object):
                     self.getevt_readyup_esc()
 
     def update(self, screen, keys, currentTime, dt):
+        if self.c_may_move:
+            for c in self.backCs:
+                c.update(dt)
+                if c.exact_position[1] >= self.y_termination:
+                    c.set_absolute((random.randrange(0,1250),-random.randrange(30,200)))
+                    c.set_destination(c.exact_position[0], 1200)
+
+            for c2 in self.frontCs:
+                c2.update(dt)
+                if c2.exact_position[1] >= self.y_termination:
+                    c2.set_absolute((random.randrange(0,1250),-random.randrange(30,200)))
+                    c2.set_destination(c2.exact_position[0], 1200)
+
 
         self.font.update(dt)
         if self.phase == Phase.START_SCREEN:
@@ -506,6 +526,11 @@ class MainMenu(object):
 
     def draw(self, screen):
         pygame.draw.rect(screen, gold, (000,000,1280,720))  # background
+        for c in self.backCs:
+            c.draw(screen)
+        for c2 in self.frontCs:
+            c2.draw(screen)
+
         # screen.blit(self.backdrop, (0,0))
         self.font.draw(screen)
         if self.phase == Phase.START_SCREEN:
@@ -572,6 +597,7 @@ class MainMenu(object):
         self.cancelSound.play()
         if not self.player2_picking:
             pygame.mixer.music.fadeout(600)
+            self.c_may_move = False
             self.phase = Phase.TO_START
             self.phase_start_time = pygame.time.get_ticks()
             print("[MainMenu(STATE)] Going back to StartScreen")
@@ -645,7 +671,6 @@ class MainMenu(object):
         self.player2_text.draw(screen)
 
     # generic
-
     def heroes_to_default(self):
         self.billy.back_to_default()
         self.king.back_to_default()
@@ -654,6 +679,24 @@ class MainMenu(object):
         self.king_font.back_to_default()
         self.victoria_font.back_to_default()
 
+    def generate_c(self, is_background=True):
+
+        if is_background:
+            scale = random.randrange(80,160)
+            c = []
+            for x in range(0, 30):
+                cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"),(scale,scale)).convert_alpha()
+                c.append(Movable(cimg, random.randrange(400,800), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
+                c[x].set_destination(c[x].exact_position[0], 820)
+            return c
+        else:
+            scale = random.randrange(130, 350)
+            c = []
+            for x in range(0, 20):
+                cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - dark.png"),(scale,scale)).convert_alpha()
+                c.append(Movable(pygame.image.load("assets\\logo\\Avarice C asset - dark.png").convert_alpha(), random.randrange(800, 1600), 4, "constant", (random.randrange(0, 1250), random.randrange(0, 680))))
+                c[x].set_destination(c[x].exact_position[0], 820)
+            return c
 
     def startup(self, currentTime, persistent):
         '''
