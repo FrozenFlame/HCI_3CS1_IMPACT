@@ -682,7 +682,7 @@ class MainMenu(object):
     def generate_c(self, is_background=True):
 
         if is_background:
-            scale = random.randrange(80,160)
+            scale = random.randrange(50,160)
             c = []
             for x in range(0, 30):
                 cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"),(scale,scale)).convert_alpha()
