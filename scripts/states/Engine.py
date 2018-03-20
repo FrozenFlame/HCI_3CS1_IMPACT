@@ -485,7 +485,7 @@ class Engine(object):
                 if boardCard.id is "parkinglot":
                     print("Parking Lot Effect")
                     boardCard.current_val += (3*vehicleCounter)
-                    boardCard.recalculate()
+                    boardCard.rebuildFront()
                     print("Parking Lot Current Val: " , boardCard.current_val)
 
                     boardCard.effectActivated = True
@@ -500,6 +500,8 @@ class Engine(object):
                     self.cashNegatives.append(15)
                     print("Self hand after Loan:", len(self.hand))
 
+                    self.spellPlayed = True
+                    self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -507,7 +509,7 @@ class Engine(object):
                 if boardCard.id is "lemonadestand":
                     print("Lemonade Stand Effect")
                     boardCard.current_val += (3*personCounter)
-                    boardCard.recalculate()
+                    boardCard.rebuildFront()
                     print ("Lemonade Current Val:",boardCard.current_val)
 
                     boardCard.effectActivated = True
@@ -519,11 +521,13 @@ class Engine(object):
                     for card in boardField.cardList:
                         if Type.PERSON in card.type:
                             card.current_val += 2
-                            card.recalculate()
+                            card.rebuildFront()
                         elif Type.OBJECT in card.type:
                             card.current_val -= 3
-                            card.recalculate()
+                            card.rebuildFront()
 
+                    self.spellPlayed = True
+                    self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -532,7 +536,7 @@ class Engine(object):
                     print("Butler Effect")
                     if boardField.cardList.index(boardCard) != 0:
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
-                        boardField.cardList[boardField.cardList.index(boardCard) - 1].recalculate()
+                        boardField.cardList[boardField.cardList.index(boardCard) - 1].rebuildFront()
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -540,6 +544,14 @@ class Engine(object):
 
                 if boardCard.id is "arsonist":    #WORKING POGCHAMP
                     print("Arsonist Effect")
+                    for x in self.boardFieldList:
+                        print("=====SELF BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print(y.id, " ")
+                    for x in self.boardFieldListOpp:
+                        print("=====ENEMY BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print(y.id, " ")
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
@@ -554,6 +566,14 @@ class Engine(object):
 
                 if boardCard.id is "saboteur":
                     print("Saboteur Effect")
+                    for x in self.boardFieldList:
+                        print("=====SELF BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print(y.id, " ")
+                    for x in self.boardFieldListOpp:
+                        print("=====ENEMY BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print(y.id, " ")
                     sent = False
                     targetList = list()
                     for bF in self.boardFieldListOpp:
@@ -568,6 +588,8 @@ class Engine(object):
                         if not sent:
                             self.sendToGraveyard(targetList[0])
 
+                    self.spellPlayed = True
+                    self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -578,7 +600,7 @@ class Engine(object):
                         for a in bF.cardList:
                             if a.id is "mansion":
                                 a.current_val += 3
-                                a.recalculate()
+                                a.rebuildFront()
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -586,6 +608,14 @@ class Engine(object):
 
                 if boardCard.id is "policeofficer":
                     print("Police Officer Effect")
+                    for x in self.boardFieldList:
+                        print("=====SELF BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print (y.id, " ")
+                    for x in self.boardFieldListOpp:
+                        print("=====ENEMY BOARDFIELD CARDS=====")
+                        for y in x.cardList:
+                            print (y.id, " ")
                     sent = False
                     targetList = list()
                     for bF in self.boardFieldListOpp:
@@ -593,11 +623,10 @@ class Engine(object):
                             if Type.BLACK in a.type and Type.PERSON in a.type:
                                 targetList.append(a)
 
-
                     if len(targetList) != 0:
                         for target in targetList:
                             r = random.randrange(0, 2)
-                            if r == 1:
+                            if r == 1 and not sent:
                                 self.sendToGraveyard(target)
                                 sent = True
                         if not sent:
@@ -616,7 +645,7 @@ class Engine(object):
                         for a in bF.cardList:
                             if Type.VEHICLE in a.type:
                                 a.current_val -= 2
-                                a.recalculate()
+                                a.rebuildFront()
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -633,7 +662,7 @@ class Engine(object):
                         if Type.VEHICLE in a.type:
                             count += 1
                     boardCard.current_val += (2*count)
-                    boardCard.recalculate()
+                    boardCard.rebuildFront()
                     print("New Junkyard Value: ", boardCard.current_val)
 
                     boardCard.effectActivated = True
@@ -657,6 +686,8 @@ class Engine(object):
                         c.resting = False
                         c.set_destination(*c.defaultPos)
 
+                    self.spellPlayed = True
+                    self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -678,6 +709,8 @@ class Engine(object):
                         c.resting = False
                         c.set_destination(*c.defaultPos)
 
+                    self.spellPlayed = True
+                    self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -816,9 +849,9 @@ class Engine(object):
                                 bF.take_card(self.clickedCard[0])
                                 self.clickedCard[0].onBoard = True
                                 self.play_card(self.clickedCard[0], self.boardFieldList)
-                                if Type.SPELL in self.clickedCard[0].type:
-                                    self.spellPlayed = True
-                                    self.playedSpell = self.clickedCard[0]
+                                # if Type.SPELL in self.clickedCard[0].type:
+                                #     self.spellPlayed = True
+                                #     self.playedSpell = self.clickedCard[0]
 
                         # TODO erase these boardfield card play below, they are obsolete.
                         # if self.player == self.first_player:
@@ -1024,6 +1057,7 @@ class Engine(object):
                     self.waitTick = currentTime                 # delete this comments when done
                     self.sendToGraveyard(self.playedSpell)
                     self.spellPlayed = False
+                    self.playedSpell = None
             if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
                     self.hero_turn_obj.update(deltaTime)
@@ -1098,6 +1132,14 @@ class Engine(object):
             for bF in self.boardFieldListOpp:
                 bF.swap()
                 bF.rearrange()
+            for gCard in self.graveYardList:
+                gCard.defaultPos = gCard.defaultPos[0], self.graveYardOppY
+                gCard.resting = False
+                gCard.set_destination(gCard.defaultPos[0], gCard.defaultPos[1])
+            for gCard in self.graveYardListOpp:
+                gCard.defaultPos = gCard.defaultPos[0], self.graveYardY
+                gCard.resting = False
+                gCard.set_destination(gCard.defaultPos[0], gCard.defaultPos[1])
             # fade value changes fading in
             # FLIPPING BOARD #
             # print()
@@ -1108,18 +1150,21 @@ class Engine(object):
             tempBackRow = self.boardField2
             tempFrontRow = self.boardField
             tempBoardFieldList = self.boardFieldList
+            tempGraveyardList = self.graveYardList
 
             self.hand = self.opponent_hand
             self.deck = self.opponent_deck
             self.boardField = self.boardFieldOpp
             self.boardField2 = self.boardFieldOpp2
             self.boardFieldList = [self.boardField, self.boardField2]
+            self.graveYardList = self.graveYardListOpp
             # setting opponent
             self.opponent_hand = tempHand
             self.opponent_deck = tempDeck
             self.boardFieldOpp = tempFrontRow
             self.boardFieldOpp2 = tempBackRow
-            self.boardFieldListOpp = tempBoardFieldList
+            self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
+            self.graveYardListOpp = tempGraveyardList
 
 
             '''
@@ -1151,10 +1196,7 @@ class Engine(object):
             self.empty_field_to_grave(self.boardField2, self.graveYardList)
             self.empty_field_to_grave(self.boardFieldOpp, self.graveYardListOpp)
             self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardListOpp)
-            while len(self.cashNegatives) > 0:
-                self.cashNegatives.pop(0)
-            self.player.cash = 0
-            self.player2.cash = 0
+
             # for boardCard in self.boardField.cardList:
             #     # self.sendToGraveyard(boardCard)
             #     print("Trashing some dogs1")
@@ -1214,12 +1256,16 @@ class Engine(object):
 
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
+                while len(self.cashNegatives) > 0:
+                    self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                 self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
+                while len(self.cashNegatives) > 0:
+                    self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.phase = Phase.ROUND_DRAW
@@ -1263,7 +1309,8 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
-
+                while len(self.cashNegatives) > 0:
+                    self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
 

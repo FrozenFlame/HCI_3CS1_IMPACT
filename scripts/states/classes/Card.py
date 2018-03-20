@@ -44,7 +44,7 @@ class Card(object):
                           "Victoria": 'big_noodle_titling_oblique.ttf',
                           "Generic": 'OLDENGL.TTF'}
 
-        self.fontSizeDictionary = {"King": 18,
+        self.fontSizeDictionary = {"King": 17,
                                "Billy": 18,
                                "Victoria": 20,
                                "Generic": 20}
@@ -52,19 +52,19 @@ class Card(object):
         self.fontSizeChoice = self.fontSizeDictionary[self.owner]
 
         self.card_art = pygame.image.load(card_art_path).convert_alpha()
-        self.name_surf = FontObj.surface_factory(str(self.name), self.fontChoice, 34, (0, 0, 0))
+        self.name_surf = FontObj.surface_factory(str(self.name), self.fontChoice, 30, (0, 0, 0))
         self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, (0, 0, 0))
         self.typeText_surf = FontObj.surface_factory(self.typeText,self.fontChoice, self.fontSizeChoice, (0, 0, 0))
         # self.baseval_surf = FontObj.surface_factory(str(self.base_val), fontChoice, 25, (0, 0, 0))
 
-        self.frontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
-        self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
-        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.80,self.frontImg.get_rect().size[1] *0.48))
-        self.frontImg.blit(self.typeText_surf, (self.frontImg.get_rect().size[0] *0.05,self.frontImg.get_rect().size[1] *0.50))
-        self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
+        self.frontImg = pygame.image.load("assets\\cards\\cardDemoWithFrame.png").convert_alpha()
+        self.frontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.08, self.frontImg.get_rect().size[1] *0.82))
+        self.frontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] *0.745,self.frontImg.get_rect().size[1] *0.535))
+        self.frontImg.blit(self.typeText_surf, (self.frontImg.get_rect().size[0] *0.08,self.frontImg.get_rect().size[1] *0.55))
+        self.frontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.04))
 
         # self.frontImg.blit(self.effect_surf, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60))
-        self.blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, self.fontSizeChoice))
+        self.blit_text(self.frontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.08, self.frontImg.get_rect().size[1] * 0.645), pygame.font.Font('assets/fonts/' + self.fontChoice, self.fontSizeChoice))
 
         self.backImg = pygame.image.load("assets\\cards\\democardBack.png").convert_alpha()  # Card backs for opposing cards and for cards in deck.
         self.img = pygame.transform.smoothscale(self.backImg, (round(self.frontImg.get_rect().size[0] *0.33), round(self.frontImg.get_rect().size[1] *0.33))) # self.img is the CURRENT image to be drawn on the screen
@@ -306,6 +306,7 @@ class Card(object):
         words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
         space = font.size(' ')[0]  # The width of a space.
         max_width, max_height = surface.get_size()
+        max_width -= 6
         x, y = pos
         for line in words:
             for word in line:
@@ -345,20 +346,21 @@ class Card(object):
         self.debuffs.append(debuff)
 
     def recalculate(self):
+        pass
+
+    def rebuildFront(self):
         color = (0, 0, 0) #black
         if self.current_val > self.base_val:
             color = (0, 128, 0) #green
         elif self.current_val < self.base_val:
             color = (255, 0, 0) #red
-        newFrontImg = pygame.image.load("assets\\cards\\democard.png").convert_alpha()
-        newFrontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.05, self.frontImg.get_rect().size[1] *0.82))
+        newFrontImg = pygame.image.load("assets\\cards\\cardDemoWithFrame.png").convert_alpha()
+        newFrontImg.blit(self.name_surf, (self.frontImg.get_rect().size[0] *0.08, self.frontImg.get_rect().size[1] *0.82))
         self.currval_surf = FontObj.surface_factory(str(self.current_val), self.fontChoice, 40, color)
-        newFrontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] * 0.80, self.frontImg.get_rect().size[1] * 0.48))
-        newFrontImg.blit(self.typeText_surf, (self.frontImg.get_rect().size[0] *0.05,self.frontImg.get_rect().size[1] *0.50))
-        newFrontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.026+2))
-        self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.60), pygame.font.Font('assets/fonts/' + self.fontChoice, self.fontSizeChoice))
-
-
+        newFrontImg.blit(self.currval_surf, (self.frontImg.get_rect().size[0] * 0.75, self.frontImg.get_rect().size[1] * 0.535))
+        newFrontImg.blit(self.typeText_surf, (self.frontImg.get_rect().size[0] *0.08,self.frontImg.get_rect().size[1] *0.55))
+        newFrontImg.blit(self.card_art, (self.frontImg.get_rect().size[0] * 0.085, self.frontImg.get_rect().size[1] * 0.04))
+        self.blit_text(newFrontImg, self.effect, (self.frontImg.get_rect().size[0] * 0.05, self.frontImg.get_rect().size[1] * 0.575), pygame.font.Font('assets/fonts/' + self.fontChoice, self.fontSizeChoice))
 
         self.frontImg = newFrontImg
     def apply_buff(self, target):
