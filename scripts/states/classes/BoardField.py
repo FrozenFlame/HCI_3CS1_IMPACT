@@ -71,8 +71,8 @@ class BoardField(object):
             c.resting = False
             c.defaultPos = self.boardx, self.boardy
             c.set_destination(*c.defaultPos)
-            if Type.SPELL not in c.type:
-                self.boardx += 80
+            # if Type.SPELL not in c.type:
+            self.boardx += 80
 
     def count_cardType(self, type):
         counter = 0

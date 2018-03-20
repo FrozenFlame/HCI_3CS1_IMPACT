@@ -206,8 +206,8 @@ class Engine(object):
 
         self.flyOutEffect.set_volume(0.20)
 
-        self.spellPlayed = False
-        self.playedSpell = None
+        # self.spellPlayed = False
+        # self.playedSpell = None
 
         self.cashNegatives = list()
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -500,8 +500,8 @@ class Engine(object):
                     self.cashNegatives.append(15)
                     print("Self hand after Loan:", len(self.hand))
 
-                    self.spellPlayed = True
-                    self.playedSpell = boardCard
+                    # self.spellPlayed = True
+                    # self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -526,8 +526,8 @@ class Engine(object):
                             card.current_val -= 3
                             card.rebuildFront()
 
-                    self.spellPlayed = True
-                    self.playedSpell = boardCard
+                    # self.spellPlayed = True
+                    # self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -547,11 +547,11 @@ class Engine(object):
                     for x in self.boardFieldList:
                         print("=====SELF BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print(y.id, " ")
+                            print(y.name)
                     for x in self.boardFieldListOpp:
                         print("=====ENEMY BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print(y.id, " ")
+                            print(y.name)
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
                         self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
@@ -569,11 +569,11 @@ class Engine(object):
                     for x in self.boardFieldList:
                         print("=====SELF BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print(y.id, " ")
+                            print(y.name)
                     for x in self.boardFieldListOpp:
                         print("=====ENEMY BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print(y.id, " ")
+                            print(y.name)
                     sent = False
                     targetList = list()
                     for bF in self.boardFieldListOpp:
@@ -588,8 +588,8 @@ class Engine(object):
                         if not sent:
                             self.sendToGraveyard(targetList[0])
 
-                    self.spellPlayed = True
-                    self.playedSpell = boardCard
+                    # self.spellPlayed = True
+                    # self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -611,26 +611,25 @@ class Engine(object):
                     for x in self.boardFieldList:
                         print("=====SELF BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print (y.id, " ")
+                            print (y.name)
                     for x in self.boardFieldListOpp:
                         print("=====ENEMY BOARDFIELD CARDS=====")
                         for y in x.cardList:
-                            print (y.id, " ")
+                            print (y.name)
                     sent = False
                     targetList = list()
                     for bF in self.boardFieldListOpp:
-                        for a in bF.cardList:
-                            if Type.BLACK in a.type and Type.PERSON in a.type:
-                                targetList.append(a)
+                        targetList.extend(bF.cardList)
 
                     if len(targetList) != 0:
+                        random.shuffle(targetList)
                         for target in targetList:
-                            r = random.randrange(0, 2)
-                            if r == 1 and not sent:
+                            if Type.PERSON in target.type and Type.BLACK in target.type:
                                 self.sendToGraveyard(target)
-                                sent = True
-                        if not sent:
-                            self.sendToGraveyard(targetList[0])
+                                break
+                            else:
+                                print(target.name, " ", target.type[0], " not sent to Graveyard")
+
                     for bF in self.boardFieldListOpp:
                         bF.rearrange()
                     boardCard.effectActivated = True
@@ -686,8 +685,8 @@ class Engine(object):
                         c.resting = False
                         c.set_destination(*c.defaultPos)
 
-                    self.spellPlayed = True
-                    self.playedSpell = boardCard
+                    # self.spellPlayed = True
+                    # self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -709,8 +708,8 @@ class Engine(object):
                         c.resting = False
                         c.set_destination(*c.defaultPos)
 
-                    self.spellPlayed = True
-                    self.playedSpell = boardCard
+                    # self.spellPlayed = True
+                    # self.playedSpell = boardCard
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -846,9 +845,14 @@ class Engine(object):
 
                         for bF in self.boardFieldList:
                             if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
-                                bF.take_card(self.clickedCard[0])
-                                self.clickedCard[0].onBoard = True
-                                self.play_card(self.clickedCard[0], self.boardFieldList)
+                                if bF is self.boardField and Type.SPELL not in self.clickedCard[0].type:
+                                    bF.take_card(self.clickedCard[0])
+                                    self.clickedCard[0].onBoard = True
+                                    self.play_card(self.clickedCard[0], self.boardFieldList)
+                                elif bF is self.boardField2:
+                                    bF.take_card(self.clickedCard[0])
+                                    self.clickedCard[0].onBoard = True
+                                    self.play_card(self.clickedCard[0], self.boardFieldList)
                                 # if Type.SPELL in self.clickedCard[0].type:
                                 #     self.spellPlayed = True
                                 #     self.playedSpell = self.clickedCard[0]
@@ -1052,12 +1056,12 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
-            if self.spellPlayed:
-                if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
-                    self.waitTick = currentTime                 # delete this comments when done
-                    self.sendToGraveyard(self.playedSpell)
-                    self.spellPlayed = False
-                    self.playedSpell = None
+            # if self.spellPlayed:
+            #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
+            #         self.waitTick = currentTime                 # delete this comments when done
+            #         self.sendToGraveyard(self.playedSpell)
+            #         self.spellPlayed = False
+            #         self.playedSpell = None
             if self.hero_cutscene:  # TODO Cutscene #33333333
                 if self.hero_cutscene_flyin:
                     self.hero_turn_obj.update(deltaTime)
@@ -1121,7 +1125,11 @@ class Engine(object):
 
 
         elif self.phase == Phase.SWAP:
-
+            #send spell cards to grave during swap
+            for card in self.boardField2.cardList:
+                if Type.SPELL in card.type:
+                    self.sendToGraveyard(card)
+                    self.boardField2.rearrange()
             for hC in self.hand:
                 hC.swap()
             for hC in self.opponent_hand:
@@ -1260,6 +1268,8 @@ class Engine(object):
                     self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
+                self.refresh_cash(self.player)
+                self.refresh_cash(self.player2)
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
@@ -1268,6 +1278,8 @@ class Engine(object):
                     self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
+                self.refresh_cash(self.player)
+                self.refresh_cash(self.player2)
                 self.phase = Phase.ROUND_DRAW
                 self.is_showing_decide = True
 
@@ -1313,7 +1325,8 @@ class Engine(object):
                     self.cashNegatives.pop(0)
                 self.player.cash = 0
                 self.player2.cash = 0
-
+                self.refresh_cash(self.player)
+                self.refresh_cash(self.player2)
             # play appropriate animations
             # check if it was the winning blow
                 #2 play animations if a player is found victorious

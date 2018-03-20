@@ -38,7 +38,7 @@ class DeckCatalogue(object):
         bodyDouble = Card("", "Body Double", 15, "", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
         junker = Card("", "Junker", 7, "", [Type.VEHICLE], hero_name)
         beg = Card("", "Beg", 0, "", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
-        scam = Card("", "Scam", 0, "", [Type.SPELL, Type.BLACK], hero_name)
+        scam = Card("", "Scam", 0, "", [Type.SPELL], hero_name)
 
         blackMarket2 = Card("", "Black Market", 15, "", [Type.STRUCTURE, Type.BLACK], hero_name)
         pickPocket2 = Card("", "Pick Pocket", 2, "", [Type.PERSON, Type.BLACK], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")
@@ -49,7 +49,7 @@ class DeckCatalogue(object):
         bodyDouble2 = Card("", "Body Double", 15, "", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
         junker2 = Card("", "Junker", 7, "", [Type.VEHICLE], hero_name)
         beg2 = Card("", "Beg", 0, "", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
-        scam2 = Card("", "Scam", 0, "", [Type.SPELL, Type.BLACK], hero_name)
+        scam2 = Card("", "Scam", 0, "", [Type.SPELL], hero_name)
 
         deck = [blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
                 blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
