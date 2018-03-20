@@ -147,7 +147,7 @@ class DeckCatalogue(object):
         impoundLot = Card("impoundlot", "Impound Lot", 5, "-2C to VEHICLE cards on enemy board", [Type.STRUCTURE], hero_name)
         junkyard = Card("junkyard", "Junkyard", 5, "+2C to SELF per VEHICLE card on both graveyards.", [Type.STRUCTURE], hero_name)
         loanSlip = Card("loanslip", "Loan Slip", 0, "-15C to Player Bank; Draw 2 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\commons\\loan slip.png")
-        creditCard = Card("creditcard", "Credit Card", 0, "+2C to PERSON cards and -3C to OBJECT cards on this boardfield", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\credit card.png")
+        creditCard = Card("creditcard", "Credit Card", 0, "+2C to PERSON cards and -3C to OBJECT cards on your board", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\credit card.png")
         resurrect = Card("resurrect", "Resurrect", 0, "Restore 1 PERSON card from your graveyard.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\resurrect.png")
         rebuild = Card("rebuild", "Rebuild", 0, "Restore 1 STRUCTURE or VEHICLE from your grave.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\rebuild.png")
         saboteur = Card("saboteur", "Saboteur", 0, "Destroy 1 random opponent card", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\saboteur.png")

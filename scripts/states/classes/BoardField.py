@@ -81,10 +81,10 @@ class BoardField(object):
                 counter += 1
         return counter
 
-    def find_card(self, cardname):
+    def find_card(self, cardid):
         foundList = list()
         for card in self.cardList:
-            if cardname is card.name:
+            if cardid is card.id:
                 foundList.append(card)
         return foundList
 

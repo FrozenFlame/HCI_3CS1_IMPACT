@@ -210,6 +210,7 @@ class Engine(object):
         # self.playedSpell = None
 
         self.cashNegatives = list()
+        self.activeLoanSlip = False
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                       ______                _   _
 # |  __ \                      |  ___|              | | (_)
@@ -416,7 +417,60 @@ class Engine(object):
         card.resting = False
         card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
 
+        def loanSlipDraw(self):
+            num_of_cards = 2
+            if not self.done_drawing:
+                # please burn cards in future patch (w/ animations muhaha)
+                self.draw_cards(num_of_cards, self.deck, self.hand)
+                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+                print("Player Hand Size: ", len(self.hand))
+                if len(self.hand) > 10:
+                    print("Player {0} hand overload!".format(self.player.user.username))
+                print("Player opponent hand Size: ", len(self.opponent_hand))
+                if len(self.opponent_hand) > 10:
+                    print("Player {0} hand overload!".format(self.player2.user.username))
+                self.flip_hand_down(self.hand)
+                self.flip_hand_down(self.opponent_hand)
+                self.done_drawing = True
+            currentTick = currentTime
+            if currentTick - self.waitTick >= self.drawCardWait:
 
+                if self.openingIndex < num_of_cards:
+                    self.waitTick = currentTick
+                    self.drawCardSound.play()
+                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                        h2.update(deltaTime, newX, self.openingY)
+                        newX += 80
+                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
+                    for h2 in self.opponent_hand:
+                        h2.resting = False
+                        h2.set_destination(h.posX, h.posY)
+                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
+                        h2.update(deltaTime, newXOpp, self.openingYOpp)
+                        newXOpp += 80
+
+                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
+                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
+                    self.hand[handex].resting = False
+                    self.hand[handex].set_destination(1180, 563)
+
+                    self.opponent_hand[handexopp].resting = False
+                    self.opponent_hand[handexopp].set_destination(1180, 100)
+                    self.opponent_hand[handexopp].posY = 100
+
+                    self.allCardsList.append(self.hand[handex])
+                    self.allCardsList.append(self.opponent_hand[handexopp])
+
+                    self.openingIndex += 1
+                else:
+                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
+                    self.opening = False
+                    self.done_drawing = False
+                    self.openingIndex = 0
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _                 _
@@ -495,8 +549,7 @@ class Engine(object):
                 if boardCard.id is "loanslip":   #cmon bruddah just draw the freakin cards
                     print("Self hand before Loan:", len(self.hand))
                     self.done_drawing = False
-                    self.draw_cards(2, self.deck, self.hand)
-                    self.done_drawing = True
+                    self.activeLoanSlip = True
                     self.cashNegatives.append(15)
                     print("Self hand after Loan:", len(self.hand))
 
@@ -518,13 +571,21 @@ class Engine(object):
 
                 if boardCard.id is "creditcard":
                     print("Credit Card Effect")
-                    for card in boardField.cardList:
-                        if Type.PERSON in card.type:
-                            card.current_val += 2
-                            card.rebuildFront()
-                        elif Type.OBJECT in card.type:
-                            card.current_val -= 3
-                            card.rebuildFront()
+                    # for card in boardField.cardList:
+                    #     if Type.PERSON in card.type:
+                    #         card.current_val += 2
+                    #         card.rebuildFront()
+                    #     elif Type.OBJECT in card.type:
+                    #         card.current_val -= 3
+                    #         card.rebuildFront()
+                    for bf in self.boardFieldList:
+                        for card in bf.cardList:
+                            if Type.PERSON in card.type:
+                                card.current_val += 2
+                                card.rebuildFront()
+                            elif Type.OBJECT in card.type:
+                                card.current_val -= 3
+                                card.rebuildFront()
 
                     # self.spellPlayed = True
                     # self.playedSpell = boardCard
@@ -554,9 +615,11 @@ class Engine(object):
                             print(y.name)
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
+                        print(self.boardFieldOpp.cardList[arsonIndex].name, " sent to graveyard")
+                        self.send_to_grave_fromboard(self.boardFieldOpp.cardList[arsonIndex], self.boardFieldOpp)
                     if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
+                        print(self.boardFieldOpp2.cardList[arsonIndex].name, " sent to graveyard")
+                        self.send_to_grave_fromboard(self.boardFieldOpp2.cardList[arsonIndex], self.boardFieldOpp2)
 
                     # for bF in self.boardFieldListOpp:
                     #     bF.rearrange()
@@ -575,18 +638,17 @@ class Engine(object):
                         for y in x.cardList:
                             print(y.name)
                     sent = False
-                    targetList = list()
                     for bF in self.boardFieldListOpp:
-                        targetList.extend(bF.cardList)
-
-                    if len(targetList) != 0:
-                        for target in targetList:
+                        for target in bF.cardList:
                             r = random.randrange(0, 2)
-                            if r == 1:
-                                self.sendToGraveyard(target)
+                            if r == 1 and not sent and Type.SPELL not in target.type:
+                                self.send_to_grave_fromboard(target, bF)
+                                print(target.name, " sent to graveyard")
                                 sent = True
-                        if not sent:
-                            self.sendToGraveyard(targetList[0])
+                                bF.rearrange()
+                    if not sent:
+                        self.send_to_grave_fromboard(self.boardFieldListOpp[0].cardList[0], self.boardFieldListOpp[0])
+                        self.boardFieldListOpp[0].rearrange()
 
                     # self.spellPlayed = True
                     # self.playedSpell = boardCard
@@ -617,21 +679,19 @@ class Engine(object):
                         for y in x.cardList:
                             print (y.name)
                     sent = False
-                    targetList = list()
                     for bF in self.boardFieldListOpp:
-                        targetList.extend(bF.cardList)
-
-                    if len(targetList) != 0:
-                        random.shuffle(targetList)
-                        for target in targetList:
+                        for target in bF.cardList:
                             if Type.PERSON in target.type and Type.BLACK in target.type:
-                                self.sendToGraveyard(target)
-                                break
-                            else:
-                                print(target.name, " ", target.type[0], " not sent to Graveyard")
+                                r = random.randrange(0, 2)
+                                if r == 1 and not sent:
+                                    self.send_to_grave_fromboard(target, bF)
+                                    print(target.name, " sent to graveyard")
+                                    sent = True
+                                    bF.rearrange()
+                    if not sent:
+                        self.send_to_grave_fromboard(self.boardFieldListOpp[0].cardList[0], self.boardFieldListOpp[0])
+                        self.boardFieldListOpp[0].rearrange()
 
-                    for bF in self.boardFieldListOpp:
-                        bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
                     self.refresh_cash(self.player2)
@@ -678,7 +738,6 @@ class Engine(object):
                         r = random.randrange(0, len(personInGraveList))
                         c = personInGraveList[r]
                         self.boardField.take_card(c)
-                        # self.recalculate_score(self.boardFieldList)
                         self.graveYardList.pop(self.graveYardList.index(c))
                         c.flip()
                         c.disabled = False
@@ -719,19 +778,20 @@ class Engine(object):
                 for a in bf.cardList:
                     a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
                     a.draw(self.screen)
-                    print(a.name, "redrawn")
                 bf.rearrange()
-                print(bf, " cardlist size: ", len(bf.cardList))
-                print(bf, "rearranged")
+
 
             for bf in self.boardFieldListOpp:
                 for a in bf.cardList:
                     a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
                     a.draw(self.screen)
-                    print(a.name, "redrawn")
                 bf.rearrange()
-                print(bf, " cardlist size: ", len(bf.cardList))
-                print(bf, "rearranged")
+            print("====SELF GRAVEYARD====")
+            for c in self.graveYardList:
+                print(c.name)
+            print("====OPPONENT GRAVEYARD====")
+            for c in self.graveYardListOpp:
+                print(c.name)
             self.recalculate_score(self.player, self.boardFieldList)
             self.recalculate_score(self.player2, self.boardFieldListOpp)
 
@@ -1056,6 +1116,9 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
+            if self.activeLoanSlip:
+                self.loanSlipDraw()
+                self.activeLoanSlip = False
             # if self.spellPlayed:
             #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
             #         self.waitTick = currentTime                 # delete this comments when done
@@ -1125,11 +1188,6 @@ class Engine(object):
 
 
         elif self.phase == Phase.SWAP:
-            #send spell cards to grave during swap
-            for card in self.boardField2.cardList:
-                if Type.SPELL in card.type:
-                    self.sendToGraveyard(card)
-                    self.boardField2.rearrange()
             for hC in self.hand:
                 hC.swap()
             for hC in self.opponent_hand:
@@ -1160,12 +1218,25 @@ class Engine(object):
             tempBoardFieldList = self.boardFieldList
             tempGraveyardList = self.graveYardList
 
+            del self.hand
+            del self.deck
+            del self.boardField2
+            del self.boardField
+            del self.boardFieldList
+            del self.graveYardList
+
             self.hand = self.opponent_hand
             self.deck = self.opponent_deck
             self.boardField = self.boardFieldOpp
             self.boardField2 = self.boardFieldOpp2
             self.boardFieldList = [self.boardField, self.boardField2]
             self.graveYardList = self.graveYardListOpp
+
+            del self.opponent_hand
+            del self.opponent_deck
+            del self.boardFieldOpp
+            del self.boardFieldOpp2
+            del self.graveYardListOpp
             # setting opponent
             self.opponent_hand = tempHand
             self.opponent_deck = tempDeck
@@ -1174,7 +1245,17 @@ class Engine(object):
             self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
             self.graveYardListOpp = tempGraveyardList
 
+            del tempHand
+            del tempDeck
+            del tempFrontRow
+            del tempBackRow
+            del tempGraveyardList
 
+            #send spell cards to grave during swap
+            for card in self.boardField2.cardList:
+                if Type.SPELL in card.type:
+                    self.sendToGraveyard(card)
+                    self.boardField2.rearrange()
             '''
             a = b
             b = c
