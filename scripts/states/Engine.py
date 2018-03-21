@@ -1067,7 +1067,7 @@ class Engine(object):
                 if boardCard.id is "scam": #scam and bodydouble use two different ways for checking if there is an available target
                     print(boardCard.name, " effect activated")
                     scammable = False
-                    for bf in self.boardFieldList
+                    for bf in self.boardFieldList:
                         for c in bf.cardList:
                             if Type.CRIME not in c.type and Type.PERSON in c.type:
                                 scammable = True
@@ -1097,7 +1097,7 @@ class Engine(object):
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
-                    
+
         ############################################## end of effects #################################################
         if effectActivated:
             for bf in self.boardFieldList:
