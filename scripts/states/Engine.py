@@ -140,7 +140,7 @@ class Engine(object):
         self.drawCardWait = 100
         self.openingIndex = 0
         self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
-        self.openingY = 610
+        self.openingY = 615
         self.openingXOpp = 220  # hand coordinate is from 220 to 1020 (OPP)
         self.openingYOpp = -30
 
@@ -449,7 +449,7 @@ class Engine(object):
         for h2 in self.hand:
             h2.resting = False
             h2.set_destination(*h2.defaultPos)
-            h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+            h2.defaultPos = (newX, self.openingY)  # 615 = LATEST(22/mar/18)self.openingY (old was 600)
             h2.update(deltaTime, newX, self.openingY)
             newX += 80
             if self.hand.index(h2) >= oldhandlength:
@@ -504,9 +504,9 @@ class Engine(object):
         for bF in bFList:
             for c in bF.cardList:
                 player.cash += c.current_val
-        for utang in self.player.cashNegatives:
+        for utang in player.cashNegatives:
             player.cash -= utang
-        for bonus in self.player.cashPositives:
+        for bonus in player.cashPositives:
             player.cash += bonus
         print("[Engine] After recalculation cash: ", self.player.cash)
         # TODO lazy, no algorithm. Make a better algorithm in the future
@@ -556,6 +556,7 @@ class Engine(object):
                 if boardCard.id is "creditcard":
                     print("Credit Card Effect")
                     self.cards_played -= 2
+                    self.player.cashNegatives.append(6)
 
                     # self.spellPlayed = True
                     # self.playedSpell = boardCard
@@ -746,10 +747,9 @@ class Engine(object):
                 if boardCard.id is "slaughterhouse":
                     print(boardCard.name, " effect activated")
                     boardAnimals = 0
-                    for bf in self.boardFieldList:
-                        for c in bf.cardList:
-                            if Type.ANIMAL in c.type:
-                                boardAnimals += 1
+                    for c in boardField:
+                        if Type.ANIMAL in c.type:
+                            boardAnimals += 1
                     boardCard.current_val += (3*boardAnimals)
 
                     boardCard.effectActivated = True
@@ -759,11 +759,9 @@ class Engine(object):
                 if boardCard.id is "cropduster":
                     print(boardCard.name, " effect activated")
                     boardFarms = 0
-                    for bf in self.boardFieldList:
-                        for c in bf.cardList:
-                            if c.id is 'farm':
-                                boardFarms += 1
-                    boardCard.current_val += (7*boardFarms)
+                    for c in boardField:
+                        if c.id is 'farm':
+                            c.current_val += 7
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -822,7 +820,7 @@ class Engine(object):
                     print(boardCard.name, " effect activated")
                     for c in boardField.cardList:
                         if Type.ANIMAL in c.type or Type.PERSON in c.type:
-                            c.current_val += 1
+                            c.current_val += 2
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -881,6 +879,9 @@ class Engine(object):
 
                 if boardCard.id is "university":
                     print(boardCard.name, " effect activated")
+                    for c in boardField:
+                        if c.id is 'student':
+                            c.current_val *= 2
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue

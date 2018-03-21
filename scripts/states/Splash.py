@@ -15,8 +15,9 @@ class Splash(object):
         self.fadeScreen.fill((0, 0, 0))  # black
         self.faded = True
         self.logotime = False
-        self.timeout = 6500
+        self.timeout = 12500
         self.alpha_step = 2
+        self.pause = False
 
     def fadeOut(self):
         alpha = 255
@@ -40,7 +41,7 @@ class Splash(object):
             pygame.display.update()
             pygame.time.delay(1)
             alpha += self.alpha_step
-        # self.faded = True
+        self.faded = True
         self.pause = True
 
     def get_evt(self, event):
@@ -51,9 +52,9 @@ class Splash(object):
             self.finished = True
 
     def update(self, screen, keys, currentTime, deltaTime):
-        if self.faded:
+        if self.faded and not self.pause:
             self.fadeOut()
-        elif self.logotime:
+        elif self.logotime and not self.pause:
             currentTick = currentTime
             if currentTick >= self.timeout:
                 self.logotime = False
@@ -61,7 +62,7 @@ class Splash(object):
             self.fadeIn()
 
         currentTick = currentTime
-        if currentTick >= self.timeout+1500:
+        if currentTick >= self.timeout+2000:
             self.finished = True
 
 

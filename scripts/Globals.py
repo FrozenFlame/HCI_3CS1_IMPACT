@@ -1,7 +1,8 @@
 class Globals:
     print("[Globals.py]Globals loaded")
     fps = 60.0
-    state = "MAIN_MENU"
+
+    state = "SPLASH"
 
     RESOLUTION_X = 1280
     RESOLUTION_Y = 720
@@ -14,5 +15,5 @@ class Globals:
 
     music_volume = 0.12
 
-    user1name = "Vex"
-    user2name = "Slasher399"
+    user1name = "Player 1"
+    user2name = "Player 2"
