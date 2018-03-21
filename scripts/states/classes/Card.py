@@ -368,7 +368,7 @@ class Card(object):
 
 class Type(Enum):
     SPELL = auto()
-    BLACK = auto()
+    CRIME = auto()
     STRUCTURE = auto()
     PERSON = auto()
     OBJECT = auto()
