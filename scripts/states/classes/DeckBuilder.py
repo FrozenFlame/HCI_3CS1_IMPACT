@@ -67,8 +67,8 @@ class DeckCatalogue(object):
         beg2 = Card("beg", "Beg", 0, "Take and Give 1C to the lowest value PERSON card on your board for every PERSON card on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
         scam2 = Card("scam", "Scam", 0, "Take and Give to PLAYER BANK all C from one random non-CRIME PERSON card on both boards", [Type.SPELL], hero_name)
 
-        deck = [blackMarket, pickPocket, strangeGravedigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
-                blackMarket2, pickPocket2, strangeGravedigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
+        deck = [blackMarket, pickPocket, graveDigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
+                blackMarket2, pickPocket2, graveDigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
         deck.extend(DeckCatalogue.get_deck_common(hero_name))
         return deck
     get_deck_king = staticmethod(get_deck_king)
