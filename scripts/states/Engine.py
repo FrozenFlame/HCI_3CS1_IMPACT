@@ -1444,12 +1444,12 @@ class Engine(object):
                 self.apply_effects(self.boardField)
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
-            if self.activatLoanSlip:
+            if self.activateLoanSlip:
                 self.cardEffectDraw(2)
                 self.activateLoanSlip = False
             if self.activateInnovate:
                 self.cardEffectDraw(1)
-                self.activateInnovate
+                self.activateInnovate = False
             # if self.spellPlayed:
             #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
             #         self.waitTick = currentTime                 # delete this comments when done
