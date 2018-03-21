@@ -25,7 +25,7 @@ class Card(object):
         self.owner = heroOwner      #owner of the card
 
         self.typeDictionary = {Type.SPELL: "SPELL",
-                                Type.BLACK: "BLACK",
+                                Type.CRIME: "CRIME",
                                 Type.STRUCTURE: "STRUCTURE",
                                 Type.PERSON: "PERSON",
                                 Type.OBJECT: "OBJECT",
