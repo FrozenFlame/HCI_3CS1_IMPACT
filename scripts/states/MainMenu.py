@@ -514,7 +514,6 @@ class MainMenu(object):
         self.usera = User(p, 99, 0)
         if self.player_hero == "Billy":
             self.heroa = Hero(self.player_hero, self.billy_img)
-            self.heroa = Hero(self.player_hero, self.billy_img)
         elif self.player_hero == "King":
             self.heroa = Hero(self.player_hero, self.king_img)
         else:

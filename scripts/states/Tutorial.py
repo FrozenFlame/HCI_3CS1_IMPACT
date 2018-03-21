@@ -5,16 +5,23 @@ from .classes.Card import Card, Type
 from .classes.Board import Board
 from .classes.Movable import Movable
 from .classes.FontObj import FontObj
-from.classes.Buff_Factory import Kind, Operation, BuffFactory
+from .classes.Buff_Factory import Kind, Operation, BuffFactory
+
+from .classes.Player import Player
+from .classes.User import User
+from .classes.Hero import Hero
+from .classes.DeckBuilder import DeckBuilder
+
 from .. import tools
 
 from ..Globals import Globals
+
 '''
 This class is the actual game between two players
 '''
 print("[Engine.py]Engine Loaded")
 
-#THIS IS JUS A DUMMY OBJECT
+# THIS IS JUS A DUMMY OBJECT
 
 '''
 GAMEBOARD NOTES:
@@ -47,8 +54,10 @@ Rough code estimate would be like:
 <victory animation> - a player gets crowned victorious
 '''
 green = (0, 128, 0)
+
+
 # class which holds the game flow
-class Engine(object):
+class Tutorial(object):
     # def __init__(self): we're gonna create
     def __init__(self):
         tools.State.__init__(self)  # inheriting from State class.
@@ -77,7 +86,7 @@ class Engine(object):
         self.notif_pause = True
         self.may_see_first = False
         self.getting_in_place = True
-        self.hero_cutscene = True
+        self.hero_cutscene = False
         self.hero_cutscene_flyin = True
         self.hero_cutscene_flyout = True
         self.may_see_hero_cutscene = False
@@ -96,6 +105,7 @@ class Engine(object):
         self.declared_winner = False
         self.music_loaded = False
         self.is_showing_decide = False
+
         # self.opening = True
 
         # objects
@@ -106,10 +116,10 @@ class Engine(object):
         self.opponent_hand = None
 
         self.boardFieldOpp2 = None  # opponent back row
-        self.boardFieldOpp = None   # opponent front row
+        self.boardFieldOpp = None  # opponent front row
         self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
-        self.boardField = None      # player front row
-        self.boardField2 = None     # player back row
+        self.boardField = None  # player front row
+        self.boardField2 = None  # player back row
         # self.boardFieldList = [self.boardField, self.boardField2, self.boardFieldOpp, self.boardFieldOpp2]
         self.boardFieldList = [self.boardField, self.boardField2]
         # self.boardCardList = list()
@@ -133,19 +143,19 @@ class Engine(object):
                         self.waitTick = currentTick
                         [do stuff]
         '''
-        self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")     # may be confused with draw()
+        self.drawCardSound = pygame.mixer.Sound("assets\\cards\\draw_card.wav")  # may be confused with draw()
 
         self.opening = True
         # self.drawCardWait = 250
         self.drawCardWait = 100
         self.openingIndex = 0
-        self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
+        self.openingX = 220  # hand coordinate is from 220 to 1020 (PLAYER)
         self.openingY = 610
         self.openingXOpp = 220  # hand coordinate is from 220 to 1020 (OPP)
         self.openingYOpp = -30
 
-        self.deckImgHolder1 = Card()     # add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
-        self.deckImgHolder2 = Card()     # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
+        self.deckImgHolder1 = Card()  # add formula to determine how many deckImgHolders; ex. (no. of cards in deck) / 3 = (no. of deckImgHolders)
+        self.deckImgHolder2 = Card()  # or have preset of (x number of deckHolders) then hide the top deckHolder for every 5 cards removed from deck
         self.deckImgHolder3 = Card()
 
         self.deckImgHolderOpp1 = Card()
@@ -155,6 +165,7 @@ class Engine(object):
         '''
         UI things (initial state) we're gonna have to put some of these things in classes so that the game would be more scalable
         '''
+        self.screen_center = Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y *0.5
         self.showEndTurnButton = False
         self.showPassTurnButton = False
         self.showHandButton = False
@@ -180,20 +191,20 @@ class Engine(object):
         self.graveYardListOpp = list()
 
         # aim for the center of the slot # not center actually idk what's pygame doing with this part.
-        self.top_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y *0.36)
-        self.bottom_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y * 0.95)
-        self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
+        self.top_slot = (Globals.RESOLUTION_X * 0.12-2, Globals.RESOLUTION_Y * 0.292)
+        self.bottom_slot = (Globals.RESOLUTION_X * 0.12-2, Globals.RESOLUTION_Y * 0.855)
+        self.coin_slot = (Globals.RESOLUTION_X * 0.082, Globals.RESOLUTION_Y * 0.5)
 
         # cash points
-        self.botcash_coords = (self.bottom_slot[0] - 125, self.bottom_slot[1] - 80)
-        self.bot_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
-        self.topcash_coords = (self.top_slot[0] - 125, self.top_slot[1] - 80)
-        self.top_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
+        self.botcash_coords = (75, 672)
+        self.bot_cash_surf = FontObj.surface_factory("C0", "GARABD.ttf", 45, green)
+        self.topcash_coords = (75, -5)
+        self.top_cash_surf = FontObj.surface_factory("C0", "GARABD.ttf", 45, green)
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
         self.fadeScreen = pygame.Surface((1280, 720))
-        self.fadeScreen.fill((0,0,0)) #black
+        self.fadeScreen.fill((0, 0, 0))  # black
         self.faded = False
         self.flewOut = False
 
@@ -210,15 +221,77 @@ class Engine(object):
         self.playedSpell = None
 
         self.cashNegatives = list()
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  _____                       ______                _   _
-# |  __ \                      |  ___|              | | (_)
-# | |  \/ __ _ _ __ ___   ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
-# | | __ / _` | '_ ` _ \ / _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-# | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
-#  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-#
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        self.startup(pygame.time.get_ticks(),{})
+
+        #  _____       _             _       _   _   _     _
+        # /__   \_   _| |_ ___  _ __(_) __ _| | | |_| |__ (_)_ __   __ _ ___
+        #   / /\/ | | | __/ _ \| '__| |/ _` | | | __| '_ \| | '_ \ / _` / __|
+        #  / /  | |_| | || (_) | |  | | (_| | | | |_| | | | | | | | (_| \__ \
+        #  \/    \__,_|\__\___/|_|  |_|\__,_|_|  \__|_| |_|_|_| |_|\__, |___/
+        #                                                          |___/
+
+        # tutorial-specific booleans TODO
+        self.tut_wait = True
+        self.tut_may_proceed = False
+        self.may_see_okay_button = False
+        self.may_see_arrow = False
+        self.may_see_arrowr = False
+        self.tut_prep_jebait = True
+        self.tut_favordiag_bool = True
+        self.tut_welcome_bool = False  # TODO pseudocode for now
+        self.tut_passend_bool = True  # this is the pass/end coin
+        self.tut_passend2_bool = True  # Once you've played your cards, you must end your turn
+        self.tut_passend3_bool = True  # However if you pass your turn, your opponent may play
+        self.tut_passend4_bool = True  # We'll use that a little later.
+        self.tut_cards_bool = True  # click show button
+        self.tut_cards2_bool = True  # explain pt1
+        self.tut_cards3_bool = True  # explain pt2
+        self.tut_cards4_bool = True  # hover to see up close
+        self.tut_place_bool = True  # go ahead, try to place a card
+        self.tut_placeb_bool = True
+        self.tut_place2_bool = True  # notice your score has gone up
+        self.tut_place3_bool = True  # try to play another
+        self.tut_second_card_played = False
+        self.tut_place4_bool = True  # see that their values have added up...
+        self.tut_place5_bool = True  # and may have even triggered their card effects for bonus cash!
+        self.tut_place5b_bool = True  # your goal is to end the round with more cash than your opponent
+        self.tut_place6_bool = True  # try playing another card!
+        self.tut_place7_bool = True  # You couldn't place the card down.
+        self.tut_place8_bool = True  # this is because you can only play 1 card per turn
+        self.tut_place9_bool = True  # click the end turn coin at the left to end your turn
+        # Don't black out the screen
+        self.tut_black_bool = True  # Now, your opponent will start playing their cards
+        self.tut_black2_bool = True  # Once a round has been decided after a series of turns
+        self.tut_black3_bool = True  # A round winner may be decided, and the loser would lose hitpoints
+        self.tut_black3b_bool = True  # Players draw a few cards before starting the next turn
+        self.tut_black4_bool = True  # Each player has 2 lives each. The survivor shall be declared winner
+        self.tut_black5_bool = True  # How far will you push the greed in order to win
+
+        # tutorial screen coordinates
+        self.tut_hand_coord = (Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.8)
+        self.tut_okaybutton_coord = (Globals.RESOLUTION_X * 0.90, Globals.RESOLUTION_Y * 0.57)
+        self.tut_board_arrow_coords = (Globals.RESOLUTION_X*0.85, Globals.RESOLUTION_Y * 0.7)
+        self.tut_botscore_coord = Globals.RESOLUTION_X * 0.20, Globals.RESOLUTION_Y * 0.96
+        # tutorial-specific objects
+        self.tut_general_dialogue = FontObj.factory("Welcome to Avarice!", Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5, "big_noodle_titling.ttf",
+                                                    55, (255, 255, 255))
+        self.tut_general_dialogue.set_absolute((1800, Globals.RESOLUTION_Y * 0.5))
+        self.tut_okaybutton = Movable(pygame.image.load("assets\\buttons\\okay.png").convert_alpha(), 1200, 4, "distance", self.tut_okaybutton_coord)
+        self.tut_arrow = Movable(pygame.image.load("assets\\arrow.png").convert_alpha(), 1200, 4, "distance", (self.coin_slot[0] + 130, self.coin_slot[1]))
+        self.tut_arrowr = Movable(pygame.image.load("assets\\arrow2.png").convert_alpha(), 1200, 4, "distance", (self.screen_center[0]+25, self.coin_slot[1]))
+
+
+
+
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  _____                       ______                _   _
+    # |  __ \                      |  ___|              | | (_)
+    # | |  \/ __ _ _ __ ___   ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+    # | | __ / _` | '_ ` _ \ / _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+    # | |_\ \ (_| | | | | | |  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
+    #  \____/\__,_|_| |_| |_|\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+    #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     def fadeIn(self):
         alpha = 0
         while alpha <= 255:
@@ -244,6 +317,7 @@ class Engine(object):
     def flip_hand(self, hand):
         for h in hand:
             h.flip()
+
     def flip_hand_down(self, hand):
         for h in hand:
             if h.front:
@@ -251,23 +325,25 @@ class Engine(object):
 
     def get_first_cards(self, deck, username):
         print("Giving first cards of: ", username)
-        random.shuffle(deck)
+        # random.shuffle(deck)
         first_ten = []
         for i in range(0, 10):  # self minus due to simultaneous pop will offset this
-            first_ten.append(deck[i-i])
-            deck.pop(i-i)
+            first_ten.append(deck[i - i])
+            deck.pop(i - i)
         return first_ten
 
     def draw_cards(self, amt, from_deck, to_hand):
         # print("Drawing {0} cards to {1}'s hand from {2}'s deck".format(amt, ))
-        for i in range (0, amt):
+        for i in range(0, amt):
             to_hand.append(from_deck[0])
             from_deck.pop(0)
 
     def flip_coin(self):
         self.board.flipCoin()
+
     def toss_coin(self):
         self.board.tossCoin()
+
     def coin_side(self):
         return self.board.coin.side
 
@@ -286,8 +362,8 @@ class Engine(object):
 
             globs = self.bottom_slot
             globs2 = self.top_slot
-            self.bplayer2_font.set_absolute((globs[0] - 85, globs[1] -16))
-            self.bplayer_font.set_absolute((globs2[0] - 85, globs2[1] -22))
+            self.bplayer2_font.set_absolute((globs[0] - 85, globs[1] - 16))
+            self.bplayer_font.set_absolute((globs2[0] - 85, globs2[1] - 22))
 
             self.player1heads = False
 
@@ -297,12 +373,10 @@ class Engine(object):
 
             globs = self.bottom_slot
             globs2 = self.top_slot
-            self.bplayer_font.set_absolute((globs[0] - 85, globs[1] -16))
-            self.bplayer2_font.set_absolute((globs2[0] - 85, globs2[1] -22))
+            self.bplayer_font.set_absolute((globs[0] - 85, globs[1] - 16))
+            self.bplayer2_font.set_absolute((globs2[0] - 85, globs2[1] - 22))
 
             self.player1heads = True
-
-
 
     def empty_field_to_grave(self, boardField, graveYardList):
         # boardField.cardList.pop(boardField.cardList.index(card))
@@ -328,7 +402,6 @@ class Engine(object):
 
         boardField.cardList = []
         boardField.rearrange()
-
 
     def send_to_grave_fromboard(self, card, boardField):  # lite version? no cardstack difference though
         # print("Index to be tossed to grave: ",boardField.cardList.index(card))
@@ -398,7 +471,6 @@ class Engine(object):
             self.graveYardList.append(card)
             card.defaultPos = self.graveYardX, self.graveYardY
 
-
         for card in self.boardFieldOpp.cardList:
             self.boardFieldOpp.cardList.pop(self.boardFieldOpp.cardList.index(card))
             self.graveYardListOpp.append(card)
@@ -409,25 +481,22 @@ class Engine(object):
             self.graveYardListOpp.append(card)
             card.defaultPos = self.graveYardOppX, self.graveYardOppY
 
-
         card.flip()
         card.onBoard = False
         card.disabled = True
         card.resting = False
         card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
 
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  _____                        _                 _
-# |  __ \                      | |               (_)
-# | |  \/ __ _ _ __ ___   ___  | |     ___   __ _ _  ___
-# | | __ / _` | '_ ` _ \ / _ \ | |    / _ \ / _` | |/ __|
-# | |_\ \ (_| | | | | | |  __/ | |___| (_) | (_| | | (__
-#  \____/\__,_|_| |_| |_|\___| \_____/\___/ \__, |_|\___|
-#                                            __/ |
-#                                           |___/
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  _____                        _                 _
+    # |  __ \                      | |               (_)
+    # | |  \/ __ _ _ __ ___   ___  | |     ___   __ _ _  ___
+    # | | __ / _` | '_ ` _ \ / _ \ | |    / _ \ / _` | |/ __|
+    # | |_\ \ (_| | | | | | |  __/ | |___| (_) | (_| | | (__
+    #  \____/\__,_|_| |_| |_|\___| \_____/\___/ \__, |_|\___|
+    #                                            __/ |
+    #                                           |___/
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def cardMousedOver(self, xy) -> bool:
         self.clickedCard = [s for s in self.allCardsList if s.collidepoint(xy[0], xy[1])]  # not actually clicked, but moused over
@@ -452,6 +521,7 @@ class Engine(object):
         self.recalculate_score(self.player, boardfieldlist)
 
         if self.cards_played == 2 and not self.passed:
+            self.tut_second_card_played = True
             self.may_drag = False
 
     def end_turn(self):
@@ -471,10 +541,12 @@ class Engine(object):
         print("[Engine] After recalculation cash: ", self.player.cash)
         # TODO lazy, no algorithm. Make a better algorithm in the future
         self.refresh_cash(player)
+
     def refresh_cash(self, player):
-        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"cash currency.ttf",45,green)
-        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"cash currency.ttf",45,green)
-    def apply_effects(self, boardField): #f this sh
+        self.bot_cash_surf = FontObj.surface_factory("C" + str(self.player.cash), "GARABD.ttf", 45, green)
+        self.top_cash_surf = FontObj.surface_factory("C" + str(self.player2.cash), "GARABD.ttf", 45, green)
+
+    def apply_effects(self, boardField):  # f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         blackCounter = boardField.count_cardType(Type.BLACK)
         personCounter = boardField.count_cardType(Type.PERSON)
@@ -484,15 +556,15 @@ class Engine(object):
             if not boardCard.effectActivated:
                 if boardCard.id is "parkinglot":
                     print("Parking Lot Effect")
-                    boardCard.current_val += (3*vehicleCounter)
+                    boardCard.current_val += (3 * vehicleCounter)
                     boardCard.recalculate()
-                    print("Parking Lot Current Val: " , boardCard.current_val)
+                    print("Parking Lot Current Val: ", boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
-                if boardCard.id is "loanslip":   #cmon bruddah just draw the freakin cards
+                if boardCard.id is "loanslip":  # cmon bruddah just draw the freakin cards
                     print("Self hand before Loan:", len(self.hand))
                     self.done_drawing = False
                     self.draw_cards(2, self.deck, self.hand)
@@ -506,9 +578,9 @@ class Engine(object):
 
                 if boardCard.id is "lemonadestand":
                     print("Lemonade Stand Effect")
-                    boardCard.current_val += (3*personCounter)
+                    boardCard.current_val += (3 * personCounter)
                     boardCard.recalculate()
-                    print ("Lemonade Current Val:",boardCard.current_val)
+                    print("Lemonade Current Val:", boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -538,7 +610,7 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-                if boardCard.id is "arsonist":    #WORKING POGCHAMP
+                if boardCard.id is "arsonist":  # WORKING POGCHAMP
                     print("Arsonist Effect")
                     arsonIndex = boardField.cardList.index(boardCard)
                     if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
@@ -593,7 +665,6 @@ class Engine(object):
                             if Type.BLACK in a.type and Type.PERSON in a.type:
                                 targetList.append(a)
 
-
                     if len(targetList) != 0:
                         for target in targetList:
                             r = random.randrange(0, 2)
@@ -632,7 +703,7 @@ class Engine(object):
                     for a in self.graveYardListOpp:
                         if Type.VEHICLE in a.type:
                             count += 1
-                    boardCard.current_val += (2*count)
+                    boardCard.current_val += (2 * count)
                     boardCard.recalculate()
                     print("New Junkyard Value: ", boardCard.current_val)
 
@@ -685,7 +756,7 @@ class Engine(object):
         if effectActivated:
             for bf in self.boardFieldList:
                 for a in bf.cardList:
-                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] * 0.33), round(a.frontImg.get_rect().size[1] * 0.33)))
                     a.draw(self.screen)
                     print(a.name, "redrawn")
                 bf.rearrange()
@@ -694,7 +765,7 @@ class Engine(object):
 
             for bf in self.boardFieldListOpp:
                 for a in bf.cardList:
-                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] *0.33), round(a.frontImg.get_rect().size[1] *0.33)))
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] * 0.33), round(a.frontImg.get_rect().size[1] * 0.33)))
                     a.draw(self.screen)
                     print(a.name, "redrawn")
                 bf.rearrange()
@@ -703,16 +774,15 @@ class Engine(object):
             self.recalculate_score(self.player, self.boardFieldList)
             self.recalculate_score(self.player2, self.boardFieldListOpp)
 
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  _____ _        _        ______                _   _
-# /  ___| |      | |       |  ___|              | | (_)
-# \ `--.| |_ __ _| |_ ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
-#  `--. \ __/ _` | __/ _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-# /\__/ / || (_| | ||  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
-# \____/ \__\__,_|\__\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-#
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  _____ _        _        ______                _   _
+    # /  ___| |      | |       |  ___|              | | (_)
+    # \ `--.| |_ __ _| |_ ___  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+    #  `--. \ __/ _` | __/ _ \ |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+    # /\__/ / || (_| | ||  __/ | | | |_| | | | | (__| |_| | (_) | | | \__ \
+    # \____/ \__\__,_|\__\___| \_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+    #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     def get_evt(self, event):
         # for bf in self.boardFieldList:
@@ -741,9 +811,9 @@ class Engine(object):
 
         if event.type == pygame.QUIT:
             self.done = True
-        #if self.board.hasPreviewCard:
-         #   print("Previewing card.")
-        #card is being moused
+        # if self.board.hasPreviewCard:
+        #   print("Previewing card.")
+        # card is being moused
 
         # print("[Engine.py] - KEYDOWN: {0}".format(pygame.key.get_pressed()))
         if event.type == pygame.KEYDOWN:
@@ -754,15 +824,15 @@ class Engine(object):
             if event.key == pygame.K_d:
                 print("[Engine] self.allCardsList[0]: ", self.allCardsList[0])
                 self.allCardsList[0].resting = False
-                self.allCardsList[0].set_destination(100,100)
+                self.allCardsList[0].set_destination(100, 100)
             if event.key == pygame.K_a:
-                print("defaultpos0 ",self.allCardsList[0].defaultPos[0]," defaultpos1 ", self.allCardsList[0].defaultPos[1])
+                print("defaultpos0 ", self.allCardsList[0].defaultPos[0], " defaultpos1 ", self.allCardsList[0].defaultPos[1])
         #     pass
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
             if self.clickedCard[0].front:
                 self.board.hasPreviewCard = True
-                self.board.previewCard = self.clickedCard[0] # this actually must be the card that's being moused over.
+                self.board.previewCard = self.clickedCard[0]  # this actually must be the card that's being moused over.
         elif not self.cardMousedOver(pygame.mouse.get_pos()):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
@@ -772,9 +842,70 @@ class Engine(object):
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
          ) __/) __ (/    \\___ \ ) _) \___ \
         (__)  \_)(_/\_/\_/(____/(____)(____/
-        
+
         '''
+        '''
+                    > welcome to avarice!
+                    > These are your cards below, click the show button to reveal them!
+                    > Each card in Avarice may have value ...
+                    > and may have an effect once you play it on your fields
+                    > hover on a card to see it up close!
+                    > try to place a card
+                    > notice that your score may have changed.
+                    > Play another card! 
+        '''
+
+        # tutorial button
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            click = pygame.mouse.get_pressed()
+            if click[0] == 1:
+                if self.tut_okaybutton.rect.collidepoint(pygame.mouse.get_pos()) and self.may_see_okay_button:
+                    self.tut_may_proceed = True
+
+
         if self.phase == Phase.PLAY and not self.hero_cutscene:
+
+            # TUTORIAL THINGS
+            if self.tut_cards2_bool:  # explain pt1
+                pass
+            elif self.tut_cards3_bool:  # explain pt2
+                pass
+            elif self.tut_cards4_bool:  # hover to see up close
+                pass
+            elif self.tut_place_bool:  # go ahead, try to place a card
+                pass
+            elif self.tut_place2_bool:  # notice your score has gone up
+                pass
+            elif self.tut_place3_bool:  # try to play another
+                pass
+            elif self.tut_place4_bool:  # see that their values have added up...
+                pass
+            elif self.tut_place5_bool:  # and may have even triggered their card effects for bonus cash!
+                pass
+            elif self.tut_place5b_bool:  # your goal is to end the round with more cash than your opponent
+                pass
+            elif self.tut_place6_bool:  # try playing another card!
+                pass
+            elif self.tut_place7_bool:  # You couldn't place the card down.
+                pass
+            elif self.tut_place8_bool:  # this is because you can only play 1 card per turn
+                pass
+            elif self.tut_place9_bool:  # click the end turn coin at the left to end your turn
+                pass
+            # Don't black out the screen
+            elif self.tut_black_bool:  # Now, your opponent will start playing their cards
+                pass
+            elif self.tut_black2_bool:  # Once a round has been decided after a series of turns
+                pass
+            elif self.tut_black3_bool:  # A round winner may be decided, and the loser would lose hitpoints
+                pass
+            elif self.tut_black3b_bool: # Players draw a few cards before starting the next turn
+                pass
+            elif self.tut_black4_bool:  # Each player has 2 lives each. The survivor shall be declared winner
+                pass
+            elif self.tut_black5_bool:  # How far will you push the greed in order to win
+                pass
+
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
@@ -804,12 +935,11 @@ class Engine(object):
                             self.clickedCard[0].isHeld = False
                         # self.clickedCard[0].flip()
 
-                        #let go into a boardField
+                        # let go into a boardField
                         # if self.clickedCard[0].colliderect(self.boardField.xStart,self.boardField.yStart,self.boardField.xEnd,self.boardField.yEnd) and not self.clickedCard[0].onBoard:
                         #     self.boardCardList.append(self.clickedCard[0])
                         #     self.clickedCard[0].onBoard = True
                         #
-
 
                         for bF in self.boardFieldList:
                             if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
@@ -819,7 +949,8 @@ class Engine(object):
                                 if Type.SPELL in self.clickedCard[0].type:
                                     self.spellPlayed = True
                                     self.playedSpell = self.clickedCard[0]
-
+                    elif self.tut_prep_jebait:
+                        self.tut_may_proceed = True
                         # TODO erase these boardfield card play below, they are obsolete.
                         # if self.player == self.first_player:
                         #     for bF in self.boardFieldList:
@@ -847,7 +978,6 @@ class Engine(object):
                         #
                         # if self.clickedCard[0].destination == None:
                         #     self.clickedCard.pop()
-
 
             if event.type == pygame.MOUSEBUTTONDOWN and not self.opening and not self.hero_cutscene:
                 click = pygame.mouse.get_pressed()
@@ -893,16 +1023,20 @@ class Engine(object):
         elif self.phase == Phase.PREP:
             # accept click stroke onto "Show" Button
             # print("Player {0}, it's your turn.".format(self.player.user.username))
-            if self.showHandButton and (self.showHandImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.showHandImgX and (self.showHandImgY + self.endTurnImgDimensionY) > pygame.mouse.get_pos()[1] > self.showHandImgY:
+
+
+
+            if self.showHandButton and (self.showHandImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.showHandImgX and (self.showHandImgY + self.endTurnImgDimensionY) > \
+                    pygame.mouse.get_pos()[1] > self.showHandImgY and self.tut_may_proceed:
                 self.mouseOnShowHandButton = True
                 self.may_drag = True
-                pass
             elif self.showHandButton:
                 self.mouseOnShowHandButton = False
-                pass
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 0:
+
+
                     if self.mouseOnShowHandButton and self.showHandButton:
                         self.musicplayer.prep_song_hero(self.player.hero.name)
                         self.musicplayer.play()
@@ -925,7 +1059,7 @@ class Engine(object):
                             self.showEndTurnButton = True
                             self.board.coin.show_end()
 
-                        #cutscene prep:
+                        # cutscene prep:
                         self.waitTick = pygame.time.get_ticks()  # this is so that fly in doesn't end instantly
                         self.hero_cutscene = True
                         self.hero_cutscene_flyin = True
@@ -937,6 +1071,21 @@ class Engine(object):
                         self.font_turn_obj.distancespeed = 3.5
                         self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
+
+                        # tutorial things
+                        print("show button pressed")
+                        self.tut_may_proceed = False
+                        self.tut_cards_bool = False
+
+                        self.tut_general_dialogue.set_destination(-400, self.screen_center[1] + 70)
+                        self.may_see_okay_button = False
+                        self.may_see_arrow = False
+
+                        self.waitTick = pygame.time.get_ticks()
+                        self.tut_wait = True
+
+
+                        self.tut_may_proceed = False
 
             # clicking this will set phase to Play
 
@@ -965,10 +1114,8 @@ class Engine(object):
             if a.flipAnimating:  # card has been flipped, update through flipAnim function w/ waitTicks
                 a.flipAnim(self.waitTick)
 
-
         if self.board.coin.animating:
             self.board.coin.flipAnim()
-
 
         if self.is_showing_decide:
             self.font_decide_obj.update(deltaTime)
@@ -978,7 +1125,7 @@ class Engine(object):
         (  _ \/ )( \ / _\ / ___)(  __)/ ___)
          ) __/) __ (/    \\___ \ ) _) \___ \
         (__)  \_)(_/\_/\_/(____/(____)(____/
-        
+
         '''
 
         if self.first_player_set:
@@ -1020,8 +1167,8 @@ class Engine(object):
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
             if self.spellPlayed:
-                if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
-                    self.waitTick = currentTime                 # delete this comments when done
+                if currentTime - self.waitTick >= 1000:  # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
+                    self.waitTick = currentTime  # delete this comments when done
                     self.sendToGraveyard(self.playedSpell)
                     self.spellPlayed = False
             if self.hero_cutscene:  # TODO Cutscene #33333333
@@ -1029,13 +1176,13 @@ class Engine(object):
                     self.hero_turn_obj.update(deltaTime)
                     self.font_turn_obj.update(deltaTime)
                     # these two set destination codes below are actually triggered in the get_evt block
-                    self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5))
-                    self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5 +200))
+                    self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5))
+                    self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5 + 200))
                     if currentTime - self.waitTick >= 2500:
                         self.hero_cutscene_flyin = False
                         self.waitTick = currentTime
-                        self.hero_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y*0.5))
-                        self.font_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y*0.5 +200))
+                        self.hero_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y * 0.5))
+                        self.font_turn_obj.set_destination(*(-300, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.flyOutEffect.play()
                 elif self.hero_cutscene_flyout:
 
@@ -1051,8 +1198,219 @@ class Engine(object):
                         self.may_see_hero_cutscene = False
                         self.hero_cutscene = False
 
+            # TUTORIAL THINGS
+
+            if self.tut_cards2_bool:  # explain pt1
+                if currentTime - self.waitTick >= 2480 and self.tut_wait:
+                    print("Enter here please")
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Each card in Avarice may have some value", self.screen_center[0]+450, self.screen_center[1]+220, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+220)
+                    self.may_see_okay_button = True
+                    self.tut_may_proceed = False
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_cards2_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+220)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_cards3_bool:  # explain pt2
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("and may have an effect once placed on your two fields", self.screen_center[0]+450, self.screen_center[1]+220, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+220)
+                    self.may_see_arrow = True
+                    self.tut_arrow.set_absolute(self.tut_board_arrow_coords)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_cards3_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+220)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_cards4_bool:  # hover to see up close
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Point on a card to see their details to the right!", self.screen_center[0]+450, self.screen_center[1]+100, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+100)
+                    self.may_see_arrow = False
+                elif self.board.hasPreviewCard:
+                    self.tut_may_proceed = False
+                    self.tut_cards4_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+100)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place_bool:  # Here you can see your card
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Here you see the card's type, value, effect, and name.", self.screen_center[0] + 450, self.screen_center[1] + 100, "big_noodle_titling.ttf",
+                                                                55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]-50, self.screen_center[1])
+                    self.tut_arrowr.set_absolute((self.screen_center[0]+240,self.screen_center[1]+55))
+                    self.may_see_arrowr = True
 
 
+                elif currentTime - self.waitTick >= 4200:
+                    self.tut_place_bool = False
+                    self.tut_may_proceed = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+100)
+                    self.may_see_okay_button = False
+                    self.tut_arrow.set_destination(Globals.RESOLUTION_X *0.94, Globals.RESOLUTION_Y *0.8)
+                    self.may_see_arrowr = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+
+            elif self.tut_placeb_bool:  # Go ahead, drag a card onto one of your two fields
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Go ahead, drag a card onto a field!", self.screen_center[0]+450, self.screen_center[1]-30, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]-30)
+                elif self.showEndTurnButton:
+                    self.tut_may_proceed = False
+                    self.tut_placeb_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]-30)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+
+            elif self.tut_place2_bool:  # notice your score has gone up
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Notice your score has gone up", self.screen_center[0]+450, self.screen_center[1]+50, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+50)
+                    self.may_see_arrow = True
+                    self.may_see_okay_button = True
+                    self.tut_arrow.set_destination(*self.tut_botscore_coord)
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place2_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.tut_botscore_coord[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place3_bool:  # try to play another
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Try to play another card", self.screen_center[0]+450, self.screen_center[1]-30, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]-30)
+                    self.may_see_arrow = False
+                elif self.tut_second_card_played:
+                    self.tut_may_proceed = False
+                    self.tut_place3_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]-30)
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place4_bool:  # see that their values have added up...
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("See that the cards' values have added up", self.screen_center[0]+450, self.screen_center[1]+220, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+220)
+                    self.tut_arrow.set_destination(self.screen_center[0]*0.23, self.screen_center[1] *0.96)
+                elif currentTime - self.waitTick >= 5000:
+                    self.tut_may_proceed = False
+                    self.tut_place4_bool = False
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+220)
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place5_bool:  # and may have even triggered their card effects for bonus cash!
+                if currentTime - self.waitTick >= 300 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("and may have even triggered their card effects for bonus cash!", self.screen_center[0]+450, self.screen_center[1]+220, "big_noodle_titling.ttf", 40, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+220)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place5_bool = False
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+220)
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+
+            elif self.tut_place5b_bool:  # your goal is to end the round with more cash than your opponent
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("your goal is to have more money than your opponent when the round ends", self.screen_center[0]+450, self.screen_center[1]-230, "big_noodle_titling.ttf", 36, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]-30, self.screen_center[1]-230)
+                    self.tut_arrow.set_destination(Globals.RESOLUTION_X*0.2, Globals.RESOLUTION_Y *0.03)
+                    self.may_see_arrow = True
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place5b_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]-230)
+                    self.may_see_arrow = False
+                    self.tut_prep_jebait = True
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place6_bool:  # try playing another card!
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Try playing another card", self.screen_center[0]+700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(*self.screen_center)
+                    self.tut_arrow.set_destination(Globals.RESOLUTION_X*0.2, Globals.RESOLUTION_Y *0.08)
+                    self.may_see_arrow = False
+                    self.may_see_okay_button = False
+                    self.tut_prep_jebait = True
+                elif self.tut_may_proceed and self.tut_prep_jebait:
+                    self.tut_may_proceed = False
+                    self.tut_place6_bool = False
+                    self.tut_prep_jebait = False
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_arrow = False
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_place7_bool:  # You couldn't place the card down.
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("However you've reached the limit of plays (2 max per turn)", self.screen_center[0]+700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(*self.screen_center)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place7_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_arrow = False
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+
+            elif self.tut_place8_bool:  # this is because you can only play 2 card per turn
+                pass
+            elif self.tut_place9_bool:  # click the end turn coin at the left to end your turn
+                pass
+            # Don't black out the screen
+            elif self.tut_black_bool:  # Now, your opponent will start playing their cards
+                pass
+            elif self.tut_black2_bool:  # Once a round has been decided after a series of turns
+                pass
+            elif self.tut_black3_bool:  # A round winner may be decided, and the loser would lose hitpoints
+                pass
+            elif self.tut_black3b_bool:  # Players draw a few cards before starting the next turn
+                pass
+            elif self.tut_black4_bool:  # Each player has 2 lives each. The survivor shall be declared winner
+                pass
+            elif self.tut_black5_bool:  # How far will you push the greed in order to win
+                pass
 
             if not self.done_turn:
                 if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > \
@@ -1074,460 +1432,153 @@ class Engine(object):
             else:  # this part is not triggering because the phase has been changed @ the get_evt block
                 self.phase = Phase.SWAP
                 self.done_turn = False
-                self.showEndTurnButton = False  #this is not working
+                self.showEndTurnButton = False  # this is not working
         elif self.phase == Phase.PREP:
+
+            # TUTORIAL THINGS
+            if self.tut_favordiag_bool:
+                if self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_general_dialogue.set_destination(-650, Globals.RESOLUTION_Y * 0.5)
+                    self.tut_favordiag_bool = False
+                    self.may_see_okay_button = False
+                    self.tut_welcome_bool = True
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_welcome_bool:  # TODO pseudocode for now
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("You had the favor of the coin toss, so you are going first.",self.screen_center[0]+450, self.screen_center[1],"big_noodle_titling.ttf",55,(255,255,255))
+                    self.tut_general_dialogue.set_destination(*self.screen_center)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_welcome_bool = False
+
+                    self.tut_general_dialogue.set_destination(-650, Globals.RESOLUTION_Y * 0.5)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_passend_bool:  # this is the pass/end coin
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("This is the pass/end coin", self.screen_center[0]+450, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(*(self.screen_center[0]-100, self.screen_center[1]))
+                    self.may_see_arrow = True
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_passend_bool = False
+
+                    self.tut_general_dialogue.set_destination(-400, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_passend2_bool:  # Once you've played your cards, you must end your turn
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Once you've played your cards, you must end your turn", self.screen_center[0]+450, self.screen_center[1]+70, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]-50, self.screen_center[1]+70)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_passend2_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]+70)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_passend3_bool:  # You made decide to not play your cards and pass the turn
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("You may decide to not play your cards and pass", self.screen_center[0]+450, self.screen_center[1]+70, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]-50, self.screen_center[1]+70)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_passend3_bool = False
+
+                    self.tut_general_dialogue.set_destination(-600, self.screen_center[1]+70)
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_passend4_bool:  # We'll use that a little later.
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("We'll use this a little later", self.screen_center[0]+450, self.screen_center[1]+70, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]-50, self.screen_center[1]+70)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_passend4_bool = False
+
+                    self.tut_general_dialogue.set_destination(-400, self.screen_center[1]+70)
+                    self.may_see_okay_button = False
+                    self.may_see_arrow = False
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+            elif self.tut_cards_bool:  # click show button
+                if currentTime - self.waitTick >= 600 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Click the show button below!", self.screen_center[0] + 450, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(*self.screen_center)
+                    self.showHandButton = True
+                    self.tut_may_proceed = True
+
+
+
             # more on animations updates
             if not len(self.hand) == 0:
                 if self.hand[0].front:
                     self.flip_hand(self.hand)
 
+            # self.showHandButton = False
 
 
-            self.showHandButton = True
 
 
-        elif self.phase == Phase.SWAP:
-
-            for hC in self.hand:
-                hC.swap()
-            for hC in self.opponent_hand:
-                hC.swap()
-            for bF in self.boardFieldList:
-                bF.swap()
-                bF.rearrange()
-            for bF in self.boardFieldListOpp:
-                bF.swap()
-                bF.rearrange()
-            # fade value changes fading in
-            # FLIPPING BOARD #
-            # print()
-            self.flip_hand(self.hand)
-
-            tempHand = self.hand
-            tempDeck = self.deck
-            tempBackRow = self.boardField2
-            tempFrontRow = self.boardField
-            tempBoardFieldList = self.boardFieldList
-
-            self.hand = self.opponent_hand
-            self.deck = self.opponent_deck
-            self.boardField = self.boardFieldOpp
-            self.boardField2 = self.boardFieldOpp2
-            self.boardFieldList = [self.boardField, self.boardField2]
-            # setting opponent
-            self.opponent_hand = tempHand
-            self.opponent_deck = tempDeck
-            self.boardFieldOpp = tempFrontRow
-            self.boardFieldOpp2 = tempBackRow
-            self.boardFieldListOpp = tempBoardFieldList
-
-
-            '''
-            a = b
-            b = c
-            c += 1
-            print a
-            '''
-
-            # END OF FLIPPING BOARD #
-            # fade value changes fading out
-
-            if self.may_count_turn:
-                self.turn_no += 1
-                self.may_count_turn = False
-            if self.first_player == self.player:
-                self.may_count_turn = True
-
-            self.swap_player(self.player)
-            self.phase = Phase.PREP
-            self.done_turn = False
-
-            self.fadeIn()
-            self.swap_portrait()
 
         elif self.phase == Phase.END_ROUND:
-            # here we compare scores, decide which hero to damage, and give score.
-            self.empty_field_to_grave(self.boardField, self.graveYardList)
-            self.empty_field_to_grave(self.boardField2, self.graveYardList)
-            self.empty_field_to_grave(self.boardFieldOpp, self.graveYardListOpp)
-            self.empty_field_to_grave(self.boardFieldOpp2, self.graveYardListOpp)
-            while len(self.cashNegatives) > 0:
-                self.cashNegatives.pop(0)
-            self.player.cash = 0
-            self.player2.cash = 0
-            # for boardCard in self.boardField.cardList:
-            #     # self.sendToGraveyard(boardCard)
-            #     print("Trashing some dogs1")
-            #     self.empty_field_to_grave(self.boardField, self.graveYardList)
-            # for boardCard in self.boardField2.cardList:
-            #     # self.sendToGraveyard(boardCard)
-            #     print("Trashing some dogs2")
-            #     self.send_to_grave_fromboard(boardCard, self.boardField2, self.graveYardList)
-            #     self.empty_field_to_grave(self.boardField2, self.graveYardList)
-            # for boardCard in self.boardFieldOpp.cardList:
-            #     print("Trashing some dogs3")
-            #     # self.sendToGraveyard(boardCard)
-            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp, self.graveYardListOpp)
-            # for boardCard in self.boardFieldOpp2.cardList:
-            #     print("Trashing some dogs4")
-            #     # self.sendToGraveyard(boardCard)
-            #     self.send_to_grave_fromboard(boardCard, self.boardFieldOpp2, self.graveYardListOpp)
-            #
-            if self.player.cash > self.player2.cash:
-                print("Player {0} has more cash".format(self.player.user.username))
-                self.player2.hitpoints -= 1
-                if self.player2.hitpoints == 1:
-                    self.cracksmall.play()
-                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
-                    rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    self.font_decide_obj = FontObj.factory(self.player.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
-                    if self.player1heads:
-                        self.bplayer2_img.surface.blit(rcrackimg,(0,0))
-                    else:
-                        self.bplayer_img.surface.blit(rcrackimg, (0, 0))
-                    self.is_showing_decide = True
-                elif self.player2.hitpoints == 0:
-                    self.crackbig.play()
-                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
-                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    if self.player1heads:
-                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
-                    else:
-                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
+            pass
 
-                    self.is_showing_decide = True
-
-                if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
-                    self.phase = Phase.FINAL_ROUND
-                    self.is_showing_decide = True
-                else:
-                    self.phase = Phase.MATCH_COMPLETE if self.player2.hitpoints == 0 else Phase.ROUND_TWO
-                    if self.phase == Phase.MATCH_COMPLETE:
-                        self.musicplayer.prep_victory(self.player.hero.name)
-
-                        self.hero_turn_obj.surface = self.player.hero.img
-                        self.font_turn_obj = FontObj.factory(self.player.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
-                        self.font_turn_obj.distancespeed = 3.5
-                        self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
-                        self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
-
-                        self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
-                        self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
-                self.player.cash = 0
-                self.player2.cash = 0
-            elif self.player.cash == self.player2.cash:
-                print("Both players have equal amount of cash!")
-                self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
-                self.player.cash = 0
-                self.player2.cash = 0
-                self.phase = Phase.ROUND_DRAW
-                self.is_showing_decide = True
-
-            else:
-                print("Opponent {0} has more cash".format(self.player2.user.username))
-                self.player.hitpoints -= 1
-                if self.player.hitpoints == 1:
-                    self.cracksmall.play()
-                    crackimg = pygame.image.load("assets\\heroes\\crack small.png")
-                    rcrackimg = pygame.transform.smoothscale(crackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    self.font_decide_obj = FontObj.factory(self.player2.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
-                    if self.player1heads:
-                        self.bplayer_img.surface.blit(rcrackimg,(0,0))
-                    else:
-                        self.bplayer2_img.surface.blit(rcrackimg, (0, 0))
-                    self.is_showing_decide = True
-                elif self.player.hitpoints == 0:
-                    self.crackbig.play()
-
-                    bigcrackimg = pygame.image.load("assets\\heroes\\crack big.png")
-                    rbigcrackimg = pygame.transform.smoothscale(bigcrackimg, (self.bplayer_img.surface.get_rect().size[0], self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    if self.player1heads:
-                        self.bplayer_img.surface.blit(rbigcrackimg, (0, 0))
-                    else:
-                        self.bplayer2_img.surface.blit(rbigcrackimg, (0, 0))
-                    self.is_showing_decide = True
-                if self.player.hitpoints == 1 and self.player2.hitpoints == 1:
-                    self.phase = Phase.FINAL_ROUND
-                    self.is_showing_decide = True
-                else:
-                    self.phase = Phase.MATCH_COMPLETE if self.player.hitpoints == 0 else Phase.ROUND_TWO
-                    if self.phase == Phase.MATCH_COMPLETE:
-                        self.musicplayer.prep_victory(self.player2.hero.name)
-                        self.hero_turn_obj.surface = self.player2.hero.img
-                        self.font_turn_obj = FontObj.factory(self.player2.user.username + " WINS", -100, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
-                        self.font_turn_obj.distancespeed = 3.5
-                        self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
-                        self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
-                        self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
-                        self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
-
-                self.player.cash = 0
-                self.player2.cash = 0
-
-            # play appropriate animations
-            # check if it was the winning blow
-                #2 play animations if a player is found victorious
-
-            # else enter next round, draw appropriate num of cards
-        elif self.phase == Phase.ROUND_TWO:
-
-            print("[Engine] Entering Round Two!")
-            num_of_cards = 2
-            if not self.done_drawing:
-                # please burn cards in future patch (w/ animations muhaha)
-                self.draw_cards(num_of_cards, self.deck, self.hand)
-                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
-                print("Player Hand Size: ", len(self.hand))
-                if len(self.hand) > 10:
-                    print("Player {0} hand overload!".format(self.player.user.username))
-                print("Player opponent hand Size: ", len(self.opponent_hand))
-                if len(self.opponent_hand) > 10:
-                    print("Player {0} hand overload!".format(self.player2.user.username))
-                self.flip_hand_down(self.hand)
-                self.flip_hand_down(self.opponent_hand)
-                self.done_drawing = True
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-
-                if self.openingIndex < num_of_cards:
-                    self.waitTick = currentTick
-                    self.drawCardSound.play()
-                    newX = 620 - (40 * (len(self.hand)-(num_of_cards-(self.openingIndex+1))))
-                    for h2 in self.hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                        h2.update(deltaTime, newX, self.openingY)
-                        newX += 80
-                    newXOpp = 620 - (40 * (len(self.opponent_hand)-(num_of_cards-(self.openingIndex+1))))
-                    for h2 in self.opponent_hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
-                        h2.update(deltaTime, newXOpp, self.openingYOpp)
-                        newXOpp += 80
-
-                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
-                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
-                    self.hand[handex].resting = False
-                    self.hand[handex].set_destination(1180, 563)
-
-                    self.opponent_hand[handexopp].resting = False
-                    self.opponent_hand[handexopp].set_destination(1180, 100)
-                    self.opponent_hand[handexopp].posY = 100
-
-                    self.allCardsList.append(self.hand[handex])
-                    self.allCardsList.append(self.opponent_hand[handexopp])
-
-                    self.openingIndex += 1
-                else:
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X* 0.5, -300)
-                    self.opening = False
-                    self.done_drawing = False
-                    self.openingIndex = 0
-                    self.phase = Phase.PREP
-
-        elif self.phase == Phase.MATCH_COMPLETE:
-            if not self.declared_winner:
-                self.declared_winner = True
-                print("[Engine] Match Complete!")
-                self.winning_player = self.player if self.player.hitpoints > 0 else self.player2
-
-                print("{0} wins!".format(self.winning_player.user.username))
-                self.musicplayer.play()
-                self.may_see_hero_cutscene = True
-
-            else:
-                self.hero_turn_obj.update(deltaTime)
-                self.font_turn_obj.update(deltaTime)
-
-        elif self.phase == Phase.FINAL_ROUND:
-            print("[Engine] Entering Final Round!")
-
-            num_of_cards = 1
-            if not self.done_drawing:
-                # please burn cards in future patch (w/ animations muhaha)
-                self.draw_cards(num_of_cards, self.deck, self.hand)
-                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
-                print("Player Hand Size: ", len(self.hand))
-                if len(self.hand) > 10:
-                    print("Player {0} hand overload!".format(self.player.user.username))
-                print("Player opponent hand Size: ", len(self.opponent_hand))
-                if len(self.opponent_hand) > 10:
-                    print("Player {0} hand overload!".format(self.player2.user.username))
-                self.flip_hand_down(self.hand)
-                self.flip_hand_down(self.opponent_hand)
-                self.done_drawing = True
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-
-                if self.openingIndex < num_of_cards:
-                    self.waitTick = currentTick
-                    self.drawCardSound.play()
-                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                        h2.update(deltaTime, newX, self.openingY)
-                        newX += 80
-                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.opponent_hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
-                        h2.update(deltaTime, newXOpp, self.openingYOpp)
-                        newXOpp += 80
-
-                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
-                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
-                    self.hand[handex].resting = False
-                    self.hand[handex].set_destination(1180, 563)
-
-                    self.opponent_hand[handexopp].resting = False
-                    self.opponent_hand[handexopp].set_destination(1180, 100)
-                    self.opponent_hand[handexopp].posY = 100
-
-                    self.allCardsList.append(self.hand[handex])
-                    self.allCardsList.append(self.opponent_hand[handexopp])
-
-                    self.openingIndex += 1
-                else:
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
-                    self.opening = False
-                    self.done_drawing = False
-                    self.openingIndex = 0
-                    self.phase = Phase.PREP
-
-        elif self.phase == Phase.ROUND_DRAW:
-            print("[Engine] Round Draw!")
-            num_of_cards = 3
-            if not self.done_drawing:
-                # please burn cards in future patch (w/ animations muhaha)
-                self.draw_cards(num_of_cards, self.deck, self.hand)
-                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
-                print("Player Hand Size: ", len(self.hand))
-                if len(self.hand) > 10:
-                    print("Player {0} hand overload!".format(self.player.user.username))
-                print("Player opponent hand Size: ", len(self.opponent_hand))
-                if len(self.opponent_hand) > 10:
-                    print("Player {0} hand overload!".format(self.player2.user.username))
-                self.flip_hand_down(self.hand)
-                self.flip_hand_down(self.opponent_hand)
-                self.done_drawing = True
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
-
-                if self.openingIndex < num_of_cards:
-                    self.waitTick = currentTick
-                    self.drawCardSound.play()
-                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                        h2.update(deltaTime, newX, self.openingY)
-                        newX += 80
-                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.opponent_hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
-                        h2.update(deltaTime, newXOpp, self.openingYOpp)
-                        newXOpp += 80
-
-                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
-                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
-                    self.hand[handex].resting = False
-                    self.hand[handex].set_destination(1180, 563)
-
-                    self.opponent_hand[handexopp].resting = False
-                    self.opponent_hand[handexopp].set_destination(1180, 100)
-                    self.opponent_hand[handexopp].posY = 100
-
-                    self.allCardsList.append(self.hand[handex])
-                    self.allCardsList.append(self.opponent_hand[handexopp])
-
-                    self.openingIndex += 1
-                else:
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X*0.5, -300)
-                    self.opening = False
-                    self.done_drawing = False
-                    self.openingIndex = 0
-                    self.phase = Phase.PREP
         elif self.phase == Phase.OPENING:
             currentTick = currentTime
-
             # for now player 1 ALWAYS chooses heads
             if not self.first_player_set:
-                if self.coin_side() == 0:
-                    print("LANDED HEADS")
-                    self.deck = self.persist['playerA'].deck
-                    self.opponent_deck = self.persist['playerB'].deck
-                    self.hand = self.get_first_cards(self.deck,self.persist['playerA'].user.username)
-                    self.opponent_hand = self.get_first_cards(self.opponent_deck,self.persist['playerB'].user.username)
 
-                    self.player = self.persist['playerA']
-                    self.first_player = self.persist['playerA']
-                    self.player2 = self.persist['playerB']
+                print("LANDED HEADS")
+                self.deck = self.player.deck
+                self.opponent_deck = self.player2.deck
+                self.hand = self.get_first_cards(self.deck, self.player.user.username)
+                self.opponent_hand = self.get_first_cards(self.opponent_deck, self.player2.user.username)
 
-                    self.musicplayer = MusicPlayer(self.player.hero.name, self.player2.hero.name)
+                self.first_player = self.player
 
-                    self.boardField.owner = self.persist['playerA'].user.username
-                    self.boardField2.owner = self.persist['playerA'].user.username
+                self.musicplayer = MusicPlayer(self.player.hero.name, self.player2.hero.name)
 
-                    self.boardFieldOpp.owner = self.persist['playerB'].user.username
-                    self.boardFieldOpp2.owner = self.persist['playerB'].user.username
-                    self.player1heads = True
+                self.boardField.owner = self.player.user.username
+                self.boardField2.owner = self.player.user.username
 
-                    globs = self.bottom_slot
-                    globs2 = self.top_slot
-                    self.bplayer_font.change_font_size(40)
-                    self.bplayer_font.set_destination(globs[0]-85, globs[1]-16)
-                    self.bplayer2_font.change_font_size(40)
-                    self.bplayer2_font.set_destination(globs2[0]-85, globs2[1]-22)
-                else:
-                    print("LANDED TAILS")
-                    self.deck = self.persist['playerB'].deck
-                    self.opponent_deck = self.persist['playerA'].deck
-                    self.hand = self.get_first_cards(self.deck, self.persist['playerB'].user.username)
-                    self.opponent_hand = self.get_first_cards(self.opponent_deck, self.persist['playerA'].user.username)
+                self.boardFieldOpp.owner = self.player2.user.username
+                self.boardFieldOpp2.owner = self.player2.user.username
+                self.player1heads = True
 
-
-                    self.player = self.persist['playerB']
-                    self.first_player = self.persist['playerB']
-                    self.player2 = self.persist['playerA']
-                    self.musicplayer = MusicPlayer(self.player2.hero.name, self.player.hero.name)
-
-
-                    self.boardField.owner = self.persist['playerB'].user.username
-                    self.boardField2.owner = self.persist['playerB'].user.username
-
-                    self.boardFieldOpp.owner = self.persist['playerA'].user.username
-                    self.boardFieldOpp2.owner = self.persist['playerA'].user.username
-                    self.player1heads = False
-                    globs = self.bottom_slot
-                    globs2 = self.top_slot
-                    self.bplayer2_font.change_font_size(40)
-                    self.bplayer2_font.set_destination(globs[0]-85, globs[1]-16)
-                    self.bplayer_font.change_font_size(40)
-                    self.bplayer_font.set_destination(globs2[0]-85, globs2[1] -22)
-
+                globs = self.bottom_slot
+                globs2 = self.top_slot
                 self.first_player_set = True
 
                 # TODO I have a feeling this would cause some issues if the players used the same image, but we'll see. #python names not variables
-                self.hero_turn_obj = Movable(self.player.hero.img,1000,4,"distance",(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
-                self.font_turn_obj = FontObj.factory(self.player.user.username+"'s turn",-200,0,"big_noodle_titling_oblique.ttf",80,(255,255,255))
+                self.hero_turn_obj = Movable(self.player.hero.img, 1000, 4, "distance", (Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5))
+                self.font_turn_obj = FontObj.factory(self.player.user.username + "'s turn", -200, 0, "big_noodle_titling_oblique.ttf", 80, (255, 255, 255))
                 self.font_turn_obj.distancespeed = 3.5
                 self.hero_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5))
                 self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
 
             # graphical representation of card giving (hands are already pre determined by get_first_cards)
-            self.bplayer_font.update(deltaTime)
-            self.bplayer2_font.update(deltaTime)
             if currentTick - self.waitTick >= self.drawCardWait:
                 if self.openingIndex < 10:
                     self.waitTick = currentTick
@@ -1577,22 +1628,22 @@ class Engine(object):
 
             if self.has_tossed_coin:
                 if self.first_toss_animating:
-                    #animate coin?
+                    # animate coin?
                     if currentTime - self.waitTick <= 3000:  # how long we want the coin to be spinning before stopping it
                         self.waitTick = currentTime
                         self.board.coin.animating = False
                         self.first_toss_animating = False
-                        if self.coin_side() == 0:
+                        if 0 == 0:
                             print("Coin pointing left")
                             self.board.coin.point_left()
-                            self.board.coin.set_destination(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5)
+                            self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
 
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
-                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0]*0.505, self.bplayer_img.original_surface.get_rect().size[1]*0.505))
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.70, self.bplayer_img.original_surface.get_rect().size[1] * 0.70))
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
-                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0]*0.505, self.bplayer2_img.original_surface.get_rect().size[1]*0.505))
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.70, self.bplayer2_img.original_surface.get_rect().size[1] * 0.70))
 
                         else:
                             print("Coin pointing right")
@@ -1606,8 +1657,6 @@ class Engine(object):
                             self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.505, self.bplayer2_img.original_surface.get_rect().size[1] * 0.505))
                             self.bplayer2_img.set_destination(*self.bottom_slot)
                             # set bplayerimg to top left slot
-                    self.bplayer_font.set_destination(-600, self.bplayer_font.exact_position[1])
-                    self.bplayer2_font.set_destination(-600, self.bplayer2_font.exact_position[1])
 
 
                 elif self.notif_pause:  # time paused to notify who goes first
@@ -1615,26 +1664,20 @@ class Engine(object):
                         self.board.coin.show_pass()
                         self.notif_pause = False
                         self.may_see_first = True
-                        #self.first_fontobj absolute position below first player card
+                        # self.first_fontobj absolute position below first player card
                         self.waitTick = currentTime
                 elif self.getting_in_place:
                     self.board.coin.set_destination(*self.coin_slot)
                     self.bplayer_img.update(deltaTime)  # these two will take their place
                     self.bplayer2_img.update(deltaTime)
-                    self.bplayer_font.update(deltaTime)
-                    self.bplayer2_font.update(deltaTime)
                     self.bplayer_img.scaleanim(self.waitTick)
                     self.bplayer2_img.scaleanim(self.waitTick)
                     if currentTime - self.waitTick >= 2000:
                         self.getting_in_place = False
                 else:
                     print("Everything in place, take first turn")
-                    # refresh graphic (smoothscale resolution problems)
-                    self.bplayer_img.surface = pygame.transform.smoothscale(self.bplayer_img.original_surface, (round(self.bplayer_img.original_surface.get_rect().size[0] *0.505), round(self.bplayer_img.original_surface.get_rect().size[1] * 0.505)))
-                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.505), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.505)))
-
-                    # self.bplayer_img.set_absolute(self.top_slot)
-                    # self.bplayer2_img.set_absolute(self.bottom_slot)
+                    self.may_see_okay_button = True
+                    self.tut_general_dialogue.set_destination(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y *0.5)
                     self.phase = Phase.OPENING
             # self.phase = Phase.OPENING
             # block down below
@@ -1642,6 +1685,11 @@ class Engine(object):
             #     self.phase = Phase.OPENING
             # else:
             #     self.phase = Phase.SWAP
+
+        # tutorial elements
+        self.tut_general_dialogue.update(deltaTime)
+        self.tut_arrow.update(deltaTime)
+
 
         self.draw(screen)  # last function of update. execute draw
 
@@ -1651,14 +1699,10 @@ class Engine(object):
 
         self.board.draw(screen)
 
-
-
         self.board.coin.draw(screen)
         if self.big_portraits_visible:
             self.bplayer_img.draw(screen)
             self.bplayer2_img.draw(screen)
-            self.bplayer_font.draw(screen)
-            self.bplayer2_font.draw(screen)
         onTopCard = None
         # cash draw
         if self.bot_cash_surf and self.top_cash_surf and not self.phase == Phase.COIN_TOSS:
@@ -1690,7 +1734,6 @@ class Engine(object):
         # elif self.showPassTurnButton:
         #     screen.blit(self.passTurnImg, (self.endTurnImgX, self.endTurnImgY))
 
-
         if self.faded:
             self.screen.blit(self.fadeScreen, (0, 0))
 
@@ -1701,6 +1744,15 @@ class Engine(object):
             self.hero_turn_obj.draw(screen)
             self.font_turn_obj.draw(screen)
 
+        # tutorial elements
+        self.tut_general_dialogue.draw(screen)
+        if self.may_see_okay_button:
+            self.tut_okaybutton.draw(screen)
+        if self.may_see_arrow:
+            self.tut_arrow.draw(screen)
+        if self.may_see_arrowr:
+            self.tut_arrowr.draw(screen)
+
     def startup(self, currentTime, persistent):
 
         self.persist = persistent
@@ -1710,29 +1762,20 @@ class Engine(object):
         testing persistent objects
         '''
         print("[Engine] ########################### ")
-        print("[Engine] {0}({1}) vs {2}({3})".format(self.persist['playerA'].user.username, self.persist['playerA'].hero.name, self.persist['playerB'].user.username, self.persist['playerB'].hero.name))
-        print("[Engine] THE BATTLE BEGINS")
+        print("[Engine] Entering the tutorial...")
         '''
         setting of board objects and setting of first perspective
         '''
         self.board = Board()
         # BoardField(x1=225, y1=390, x2=1010, y2=470, boardx=220, boardy=380)
-        self.boardFieldOpp2 = BoardField(225,105,1010,185)  # opponent back row
-        self.boardFieldOpp = BoardField(225,240,1010,320)  # opponent front row
-        self.boardField = BoardField(225,390,1010,470)  # player front row
-        self.boardField2 = BoardField(225,525,1010,605)  # player back row
+        self.boardFieldOpp2 = BoardField(225, 105, 1010, 185)  # opponent back row
+        self.boardFieldOpp = BoardField(225, 240, 1010, 320)  # opponent front row
+        self.boardField = BoardField(225, 390, 1010, 470)  # player front row
+        self.boardField2 = BoardField(225, 525, 1010, 605)  # player back row
         self.boardFieldList = [self.boardField, self.boardField2]
         self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
 
-        # Game trackers
-        self.turn_no = 0
-        self.player = None
-        self.player2 = None
-        self.first_player = None  # does not change after coin toss
-        self.opponent = None
-        self.winning_player = None
-        self.phase = Phase.COIN_TOSS
-        self.cards_played = 0
+
 
         self.opening = True
         self.done_turn = False
@@ -1740,15 +1783,28 @@ class Engine(object):
         self.passed = False
         self.done_drawing = False
 
-        self.bplayer_img = persistent['portraitA']
-        self.bplayer_img.set_absolute((Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45))
-        self.bplayer_font = persistent['fontA']
-        self.bplayer_font.set_absolute((Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45+140))
+        self.usera = User("Player 1", 99, 0)
+        self.heroa = Hero("Billy", pygame.image.load("assets\\heroes\\hero_billy.png").convert_alpha())
+        self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck("Billy"))  # NOTE set hero name deck here
 
-        self.bplayer2_img = persistent['portraitB']
-        self.bplayer2_img.set_absolute((Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45))
-        self.bplayer2_font = persistent['fontB']
-        self.bplayer2_font.set_absolute((Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45+140))
+        self.userb = User("Player 2", 99, 0)
+        self.herob = Hero("King", pygame.image.load("assets\\heroes\\hero_king.png").convert_alpha())
+        self.playerb = Player(self.userb, self.herob, DeckBuilder.build_deck("King"))  # NOTE set hero name deck here
+
+
+        self.bplayer_img = Movable(self.heroa.img,1000, 4,"distance", (Globals.RESOLUTION_X *0.5 -250, Globals.RESOLUTION_Y * 0.45))
+
+        self.bplayer2_img = Movable(self.herob.img,1000, 4,"distance", (Globals.RESOLUTION_X *0.5 +250, Globals.RESOLUTION_Y * 0.45))
+
+        # Game trackers
+        self.turn_no = 0
+        self.player = self.playera
+        self.player2 = self.playerb
+        self.first_player = None  # does not change after coin toss
+        self.opponent = None
+        self.winning_player = None
+        self.phase = Phase.COIN_TOSS
+        self.cards_played = 0
 
         self.big_portraits_visible = True
 
@@ -1777,7 +1833,7 @@ class Engine(object):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 class MusicPlayer(object):
-    def __init__(self,hero,hero2):
+    def __init__(self, hero, hero2):
         self.hero = hero
         self.hero2 = hero2
         self.music_list = []
@@ -1785,8 +1841,8 @@ class MusicPlayer(object):
         self.music_list2 = []
         self.victory2 = None
         self.is_mirror = False
-        self.last_played_index = random.randrange(0,4)
-        self.last_played_index2 = random.randrange(0,4)
+        self.last_played_index = random.randrange(0, 4)
+        self.last_played_index2 = random.randrange(0, 4)
         self.to_play_hero2 = False
         self.last_hero = None
         self.has_victor = False
@@ -1815,10 +1871,10 @@ class MusicPlayer(object):
                 self.victory = "\\king\\king_victory.ogg"
             else:
                 self.music_list = [
-                "\\victoria\\victoria_theme01.ogg",
-                "\\victoria\\victoria_theme02.ogg",
-                "\\victoria\\victoria_theme03.ogg",
-                "\\victoria\\victoria_theme04.ogg",
+                    "\\victoria\\victoria_theme01.ogg",
+                    "\\victoria\\victoria_theme02.ogg",
+                    "\\victoria\\victoria_theme03.ogg",
+                    "\\victoria\\victoria_theme04.ogg",
                 ]
                 self.victory = "\\victoria\\victoria_victory.ogg"
 
@@ -1841,10 +1897,10 @@ class MusicPlayer(object):
                 self.victory2 = "\\king\\king_victory.ogg"
             else:
                 self.music_list2 = [
-                "\\victoria\\victoria_theme01.ogg",
-                "\\victoria\\victoria_theme02.ogg",
-                "\\victoria\\victoria_theme03.ogg",
-                "\\victoria\\victoria_theme04.ogg",
+                    "\\victoria\\victoria_theme01.ogg",
+                    "\\victoria\\victoria_theme02.ogg",
+                    "\\victoria\\victoria_theme03.ogg",
+                    "\\victoria\\victoria_theme04.ogg",
                 ]
                 self.victory2 = "\\victoria\\victoria_victory.ogg"
         else:
@@ -1866,10 +1922,10 @@ class MusicPlayer(object):
                 self.victory = "\\king\\king_victory.ogg"
             else:
                 self.music_list = [
-                "\\victoria\\victoria_theme01.ogg",
-                "\\victoria\\victoria_theme02.ogg",
-                "\\victoria\\victoria_theme03.ogg",
-                "\\victoria\\victoria_theme04.ogg",
+                    "\\victoria\\victoria_theme01.ogg",
+                    "\\victoria\\victoria_theme02.ogg",
+                    "\\victoria\\victoria_theme03.ogg",
+                    "\\victoria\\victoria_theme04.ogg",
                 ]
                 self.victory = "\\victoria\\victoria_victory.ogg"
 
@@ -1879,27 +1935,29 @@ class MusicPlayer(object):
     def stop(self):
         pygame.mixer.music.stop()
         pass
+
     def prep_song(self):
         if not self.is_mirror:
             if not self.to_play_hero2:
-                index = random.randrange(0,4)
+                index = random.randrange(0, 4)
                 while index == self.last_played_index:
-                    index = random.randrange(0,4)
+                    index = random.randrange(0, 4)
 
-                pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list[index])
+                pygame.mixer.music.load("assets\\music\\heroes\\" + self.music_list[index])
                 pygame.mixer.music.set_volume(Globals.music_volume)
                 # pygame.mixer.music.play()
                 self.to_play_hero2 = True
 
             elif self.to_play_hero2:
-                index = random.randrange(0,4)
+                index = random.randrange(0, 4)
                 while index == self.last_played_index2:
-                    index = random.randrange(0,4)
-                pygame.mixer.music.load("assets\\music\\heroes\\"+self.music_list2[index])
+                    index = random.randrange(0, 4)
+                pygame.mixer.music.load("assets\\music\\heroes\\" + self.music_list2[index])
                 pygame.mixer.music.set_volume(Globals.music_volume)
                 # pygame.mixer.music.play()
                 self.to_play_hero2 = False
-    def prep_song_hero(self,hero):
+
+    def prep_song_hero(self, hero):
         print("stop music")
 
         # if not self.last_hero == hero:
@@ -1950,7 +2008,6 @@ class MusicPlayer(object):
     def play(self):
         self.mc.play()
 
-
     def prep_victory(self, hero):
         if hero == "Billy":
             self.victory = "\\billy\\billy_victory.ogg"
@@ -1959,26 +2016,26 @@ class MusicPlayer(object):
             self.victory = "\\king\\king_victory.ogg"
         else:
             self.victory = "\\victoria\\victoria_victory.ogg"
-        self.mc.load("assets\\music\\heroes"+self.victory)
+        self.mc.load("assets\\music\\heroes" + self.victory)
+
 
 class Phase(Enum):
     # auto() is an enum function that makes it decide what type to use for that enum
-    COIN_TOSS = auto()      # flipping of coin, decides player1 and 2
-    OPENING = auto()        # 10 cards drawn
+    COIN_TOSS = auto()  # flipping of coin, decides player1 and 2
+    OPENING = auto()  # 10 cards drawn
 
-    SWAP = auto()           # Screen fades out, board flips
-    PREP = auto()           # Player about to start turn
-    PLAY = auto()           # Player controls are enabled, can click around etc.
+    SWAP = auto()  # Screen fades out, board flips
+    PREP = auto()  # Player about to start turn
+    PLAY = auto()  # Player controls are enabled, can click around etc.
 
     # currently not yet used
-    END_ROUND = auto()      # both players have now selected PASS
-
+    END_ROUND = auto()  # both players have now selected PASS
 
     # NOTE: we might need intermediary phases here. To give space for proper animation maybe?
 
     # tracks how round ended #
-    ROUND_DRAW = auto()     # Three cards drawn
-    ROUND_TWO = auto()      # Two cards drawn
-    FINAL_ROUND = auto()    # One card drawn
+    ROUND_DRAW = auto()  # Three cards drawn
+    ROUND_TWO = auto()  # Two cards drawn
+    FINAL_ROUND = auto()  # One card drawn
     MATCH_COMPLETE = auto()
 

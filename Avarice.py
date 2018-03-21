@@ -5,6 +5,7 @@ from scripts.states import Engine #states imported
 from scripts.states import MainMenu, MainMenu2
 from scripts.Globals import Globals
 from scripts.states import Splash
+from scripts.states import Tutorial
 
 def main():
     coordinator = tools.Coordinator("Avarice - A Greed-Based Card Game")
@@ -15,7 +16,8 @@ def main():
     states = {"SPLASH": Splash.Splash(),
               "MAIN_MENU": MainMenu.MainMenu(),
               "MAIN_MENU2": MainMenu2.MainMenu(),
-              "AVARICE": Engine.Engine()
+              "AVARICE": Engine.Engine(),
+              "TUTORIAL": Tutorial.Tutorial()
               #"OPTIONS": theoretical.Options()
               #"HERO_SELECT": theoretical.HeroSelect()
               #"GAME_SUMMARY": theoretical.GameSummary()
