@@ -53,7 +53,7 @@ Rough code estimate would be like:
 (end of phase, repeat)
 <victory animation> - a player gets crowned victorious
 '''
-green = (0, 128, 0)
+green = (255, 125, 0)
 
 
 # class which holds the game flow
@@ -199,9 +199,9 @@ class Tutorial(object):
 
         # cash points
         self.botcash_coords = (75, 672)
-        self.bot_cash_surf = FontObj.surface_factory("C0", "GARABD.ttf", 45, green)
+        self.bot_cash_surf = FontObj.surface_factory("C0", "OLDENGL.ttf", 45, green)
         self.topcash_coords = (75, -5)
-        self.top_cash_surf = FontObj.surface_factory("C0", "GARABD.ttf", 45, green)
+        self.top_cash_surf = FontObj.surface_factory("C0", "OLDENGL.ttf", 45, green)
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -547,8 +547,8 @@ class Tutorial(object):
         self.refresh_cash(player)
 
     def refresh_cash(self, player):
-        self.bot_cash_surf = FontObj.surface_factory("C" + str(self.player.cash), "GARABD.ttf", 45, green)
-        self.top_cash_surf = FontObj.surface_factory("C" + str(self.player2.cash), "GARABD.ttf", 45, green)
+        self.bot_cash_surf = FontObj.surface_factory("C" + str(self.player.cash), "OLDENGL.ttf", 45, green)
+        self.top_cash_surf = FontObj.surface_factory("C" + str(self.player2.cash), "OLDENGL.ttf", 45, green)
 
     def apply_effects(self, boardField):  # f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
