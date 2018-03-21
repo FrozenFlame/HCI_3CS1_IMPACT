@@ -548,7 +548,7 @@ class Tutorial(object):
 
     def apply_effects(self, boardField):  # f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
-        blackCounter = boardField.count_cardType(Type.BLACK)
+        blackCounter = boardField.count_cardType(Type.CRIME)
         personCounter = boardField.count_cardType(Type.PERSON)
         effectActivated = False
 
@@ -662,7 +662,7 @@ class Tutorial(object):
                     targetList = list()
                     for bF in self.boardFieldListOpp:
                         for a in bF.cardList:
-                            if Type.BLACK in a.type and Type.PERSON in a.type:
+                            if Type.CRIME in a.type and Type.PERSON in a.type:
                                 targetList.append(a)
 
                     if len(targetList) != 0:
