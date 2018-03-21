@@ -82,7 +82,7 @@ class DeckCatalogue(object):
         skyscraper = Card("skyscraper", "Skyscraper", 28, "", [Type.STRUCTURE], hero_name)
         supplyTruck = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
         riotResponseVehicle = Card("riotresponsevehicle", "Riot Response Vehicle", 10, "", [Type.VEHICLE], hero_name)
-        innovate = Card("innovate", "Innovate", 0, "Draw a card", [Type.SPELL], hero_name, "assets\\cards\\card_art\\victoria\\innovation.png")
+        innovate = Card("innovate", "Innovate", 0, "Draw 2 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\victoria\\innovation.png")
         solidWorkforce = Card("solidworkforce", "Solid Workforce", 0, "+3C to all non-CRIME PERSON cards on your board", [Type.SPELL], hero_name)
 
         insurance2 = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card on your board to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
@@ -93,7 +93,7 @@ class DeckCatalogue(object):
         skyscraper2 = Card("skyscraper", "Skyscraper", 28, "", [Type.STRUCTURE], hero_name)
         supplyTruck2 = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
         riotResponseVehicle2 = Card("riotresponsevehicle", "Riot Response Vehicle", 10, "", [Type.VEHICLE], hero_name)
-        innovate2 = Card("innovate", "Innovate", 0, "Draw a card", [Type.SPELL], hero_name, "assets\\cards\\card_art\\victoria\\innovation.png")
+        innovate2 = Card("innovate", "Innovate", 0, "Draw 2 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\victoria\\innovation.png")
         solidWorkforce2 = Card("solidworkforce", "Solid Workforce", 0, "+3C to all non-CRIME PERSON cards on your board", [Type.SPELL], hero_name)
 
         deck = [insurance, shareHolder, superstar, hacker, university, skyscraper, supplyTruck, riotResponseVehicle, innovate, solidWorkforce,
@@ -164,7 +164,7 @@ class DeckCatalogue(object):
         parkingLot = Card("parkinglot", "Parking Lot", 10, "+3C to SELF per VEHICLE card on this boardfield.", [Type.STRUCTURE], hero_name)
         impoundLot = Card("impoundlot", "Impound Lot", 5, "-2C to VEHICLE cards on enemy board", [Type.STRUCTURE], hero_name)
         junkyard = Card("junkyard", "Junkyard", 5, "+2C to SELF per VEHICLE card on both graveyards.", [Type.STRUCTURE], hero_name)
-        loanSlip = Card("loanslip", "Loan Slip", 0, "-15C to PLAYER BANK; Draw 2 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\commons\\loan slip.png")
+        loanSlip = Card("loanslip", "Loan Slip", 0, "-20C to PLAYER BANK; Draw 3 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\commons\\loan slip.png")
         creditCard = Card("creditcard", "Credit Card", 0, "+2C to PERSON cards and -3C to OBJECT cards on your board", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\credit card.png")
         resurrect = Card("resurrect", "Resurrect", 0, "Restore 1 PERSON card from your graveyard.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\resurrect.png")
         rebuild = Card("rebuild", "Rebuild", 0, "Restore 1 STRUCTURE or VEHICLE from your grave.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\rebuild.png")

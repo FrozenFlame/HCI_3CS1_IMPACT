@@ -426,42 +426,29 @@ class Engine(object):
     def cardEffectDraw(self, amt, currentTime, deltaTime):
     ############ (backend) transfer card from deck to hand ########################
         num_of_cards = amt
-        if not self.done_drawing:
+        # if not self.done_drawing:
             # please burn cards in future patch (w/ animations muhaha)
-            self.draw_cards(num_of_cards, self.deck, self.hand)
-            print("Player Hand Size: ", len(self.hand))
-            if len(self.hand) > 10:
-                print("Player {0} hand overload!".format(self.player.user.username))
+        oldhandlength = len(self.hand)
+        self.draw_cards(num_of_cards, self.deck, self.hand)
+        difference = len(self.hand) - oldhandlength
+        print("Player Hand Size: ", len(self.hand))
+        if len(self.hand) > 10:
+            print("Player {0} hand overload!".format(self.player.user.username))
 
-            self.done_drawing = True
+            # self.done_drawing = True
     ##################### (frontend) drawing animation ############################
-        currentTick = currentTime
-        if currentTick - self.waitTick >= self.drawCardWait:
-
-            if self.openingIndex < num_of_cards:
-                self.waitTick = currentTick
-                self.drawCardSound.play()
-                newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
-                for h2 in self.hand:
-                    h2.resting = False
-                    h2.set_destination(*h2.defaultPos)
-                    h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                    h2.update(deltaTime, newX, self.openingY)
-                    newX += 80
-                newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
-
-                handex = (len(self.hand) - num_of_cards) + self.openingIndex
-                self.hand[handex].resting = False
-                self.hand[handex].set_destination(1180, 563)
-
-                self.allCardsList.append(self.hand[handex])
-
-                self.openingIndex += 1
-            else:
-                self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
-                self.opening = False
-                self.done_drawing = False
-                self.openingIndex = 0
+        self.drawCardSound.play()
+        # adjust hand cards
+        newX = 620 - (40 * len(self.hand))
+        for h2 in self.hand:
+            h2.resting = False
+            h2.set_destination(*h2.defaultPos)
+            h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+            h2.update(deltaTime, newX, self.openingY)
+            newX += 80
+            if self.hand.index(h2) >= oldhandlength:
+                h2.flip()
+                self.allCardsList.append(self.hand[self.hand.index(h2)])
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _                 _
@@ -699,7 +686,7 @@ class Engine(object):
                     print("Self hand before Loan:", len(self.hand))
                     self.done_drawing = False
                     self.activateLoanSlip = True
-                    self.cashNegatives.append(15)
+                    self.cashNegatives.append(20)
                     print("Self hand after Loan:", len(self.hand))
 
                     # self.spellPlayed = True
@@ -1452,10 +1439,10 @@ class Engine(object):
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
             if self.activateLoanSlip:
-                self.cardEffectDraw(2, currentTime, deltaTime)
+                self.cardEffectDraw(3, currentTime, deltaTime)
                 self.activateLoanSlip = False
             if self.activateInnovate:
-                self.cardEffectDraw(1, currentTime, deltaTime)
+                self.cardEffectDraw(2, currentTime, deltaTime)
                 self.activateInnovate = False
             # if self.spellPlayed:
             #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
