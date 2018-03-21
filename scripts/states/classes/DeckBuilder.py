@@ -6,7 +6,8 @@ class DeckBuilder(object):
         return {
             'King': DeckCatalogue.get_deck_king(hero_name),
             'Victoria': DeckCatalogue.get_deck_victoria(hero_name),
-            'Billy': DeckCatalogue.get_deck_billy(hero_name)
+            'Billy': DeckCatalogue.get_deck_billy(hero_name),
+            'Tutorial': DeckCatalogue.get_deck_tutorial(hero_name)
         }.get(hero_name, DeckCatalogue.get_deck_generic(hero_name))  # generic is default if hero_name not found
 
     build_deck = staticmethod(build_deck)
