@@ -185,10 +185,10 @@ class Engine(object):
         self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
 
         # cash points
-        self.botcash_coords = (self.bottom_slot[0] - 125, self.bottom_slot[1] - 80)
-        self.bot_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
-        self.topcash_coords = (self.top_slot[0] - 125, self.top_slot[1] - 80)
-        self.top_cash_surf = FontObj.surface_factory("C0","cash currency.ttf",45,green)
+        self.botcash_coords = (self.bottom_slot[0] - 185, self.bottom_slot[1] - 235)
+        self.bot_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
+        self.topcash_coords = (self.top_slot[0] - 185, self.top_slot[1] - 235)
+        self.top_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -506,8 +506,8 @@ class Engine(object):
         # TODO lazy, no algorithm. Make a better algorithm in the future
         self.refresh_cash(player)
     def refresh_cash(self, player):
-        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"cash currency.ttf",45,green)
-        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"cash currency.ttf",45,green)
+        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"oldengl.ttf",45, (30, 160, 0))
+        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"oldengl.ttf",45, (30, 160, 0))
     def apply_effects(self, boardField): #f this sh
         bf_vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         bf_crimeCounter = boardField.count_cardType(Type.CRIME)
@@ -1770,14 +1770,14 @@ class Engine(object):
                     newX = 620 - (40 * (len(self.hand)-(num_of_cards-(self.openingIndex+1))))
                     for h2 in self.hand:
                         h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
+                        h2.set_destination(h2.posX, h2.posY)
                         h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
                         h2.update(deltaTime, newX, self.openingY)
                         newX += 80
                     newXOpp = 620 - (40 * (len(self.opponent_hand)-(num_of_cards-(self.openingIndex+1))))
                     for h2 in self.opponent_hand:
                         h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
+                        h2.set_destination(h2.posX, h2.posY)
                         h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
                         h2.update(deltaTime, newXOpp, self.openingYOpp)
                         newXOpp += 80
@@ -1842,14 +1842,14 @@ class Engine(object):
                     newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
                     for h2 in self.hand:
                         h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
+                        h2.set_destination(h2.posX, h2.posY)
                         h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
                         h2.update(deltaTime, newX, self.openingY)
                         newX += 80
                     newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
                     for h2 in self.opponent_hand:
                         h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
+                        h2.set_destination(h2.posX, h2.posY)
                         h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
                         h2.update(deltaTime, newXOpp, self.openingYOpp)
                         newXOpp += 80
