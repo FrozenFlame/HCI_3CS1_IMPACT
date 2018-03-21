@@ -106,6 +106,8 @@ class Tutorial(object):
         self.music_loaded = False
         self.is_showing_decide = False
 
+        self.noSpells = True
+
         # self.opening = True
 
         # objects
@@ -983,10 +985,13 @@ class Tutorial(object):
 
                     for s in self.allCardsList:
                         if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
-                            self.clickedCard.append(s)
-                            s.onTop = True
-                            self.allCardsList.pop(self.allCardsList.index(s))
-                            self.allCardsList.append(s)
+                            if Type.SPELL in s.type and self.noSpells:
+                                continue
+                            else:
+                                self.clickedCard.append(s)
+                                s.onTop = True
+                                self.allCardsList.pop(self.allCardsList.index(s))
+                                self.allCardsList.append(s)
 
                     if len(self.clickedCard) > 0:
                         if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False and self.clickedCard[0].front and self.may_drag:
@@ -1293,6 +1298,8 @@ class Tutorial(object):
                     self.may_see_arrow = True
                     self.may_see_okay_button = True
                     self.tut_arrow.set_destination(*self.tut_botscore_coord)
+
+                    self.noSpells = False
                 elif self.tut_may_proceed:
                     self.tut_may_proceed = False
                     self.tut_place2_bool = False

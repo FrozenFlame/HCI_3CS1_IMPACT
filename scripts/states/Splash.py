@@ -53,6 +53,7 @@ class Splash(object):
     def update(self, screen, keys, currentTime, deltaTime):
         if self.faded:
             self.fadeOut()
+            self.faded = False
         elif self.logotime:
             currentTick = currentTime
             if currentTick >= self.timeout:

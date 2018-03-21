@@ -878,6 +878,9 @@ class Engine(object):
 
                 if boardCard.id is "university":
                     print(boardCard.name, " effect activated")
+                    for c in boardField:
+                        if c.id is 'student':
+                            c.current_val *= 2
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
