@@ -316,6 +316,7 @@ class Engine(object):
             for c in boardField.cardList:
                 c.defaultPos = self.graveYardX, self.graveYardY
                 c.flip()
+                c.current_val = c.base_val
                 c.onBoard = False
                 c.disabled = True
                 c.resting = False
@@ -324,6 +325,7 @@ class Engine(object):
             for c in boardField.cardList:
                 c.defaultPos = self.graveYardOppX, self.graveYardOppY
                 c.flip()
+                c.current_val = c.base_val
                 c.onBoard = False
                 c.disabled = True
                 c.resting = False
@@ -345,6 +347,7 @@ class Engine(object):
             self.graveYardListOpp.append(card)
 
         card.flip()
+        card.current_val = card.base_val
         card.onBoard = False
         card.disabled = True
         card.resting = False
@@ -414,6 +417,7 @@ class Engine(object):
 
 
         card.flip()
+        card.current_val = card.base_val
         card.onBoard = False
         card.disabled = True
         card.resting = False
@@ -929,9 +933,172 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-        ############################################## king effects #######################################################
+        ############################################## king effects ###################################################
+                if boardCard.id is "blackmarket":
+                    print(boardCard.name, " effect activated")
+                    for c in boardField:
+                        if Type.OBJECT in c.type:
+                            c.current_val += (c.base_val/2)
 
-        ############################################## end of effects #########################################################
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "pickpocket":
+                    print(boardCard.name, " effect activated")
+                    enemyBoardfield = list()
+                    if boardField is self.boardField:
+                        enemyBoardfield = self.boardFieldOpp
+                    else:
+                        enemyBoardfield = self.boardFieldOpp2
+
+                    if len(enemyBoardfield) > 0:
+                        for c in enemyBoardfield.cardList:
+                            if Type.PERSON in c.type:
+                                boardCard += (c.current_val/4)
+                                c.current_val -= (c.current_val/4)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "gravedigger":
+                    print(boardCard.name, " effect activated")
+                    for c in self.graveYardList:
+                         if Type.PERSON in c.type:
+                             boardCard.current_val += (c.base_val/2)
+                    for c in self.graveYardListOpp:
+                         if Type.PERSON in c.type:
+                             boardCard.current_val += (c.base_val/2)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "robinhood":
+                    print(boardCard.name, " effect activated")
+                    enemyBoardfield = list()
+                    if boardField is self.boardField:
+                        enemyBoardfield = self.boardFieldOpp
+                    else:
+                        enemyBoardfield = self.boardFieldOpp2
+
+                    if len(enemyBoardfield) > 0:
+                        for c in enemyBoardfield.cardList:
+                            if c.id is 'bagofcash' or c.id is 'bigbagofcash' or c.id is 'dolladollabills':
+                                self.cashPositives.append(c.current_val/4)
+                                c.current_val -= (c.current_val/4)
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "slums":
+                    print(boardCard.name, " effect activated")
+
+                if boardCard.id is "kingpin":
+                    print(boardCard.name, " effect activated")
+                    for c in boardField:
+                        if Type.CRIME in c.type:
+                            boardCard.current_val += 2
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "bodydouble": #scam and bodydouble use two different ways for checking if there is an available target
+                    print(boardCard.name, " effect activated")
+                    bodydoubled = False
+                    for bf in self.boardFieldList:
+                        for c in bf.cardList:
+                            if Type.PERSON in c.type and not bodydoubled:
+                                r = random.randrange(0, 6)
+                                if r is 1:
+                                    boardCard.current_val += c.current_val
+                                    bodydoubled = True
+                    for bf in self.boardFieldListOpp:
+                        for c in bf.cardList:
+                            if Type.PERSON in c.type and not bodydoubled:
+                                r = random.randrange(0, 6)
+                                if r is 1:
+                                    boardCard.current_val += c.current_val
+                                    bodydoubled = True
+
+                    if not bodydoubled:
+                        for bf in self.boardFieldList:
+                            for c in bf.cardList:
+                                if Type.PERSON in c.type and not bodydoubled:
+                                    boardCard.current_val += c.current_val
+                                    bodydoubled = True
+                        if not bodydoubled:
+                            for bf in self.boardFieldListOpp:
+                                for c in bf.cardList:
+                                    if Type.PERSON in c.type and not bodydoubled:
+                                        boardCard.current_val += c.current_val
+                                        bodydoubled = True
+
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "junker":
+                    print(boardCard.name, " effect activated")
+
+                if boardCard.id is "beg":
+                    print(boardCard.name, " effect activated")
+                    poorest = Card()
+                    poorest.current_val = 10000 #lol
+                    for bf in self.boardFieldList:
+                        for c in bf.cardList:
+                            if poorest.current_val > c.current_val:
+                                poorest = c
+
+                    for bf in self.boardFieldListOpp:
+                        for c in bf.cardList:
+                            if Type.PERSON in c.type:
+                                c.current_val -= 1
+                                poorest.current_val += 1
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+
+                if boardCard.id is "scam": #scam and bodydouble use two different ways for checking if there is an available target
+                    print(boardCard.name, " effect activated")
+                    scammable = False
+                    for bf in self.boardFieldList
+                        for c in bf.cardList:
+                            if Type.CRIME not in c.type and Type.PERSON in c.type:
+                                scammable = True
+
+                    if scammable:       #this makes sure that there is atleast one non-CRIME PERSON card on both boards
+                        badluckbrian = Card()
+                        scammed = False
+                        for bf in self.boardFieldList:
+                            for c in bf.cardList:
+                                if Type.PERSON in c.type and Type.CRIME not in c.type and not scammed:
+                                    r = random.randrange(0, 6)
+                                    if r is 1:
+                                        badluckbrian = c
+                                        scammed = True
+                        if not scammed:
+                            for bf in self.boardFieldListOpp:
+                                for c in bf.cardList:
+                                    if Type.PERSON in c.type and Type.CRIME not in c.type and not scammed:
+                                        r = random.randrange(0, 6)
+                                        if r is 1:
+                                            badluckbrian = c
+                                            scammed = True
+
+                        self.cashPositives.append(badluckbrian.current_val)
+                        badluckbrian.current_val = 0
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
+                    
+        ############################################## end of effects #################################################
         if effectActivated:
             for bf in self.boardFieldList:
                 for a in bf.cardList:
