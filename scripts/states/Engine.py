@@ -1509,8 +1509,6 @@ class Engine(object):
                 if self.hand[0].front:
                     self.flip_hand(self.hand)
 
-
-
             self.showHandButton = True
 
 
