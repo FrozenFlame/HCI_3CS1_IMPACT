@@ -1,7 +1,7 @@
 class Globals:
     print("[Globals.py]Globals loaded")
     fps = 60.0
-    state = "TUTORIAL"
+    state = "MAIN_MENU"
 
     RESOLUTION_X = 1280
     RESOLUTION_Y = 720

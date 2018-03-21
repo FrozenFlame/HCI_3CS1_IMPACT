@@ -179,16 +179,24 @@ class Engine(object):
         self.graveYardOppY = Globals.RESOLUTION_Y * 0.065
         self.graveYardListOpp = list()
 
+        # # aim for the center of the slot # not center actually idk what's pygame doing with this part.
+        # self.top_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y *0.36)
+        # self.bottom_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y * 0.95)
         # aim for the center of the slot # not center actually idk what's pygame doing with this part.
-        self.top_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y *0.36)
-        self.bottom_slot = (Globals.RESOLUTION_X *0.155, Globals.RESOLUTION_Y * 0.95)
+        self.top_slot = (Globals.RESOLUTION_X * 0.155, Globals.RESOLUTION_Y * 0.375)
+        self.bottom_slot = (Globals.RESOLUTION_X * 0.155, Globals.RESOLUTION_Y * 0.935)
         self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
 
+        # # cash points
+        # self.botcash_coords = (self.bottom_slot[0] - 75, self.bottom_slot[1] - 75)
+        # self.bot_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
+        # self.topcash_coords = (self.top_slot[0] - 75, self.top_slot[1] - 75)
+        # self.top_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
         # cash points
-        self.botcash_coords = (self.bottom_slot[0] - 75, self.bottom_slot[1] - 75)
-        self.bot_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
-        self.topcash_coords = (self.top_slot[0] - 75, self.top_slot[1] - 75)
-        self.top_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
+        self.botcash_coords = (75, 675)
+        self.bot_cash_surf = FontObj.surface_factory("C0", "OLDENGL.ttf", 45, (255, 125, 0))
+        self.topcash_coords = (75, -5)
+        self.top_cash_surf = FontObj.surface_factory("C0", "OLDENGL.ttf", 45, (255, 125, 0))
 
         # fade things
         self.screen = pygame.display.set_mode((1280, 720))
@@ -547,12 +555,7 @@ class Engine(object):
 
                 if boardCard.id is "creditcard":
                     print("Credit Card Effect")
-                    for bf in self.boardFieldList:
-                        for card in bf.cardList:
-                            if Type.PERSON in card.type:
-                                card.current_val += 2
-                            elif Type.OBJECT in card.type:
-                                card.current_val -= 3
+                    self.cards_played -= 2
 
                     # self.spellPlayed = True
                     # self.playedSpell = boardCard
@@ -2064,23 +2067,28 @@ class Engine(object):
                             self.board.coin.point_left()
                             self.board.coin.set_destination(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y*0.5)
 
+                            # # set bplayerimg to bottom left slot
+                            # self.bplayer_img.set_destination(*self.bottom_slot)
+                            # self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0]*0.505, self.bplayer_img.original_surface.get_rect().size[1]*0.505))
+                            # # set bplayer2img to top left slot
+                            # self.bplayer2_img.set_destination(*self.top_slot)
+                            # self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0]*0.505, self.bplayer2_img.original_surface.get_rect().size[1]*0.505))
                             # set bplayerimg to bottom left slot
                             self.bplayer_img.set_destination(*self.bottom_slot)
-                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0]*0.505, self.bplayer_img.original_surface.get_rect().size[1]*0.505))
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.52, self.bplayer_img.original_surface.get_rect().size[1] * 0.52))
                             # set bplayer2img to top left slot
                             self.bplayer2_img.set_destination(*self.top_slot)
-                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0]*0.505, self.bplayer2_img.original_surface.get_rect().size[1]*0.505))
-
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.52, self.bplayer2_img.original_surface.get_rect().size[1] * 0.52))
                         else:
                             print("Coin pointing right")
                             self.board.coin.point_right()
                             self.board.coin.set_destination(Globals.RESOLUTION_X * 0.5, Globals.RESOLUTION_Y * 0.5)
 
                             # set bplayer2img to bottom left slot
-                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.505, self.bplayer_img.original_surface.get_rect().size[1] * 0.505))
+                            self.bplayer_img.scale_to((self.bplayer_img.original_surface.get_rect().size[0] * 0.52, self.bplayer_img.original_surface.get_rect().size[1] * 0.52))
                             self.bplayer_img.set_destination(*self.top_slot)
 
-                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.505, self.bplayer2_img.original_surface.get_rect().size[1] * 0.505))
+                            self.bplayer2_img.scale_to((self.bplayer2_img.original_surface.get_rect().size[0] * 0.52, self.bplayer2_img.original_surface.get_rect().size[1] * 0.52))
                             self.bplayer2_img.set_destination(*self.bottom_slot)
                             # set bplayerimg to top left slot
                     self.bplayer_font.set_destination(-600, self.bplayer_font.exact_position[1])
@@ -2107,8 +2115,8 @@ class Engine(object):
                 else:
                     print("Everything in place, take first turn")
                     # refresh graphic (smoothscale resolution problems)
-                    self.bplayer_img.surface = pygame.transform.smoothscale(self.bplayer_img.original_surface, (round(self.bplayer_img.original_surface.get_rect().size[0] *0.505), round(self.bplayer_img.original_surface.get_rect().size[1] * 0.505)))
-                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.505), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.505)))
+                    self.bplayer_img.surface = pygame.transform.smoothscale(self.bplayer_img.original_surface, (round(self.bplayer_img.original_surface.get_rect().size[0] *0.52), round(self.bplayer_img.original_surface.get_rect().size[1] * 0.52)))
+                    self.bplayer2_img.surface = pygame.transform.smoothscale(self.bplayer2_img.original_surface, (round(self.bplayer2_img.original_surface.get_rect().size[0] * 0.52), round(self.bplayer2_img.original_surface.get_rect().size[1] * 0.52)))
 
                     # self.bplayer_img.set_absolute(self.top_slot)
                     # self.bplayer2_img.set_absolute(self.bottom_slot)
