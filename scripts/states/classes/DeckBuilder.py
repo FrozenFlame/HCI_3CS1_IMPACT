@@ -141,7 +141,7 @@ class DeckCatalogue(object):
         bigBagOfCash = Card("bigbagofcash", "Big Bag of Cash", 20, "", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\commons\\big money bag.png")
         deed = Card("deed", "Deed", 25, "", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\commons\\deed.png")
         dollaDollaBills = Card("dolladollabills", "Dolla Dolla Bills", 7, "", [Type.OBJECT], hero_name,"assets\\cards\\card_art\\commons\\dollars.png")
-        mansion = Card("mansion", "Mansion", 25, "", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\")
+        mansion = Card("mansion", "Mansion", 25, "", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\mansion.png")
         house = Card("house", "House", 10, "", [Type.STRUCTURE], hero_name)
         student = Card("student", "Student", 5, "", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\student.png")
         car = Card("car", "Car", 15, "", [Type.VEHICLE], hero_name)
