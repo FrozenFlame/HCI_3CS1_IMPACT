@@ -4,6 +4,7 @@ from enum import Enum, auto
 from scripts import tools
 from .classes.Buttons import Buttons
 from .classes.ButtonCol.PlayButton import PlayButton
+from .classes.ButtonCol.TutorialButton import TutorialButton
 from .classes.Player import Player
 from .classes.Hero import Hero
 from .classes.User import User
@@ -27,15 +28,20 @@ class MainMenu(object):
         tools.State.__init__(self)
 
         self.next = None
-        self.buttons = Buttons(Globals.RESOLUTION_X*0.50, Globals.RESOLUTION_Y *0.80)
+        self.buttons = Buttons(Globals.RESOLUTION_X*0.30, Globals.RESOLUTION_Y *0.80)
         self.buttons.posX -= self.buttons.width *0.5
         self.buttons.posY -= self.buttons.height *0.5
         self.buttons.dspeed = 5
+
         self.play_button = PlayButton(Globals.RESOLUTION_X*0.5, Globals.RESOLUTION_Y + 100)
         self.play_button.posX -= self.play_button.width *0.5
         self.play_button.posY -= self.play_button.height *0.5
         self.play_button.dspeed = 5
 
+        self.tutorial_button = TutorialButton(Globals.RESOLUTION_X*0.70, Globals.RESOLUTION_Y *0.80)
+        self.tutorial_button.posX -= self.tutorial_button.width *0.5
+        self.tutorial_button.posY -= self.tutorial_button.height *0.5
+        self.tutorial_button.dspeed = 5
         ''' (ascii font Ogre)
            __             _          ___             _                      
           / /  ___   __ _(_) ___    / __\ ___   ___ | | ___  __ _ _ __  ___ 
@@ -158,6 +164,7 @@ class MainMenu(object):
         self.fadeScreen.fill((0, 0, 0))  # black
         self.faded = False
         self.buttons.set_image(self.buttons.startButtonNormal)
+        self.tutorial_button.set_image(self.tutorial_button.startButtonNormal)
         self.has_faded_out = False
         self.playing_sound = False
 
@@ -351,8 +358,12 @@ class MainMenu(object):
 
                     self.heroes_to_default()
 
-                    # allow coins to get moving
-                    # reset wait timer
+            self.tutorial_button.get_evt(click, event, mouse)
+            if self.tutorial_button.has_message:  # start button
+                self.tutorial_button.has_message = False
+                self.fadeIn()
+                self.phase = Phase.TUTORIAL
+                self.phase_start_time = pygame.time.get_ticks()
         elif self.phase == Phase.READY_UP:
 
             self.play_button.get_evt(click,event,mouse)
@@ -507,6 +518,11 @@ class MainMenu(object):
 
             self.finished = True
 
+        elif self.phase == Phase.TUTORIAL:
+            print("Tasty Tuts, Here a-comes the tutorial!")
+            self.next = "TUTORIAL"
+            self.finished = True
+
 
         self.draw(screen)
 
@@ -543,6 +559,7 @@ class MainMenu(object):
             # screen.blit(self.logo, self.logo_pos)
             # self.play_button.draw(screen)
             self.backdropMovable.draw(screen)
+            self.tutorial_button.draw(screen)
 
         elif self.phase == Phase.TO_HERO or self.phase == Phase.TO_START:
             self.buttons.draw(screen)
@@ -760,6 +777,7 @@ class Phase(Enum):
     READY_UP = auto()
     TO_GAME = auto()
     GAME = auto()
+    TUTORIAL = auto()
 
 
 
