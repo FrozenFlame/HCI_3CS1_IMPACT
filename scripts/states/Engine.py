@@ -2252,6 +2252,7 @@ class Engine(object):
         self.opening = False
         self.done = False
         Globals.gameStart = False
+        Globals.mainmenu = True
         return self.persist
 
 

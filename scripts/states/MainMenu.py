@@ -363,6 +363,7 @@ class MainMenu(object):
                 self.tutorial_button.has_message = False
                 self.fadeIn()
                 self.phase = Phase.TUTORIAL
+                Globals.tutorial = True
                 self.phase_start_time = pygame.time.get_ticks()
         elif self.phase == Phase.READY_UP:
 
@@ -746,7 +747,7 @@ class MainMenu(object):
             TEST ONLY STATIC PERSIST
         '''
 
-        if not Globals.gameStart:
+        if not Globals.gameStart and not Globals.tutorial:
             self.persist['playerA'] = self.playera
             self.persist['playerB'] = self.playerb
             self.persist['portraitA'] = self.player_imgmov

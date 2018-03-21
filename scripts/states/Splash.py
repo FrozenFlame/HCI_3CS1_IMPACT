@@ -15,7 +15,7 @@ class Splash(object):
         self.fadeScreen.fill((0, 0, 0))  # black
         self.faded = True
         self.logotime = False
-        self.timeout = 12500
+        self.timeout = 5000
         self.alpha_step = 2
         self.pause = False
 

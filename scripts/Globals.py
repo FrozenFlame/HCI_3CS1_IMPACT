@@ -10,6 +10,8 @@ class Globals:
 
     # temp vals
     gameStart = False
+    mainmenu = False
+    tutorial = False
 
     mixer_volume = 0.5
 

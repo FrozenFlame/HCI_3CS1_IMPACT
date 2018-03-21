@@ -985,9 +985,9 @@ class Tutorial(object):
 
                     for s in self.allCardsList:
                         if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
-                            if Type.SPELL in s.type and self.noSpells:
-                                continue
-                            else:
+                            # # if Type.SPELL in s.type and self.noSpells:
+                            # #     continue
+                            # else:
                                 self.clickedCard.append(s)
                                 s.onTop = True
                                 self.allCardsList.pop(self.allCardsList.index(s))
@@ -1299,7 +1299,7 @@ class Tutorial(object):
                     self.may_see_okay_button = True
                     self.tut_arrow.set_destination(*self.tut_botscore_coord)
 
-                    self.noSpells = False
+                    # self.noSpells = False
                 elif self.tut_may_proceed:
                     self.tut_may_proceed = False
                     self.tut_place2_bool = False
@@ -1928,6 +1928,8 @@ class Tutorial(object):
         self.big_portraits_visible = True
 
     def cleanup(self):
+        Globals.tutorial = False
+        Globals.mainmenu = True
         pygame.mixer.music.fadeout(1000)
         self.board = None
         self.boardField = None

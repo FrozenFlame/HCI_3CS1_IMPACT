@@ -14,10 +14,7 @@ def main():
 
     # okay, I'm guessing this is first preload. But eventually, you'll have to push and pop new instances here
     states = {"SPLASH": Splash.Splash(),
-              "MAIN_MENU": MainMenu.MainMenu(),
-              "MAIN_MENU2": MainMenu2.MainMenu(),
-              "AVARICE": Engine.Engine(),
-              "TUTORIAL": Tutorial.Tutorial()
+              "MAIN_MENU": MainMenu.MainMenu()
               #"OPTIONS": theoretical.Options()
               #"HERO_SELECT": theoretical.HeroSelect()
               #"GAME_SUMMARY": theoretical.GameSummary()
