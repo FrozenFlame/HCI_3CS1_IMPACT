@@ -140,7 +140,7 @@ class Engine(object):
         self.drawCardWait = 100
         self.openingIndex = 0
         self.openingX = 220                # hand coordinate is from 220 to 1020 (PLAYER)
-        self.openingY = 610
+        self.openingY = 615
         self.openingXOpp = 220  # hand coordinate is from 220 to 1020 (OPP)
         self.openingYOpp = -30
 
@@ -449,7 +449,7 @@ class Engine(object):
         for h2 in self.hand:
             h2.resting = False
             h2.set_destination(*h2.defaultPos)
-            h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+            h2.defaultPos = (newX, self.openingY)  # 615 = LATEST(22/mar/18)self.openingY (old was 600)
             h2.update(deltaTime, newX, self.openingY)
             newX += 80
             if self.hand.index(h2) >= oldhandlength:
