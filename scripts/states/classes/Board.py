@@ -52,11 +52,14 @@ class Board(object):
             self.right_img = pygame.image.load("assets\\board\\coinright.png").convert_alpha()
             self.end_img = pygame.image.load("assets\\board\\coinend.png").convert_alpha()
             self.pass_img = pygame.image.load("assets\\board\\coinpass.png").convert_alpha()
+            self.base_img = pygame.image.load("assets\\board\\coin.png").convert_alpha()
 
             self.left = pygame.transform.smoothscale(self.left_img, (round(self.left_img.get_rect().size[0]*0.66), round(self.left_img.get_rect().size[1]*0.66)))
             self.right = pygame.transform.smoothscale(self.right_img, (round(self.right_img.get_rect().size[0]*0.66), round(self.right_img.get_rect().size[1]*0.66)))
             self.coinend = pygame.transform.smoothscale(self.end_img, (round(self.end_img.get_rect().size[0]*0.66), round(self.end_img.get_rect().size[1]*0.66)))
             self.coinpass = pygame.transform.smoothscale(self.pass_img, (round(self.pass_img.get_rect().size[0]*0.66), round(self.pass_img.get_rect().size[1]*0.66)))
+            self.base = pygame.transform.smoothscale(self.base_img, (round(self.base_img.get_rect().size[0]*0.66), round(self.base_img.get_rect().size[1]*0.66)))
+
             self.img = self.left  # image visible to the people
             self.rect = self.img.get_rect()
             self.side = 0  # 0 and 1 for point left and point right
@@ -80,13 +83,54 @@ class Board(object):
             self.move_type = "constant"
             self.scalespeed = 10
 
+            self.width = self.img.get_rect().size[0]
+            self.height = self.img.get_rect().size[1]
+            self.flipY = self.height
+            self.flipDisplace = 0
+            self.flipped = False
+
         def flip(self):
             self.animating = True
             self.longanim = False
             self.side = 0 if self.side != 0 else 1
 
-        def flipAnim(self):
+        def flipAnim(self, waitTick):
             pass
+            # waitTime = 10
+            # if self.flipY > 0 and not self.flipped:  # shrinking animation
+            #     currentTick = pygame.time.get_ticks()
+            #     if currentTick - waitTick >= waitTime:
+            #         waitTick = currentTick
+            #         self.img = pygame.transform.smoothscale(self.img, (self.width, self.flipY))
+            #         self.flipDisplace = (self.height - self.img.get_rect().size[1])
+            #
+            #
+            #         self.flipY -= 20
+            # ################################################################################
+            # elif self.flipY <= 0 and not self.flipped:  # time to flip trigger + changing of image
+            #     self.flipY += 20
+            #     self.img = pygame.transform.smoothscale(pygame.transform.smoothscale(self.base, (
+            #     round(self.base.get_rect().size[0] * 0.33), round(self.base.get_rect().size[0] * 0.33))),
+            #                                                 (self.width, self.flipY))
+            #     self.flipped = True
+            #
+            # ################################################################################
+            # elif self.flipY <= 74 and self.flipped:  # growing animation
+            #
+            #     currentTick = pygame.time.get_ticks()
+            #     if currentTick - waitTick >= waitTime:
+            #         waitTick = currentTick
+            #         self.img = pygame.transform.smoothscale(self.img, (self.width, self.flipY))
+            #         self.flipDisplace = (self.width - self.img.get_rect().size[0])
+            #         self.flipY += 20
+            # ################################################################################
+            # elif self.flipY >= 75 and self.flipped:  # animation completed, new image face set
+            #     self.img = pygame.transform.smoothscale(self.base, (
+            #     round(self.base.get_rect().size[0] * 0.33), round(self.base.get_rect().size[1] * 0.33)))
+            #     self.flipped = False
+            #     self.flipAnimating = False
+            #     self.flipY = 74  # restoring flipX back to original value
+
         def toss(self): # random first toss in the game
             self.animating = True
             self.longanim = True
