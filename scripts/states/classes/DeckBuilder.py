@@ -105,8 +105,8 @@ class DeckCatalogue(object):
 
 
     def get_deck_billy(hero_name):
-        slaughterHouse = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on your board", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
-        cropDuster = Card("cropduster", "Crop Duster", 10, "+7C for every 'FARM' card on your board", [Type.VEHICLE], hero_name)
+        slaughterHouse = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
+        cropDuster = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this board", [Type.VEHICLE], hero_name)
         farm = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
         barn = Card("barn", "Barn", 5, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name)
@@ -114,11 +114,11 @@ class DeckCatalogue(object):
         chicken = Card("chicken", "Chicken", 5, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog = Card("farmdog", "Farm Dog", 3, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\dog.png")
         reap = Card("reap", "Reap", 0, "Gain all the values of your 'Farm' cards on board, then send them to graveyard", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\reap.png")
-        drought = Card("drought", "Drought", 0, "-5C to 'Farm', -2C to ANIMAL and PERSON, +10C to 'Water Purifier' on your board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\drought.png")
-        waterPurifier = Card("waterpurifier", "Water Purifier", 5, "+1C to all ANIMAL or PERSON cards on this boardfield", [Type.OBJECT], hero_name)
+        drought = Card("drought", "Drought", 0, "-5C 'Farm', -2C ANIMAL / PERSON, +10C 'Water Purifier' on your board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\drought.png")
+        waterPurifier = Card("waterpurifier", "Water Purifier", 5, "+2C to all ANIMAL or PERSON cards on this boardfield", [Type.OBJECT], hero_name)
 
-        slaughterHouse2 = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on your board", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
-        cropDuster2 = Card("cropduster", "Crop Duster", 10, "+7C for every 'FARM' card on your board", [Type.VEHICLE], hero_name)
+        slaughterHouse2 = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
+        cropDuster2 = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this board", [Type.VEHICLE], hero_name)
         farm2 = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy2 = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
         barn2 = Card("barn", "Barn", 0, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name)
@@ -126,8 +126,8 @@ class DeckCatalogue(object):
         chicken2 = Card("chicken", "Chicken", 5, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog2 = Card("farmdog", "Farm Dog", 3, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\dog.png")
         reap2 = Card("reap", "Reap", 0, "Gain all the values of your 'Farm' cards on board, then send them to graveyard", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\reap.png")
-        drought2 = Card("drought", "Drought", 0, "-5C to 'Farm' cards, +2C to ANIMAL cards on your board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\drought.png")
-        waterPurifier2 = Card("waterpurifier", "Water Purifier", 5, "+1C to all ANIMAL or PERSON cards on your board", [Type.OBJECT], hero_name)
+        drought2 = Card("drought", "Drought", 0, "-5C 'Farm', -2C ANIMAL / PERSON, +10C 'Water Purifier' on your board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\drought.png")
+        waterPurifier2 = Card("waterpurifier", "Water Purifier", 5, "+2C to all ANIMAL or PERSON cards on your board", [Type.OBJECT], hero_name)
 
 
         deck = [slaughterHouse, cropDuster, farm, farmBoy, barn, cow, chicken, farmDog, reap, drought, waterPurifier,
@@ -166,7 +166,7 @@ class DeckCatalogue(object):
         impoundLot = Card("impoundlot", "Impound Lot", 5, "-2C to VEHICLE cards on enemy board", [Type.STRUCTURE], hero_name)
         junkyard = Card("junkyard", "Junkyard", 5, "+2C to SELF per VEHICLE card on both graveyards.", [Type.STRUCTURE], hero_name)
         loanSlip = Card("loanslip", "Loan Slip", 0, "-20C to PLAYER BANK; Draw 3 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\commons\\loan slip.png")
-        creditCard = Card("creditcard", "Credit Card", 0, "Play 2 extra cards this turn", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\credit card.png")
+        creditCard = Card("creditcard", "Credit Card", 0, "Play 2 extra cards this turn, lose 6C", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\credit card.png")
         resurrect = Card("resurrect", "Resurrect", 0, "Restore 1 PERSON card from your graveyard.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\resurrect.png")
         rebuild = Card("rebuild", "Rebuild", 0, "Restore 1 STRUCTURE or VEHICLE from your grave.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\rebuild.png")
         saboteur = Card("saboteur", "Saboteur", 0, "Destroy 1 random opponent card", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\saboteur.png")
