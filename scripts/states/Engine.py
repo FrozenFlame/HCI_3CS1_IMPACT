@@ -418,60 +418,60 @@ class Engine(object):
         card.resting = False
         card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
 
-        def loanSlipDraw(self):
-            num_of_cards = 2
-            if not self.done_drawing:
-                # please burn cards in future patch (w/ animations muhaha)
-                self.draw_cards(num_of_cards, self.deck, self.hand)
-                self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
-                print("Player Hand Size: ", len(self.hand))
-                if len(self.hand) > 10:
-                    print("Player {0} hand overload!".format(self.player.user.username))
-                print("Player opponent hand Size: ", len(self.opponent_hand))
-                if len(self.opponent_hand) > 10:
-                    print("Player {0} hand overload!".format(self.player2.user.username))
-                self.flip_hand_down(self.hand)
-                self.flip_hand_down(self.opponent_hand)
-                self.done_drawing = True
-            currentTick = currentTime
-            if currentTick - self.waitTick >= self.drawCardWait:
+    def loanSlipDraw(self):
+        num_of_cards = 2
+        if not self.done_drawing:
+            # please burn cards in future patch (w/ animations muhaha)
+            self.draw_cards(num_of_cards, self.deck, self.hand)
+            self.draw_cards(num_of_cards, self.opponent_deck, self.opponent_hand)
+            print("Player Hand Size: ", len(self.hand))
+            if len(self.hand) > 10:
+                print("Player {0} hand overload!".format(self.player.user.username))
+            print("Player opponent hand Size: ", len(self.opponent_hand))
+            if len(self.opponent_hand) > 10:
+                print("Player {0} hand overload!".format(self.player2.user.username))
+            self.flip_hand_down(self.hand)
+            self.flip_hand_down(self.opponent_hand)
+            self.done_drawing = True
+        currentTick = currentTime
+        if currentTick - self.waitTick >= self.drawCardWait:
 
-                if self.openingIndex < num_of_cards:
-                    self.waitTick = currentTick
-                    self.drawCardSound.play()
-                    newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
-                        h2.update(deltaTime, newX, self.openingY)
-                        newX += 80
-                    newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
-                    for h2 in self.opponent_hand:
-                        h2.resting = False
-                        h2.set_destination(h.posX, h.posY)
-                        h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
-                        h2.update(deltaTime, newXOpp, self.openingYOpp)
-                        newXOpp += 80
+            if self.openingIndex < num_of_cards:
+                self.waitTick = currentTick
+                self.drawCardSound.play()
+                newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
+                for h2 in self.hand:
+                    h2.resting = False
+                    h2.set_destination(h.posX, h.posY)
+                    h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
+                    h2.update(deltaTime, newX, self.openingY)
+                    newX += 80
+                newXOpp = 620 - (40 * (len(self.opponent_hand) - (num_of_cards - (self.openingIndex + 1))))
+                for h2 in self.opponent_hand:
+                    h2.resting = False
+                    h2.set_destination(h.posX, h.posY)
+                    h2.defaultPos = (newXOpp, self.openingYOpp)  # 600 = self.openingY
+                    h2.update(deltaTime, newXOpp, self.openingYOpp)
+                    newXOpp += 80
 
-                    handex = (len(self.hand) - num_of_cards) + self.openingIndex
-                    handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
-                    self.hand[handex].resting = False
-                    self.hand[handex].set_destination(1180, 563)
+                handex = (len(self.hand) - num_of_cards) + self.openingIndex
+                handexopp = (len(self.opponent_hand) - num_of_cards) + self.openingIndex
+                self.hand[handex].resting = False
+                self.hand[handex].set_destination(1180, 563)
 
-                    self.opponent_hand[handexopp].resting = False
-                    self.opponent_hand[handexopp].set_destination(1180, 100)
-                    self.opponent_hand[handexopp].posY = 100
+                self.opponent_hand[handexopp].resting = False
+                self.opponent_hand[handexopp].set_destination(1180, 100)
+                self.opponent_hand[handexopp].posY = 100
 
-                    self.allCardsList.append(self.hand[handex])
-                    self.allCardsList.append(self.opponent_hand[handexopp])
+                self.allCardsList.append(self.hand[handex])
+                self.allCardsList.append(self.opponent_hand[handexopp])
 
-                    self.openingIndex += 1
-                else:
-                    self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
-                    self.opening = False
-                    self.done_drawing = False
-                    self.openingIndex = 0
+                self.openingIndex += 1
+            else:
+                self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, -300)
+                self.opening = False
+                self.done_drawing = False
+                self.openingIndex = 0
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #  _____                        _                 _
@@ -867,7 +867,29 @@ class Engine(object):
                     effectActivated = True
                     continue
 
-############################################### end effects ##########################################################
+############################################## victoria effects #######################################################
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+                if boardCard.id is "waterpurifier":
+                    print(boardCard.name, " effect activated")
+
+        ############################################## end of effects #########################################################
         if effectActivated:
             for bf in self.boardFieldList:
                 for a in bf.cardList:
@@ -1212,7 +1234,7 @@ class Engine(object):
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
             if self.activeLoanSlip:
-                self.loanSlipDraw()
+                self.loanSlipDraw
                 self.activeLoanSlip = False
             # if self.spellPlayed:
             #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
