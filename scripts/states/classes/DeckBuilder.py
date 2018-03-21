@@ -75,9 +75,9 @@ class DeckCatalogue(object):
 
     def get_deck_victoria(hero_name):
         insurance = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card on your board to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
-        shareHolder = Card("shareholder", "Share Holder", 10, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
+        shareHolder = Card("shareholder", "Share Holder", 12, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
         superstar = Card("superstar", "Superstar", 15, "+2C per PERSON card on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\superstar.png")
-        hacker = Card("hacker", "Hacker", 12, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
+        hacker = Card("hacker", "Hacker", 10, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
         university = Card("university", "University", 15, "", [Type.STRUCTURE], hero_name)
         skyscraper = Card("skyscraper", "Skyscraper", 28, "", [Type.STRUCTURE], hero_name)
         supplyTruck = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
@@ -86,9 +86,9 @@ class DeckCatalogue(object):
         solidWorkforce = Card("solidworkforce", "Solid Workforce", 0, "+3C to all non-CRIME PERSON cards on your board", [Type.SPELL], hero_name)
 
         insurance2 = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card on your board to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
-        shareHolder2 = Card("shareholder", "Share Holder", 10, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
+        shareHolder2 = Card("shareholder", "Share Holder", 12, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
         superstar2 = Card("superstar", "Superstar", 15, "+2C per PERSON card on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\superstar.png")
-        hacker2 = Card("hacker", "Hacker", 12, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
+        hacker2 = Card("hacker", "Hacker", 10, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
         university2 = Card("university", "University", 15, "", [Type.STRUCTURE], hero_name)
         skyscraper2 = Card("skyscraper", "Skyscraper", 28, "", [Type.STRUCTURE], hero_name)
         supplyTruck2 = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
