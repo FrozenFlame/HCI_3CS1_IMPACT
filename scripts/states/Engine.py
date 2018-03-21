@@ -185,9 +185,9 @@ class Engine(object):
         self.coin_slot = (Globals.RESOLUTION_X *0.082, Globals.RESOLUTION_Y *0.5)
 
         # cash points
-        self.botcash_coords = (self.bottom_slot[0] - 185, self.bottom_slot[1] - 235)
+        self.botcash_coords = (self.bottom_slot[0] - 75, self.bottom_slot[1] - 75)
         self.bot_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
-        self.topcash_coords = (self.top_slot[0] - 185, self.top_slot[1] - 235)
+        self.topcash_coords = (self.top_slot[0] - 75, self.top_slot[1] - 75)
         self.top_cash_surf = FontObj.surface_factory("C0","oldengl.ttf",45, (255, 125, 0))
 
         # fade things
@@ -209,8 +209,6 @@ class Engine(object):
         # self.spellPlayed = False
         # self.playedSpell = None
 
-        self.cashNegatives = list()
-        self.cashPositives = list()
         self.activateLoanSlip = False
         self.activateInnovate = False
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -498,16 +496,16 @@ class Engine(object):
         for bF in bFList:
             for c in bF.cardList:
                 player.cash += c.current_val
-        for utang in self.cashNegatives:
+        for utang in self.player.cashNegatives:
             player.cash -= utang
-        for bonus in self.cashPositives:
+        for bonus in self.player.cashPositives:
             player.cash += bonus
         print("[Engine] After recalculation cash: ", self.player.cash)
         # TODO lazy, no algorithm. Make a better algorithm in the future
         self.refresh_cash(player)
     def refresh_cash(self, player):
-        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"oldengl.ttf",45, (30, 160, 0))
-        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"oldengl.ttf",45, (30, 160, 0))
+        self.bot_cash_surf = FontObj.surface_factory("C"+str(self.player.cash),"oldengl.ttf",45, (255, 125, 0))
+        self.top_cash_surf = FontObj.surface_factory("C"+str(self.player2.cash),"oldengl.ttf",45, (255, 125, 0))
     def apply_effects(self, boardField): #f this sh
         bf_vehicleCounter = boardField.count_cardType(Type.VEHICLE)
         bf_crimeCounter = boardField.count_cardType(Type.CRIME)
@@ -686,7 +684,7 @@ class Engine(object):
                     print("Self hand before Loan:", len(self.hand))
                     self.done_drawing = False
                     self.activateLoanSlip = True
-                    self.cashNegatives.append(20)
+                    self.player.cashNegatives.append(20)
                     print("Self hand after Loan:", len(self.hand))
 
                     # self.spellPlayed = True
@@ -795,7 +793,7 @@ class Engine(object):
                     for bf in self.boardFieldList:
                         for c in bf.cardList:
                             if c.id is 'farm':
-                                self.cashPositives.append(c.current_val)
+                                self.player.cashPositives.append(c.current_val)
                                 self.send_to_grave_fromboard(c, bf)
 
                     boardCard.effectActivated = True
@@ -974,7 +972,7 @@ class Engine(object):
                     if len(enemyBoardfield.cardList) > 0:
                         for c in enemyBoardfield.cardList:
                             if c.id is 'bagofcash' or c.id is 'bigbagofcash' or c.id is 'dolladollabills':
-                                self.cashPositives.append((int(c.current_val/4)))
+                                self.player.cashPositives.append((int(c.current_val/4)))
                                 c.current_val -= (int(c.current_val/4))
 
                     boardCard.effectActivated = True
@@ -1085,7 +1083,7 @@ class Engine(object):
                                             badluckbrian = c
                                             scammed = True
 
-                        self.cashPositives.append(badluckbrian.current_val)
+                        self.player.cashPositives.append(badluckbrian.current_val)
                         badluckbrian.current_val = 0
 
                     boardCard.effectActivated = True
@@ -1386,7 +1384,7 @@ class Engine(object):
 
 
         if self.board.coin.animating:
-            self.board.coin.flipAnim()
+            self.board.coin.flipAnim(self.waitTick)
 
 
         if self.is_showing_decide:
@@ -1576,6 +1574,17 @@ class Engine(object):
             del tempBackRow
             del tempGraveyardList
 
+            # tempCashNegatives = self.player.cashNegatives
+            # tempCashPositives = self.player.cashPositives
+            # del self.player.cashNegatives
+            # del self.player.cashPositives
+            # self.player.cashNegatives = self.player2.cashNegatives
+            # self.player.cashPositives = self.player2.cashPositives
+            # del self.player2.cashNegatives
+            # del self.player2.cashPositives
+            # self.player2.cashNegatives = tempCashNegatives
+            # self.player2.cashPositives = tempCashPositives
+
             #send spell cards to grave during swap
             # for card in self.boardField2.cardList:
             #     if Type.SPELL in card.type:
@@ -1636,7 +1645,7 @@ class Engine(object):
                     self.cracksmall.play()
                     crackimg = pygame.image.load("assets\\heroes\\crack small.png")
                     rcrackimg = pygame.transform.smoothscale(crackimg,(self.bplayer_img.surface.get_rect().size[0],self.bplayer_img.surface.get_rect().size[1])).convert_alpha()
-                    self.font_decide_obj = FontObj.factory(self.player.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
+                    self.font_decide_obj = FontObj.factory(self.player.user.username + " won the Round!", Globals.RESOLUTION_X * 0.5, -200, "oldengl.ttf", 40, (255, 255, 255))
                     self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
                     if self.player1heads:
                         self.bplayer2_img.surface.blit(rcrackimg,(0,0))
@@ -1670,10 +1679,8 @@ class Engine(object):
 
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
-                while len(self.cashNegatives) > 0:
-                    self.cashNegatives.pop(0)
-                while len(self.cashPositives) > 0:
-                    self.cashPositives.pop(0)
+                self.player.renew_balances()
+                self.player2.renew_balances()
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.refresh_cash(self.player)
@@ -1682,10 +1689,9 @@ class Engine(object):
                 print("Both players have equal amount of cash!")
                 self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
                 self.font_decide_obj.set_destination(Globals.RESOLUTION_X * 0.5, 200)
-                while len(self.cashNegatives) > 0:
-                    self.cashNegatives.pop(0)
-                while len(self.cashPositives) > 0:
-                    self.cashPositives.pop(0)
+
+                self.player.renew_balances()
+                self.player2.renew_balances()
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.refresh_cash(self.player)
@@ -1731,10 +1737,9 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
-                while len(self.cashNegatives) > 0:
-                    self.cashNegatives.pop(0)
-                while len(self.cashPositives) > 0:
-                    self.cashPositives.pop(0)
+
+                self.player.renew_balances()
+                self.player2.renew_balances()
                 self.player.cash = 0
                 self.player2.cash = 0
                 self.refresh_cash(self.player)
