@@ -423,7 +423,7 @@ class Engine(object):
         card.resting = False
         card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
 
-    def cardEffectDraw(self, amt):
+    def cardEffectDraw(self, amt, currentTime):
         num_of_cards = 2
         if not self.done_drawing:
             # please burn cards in future patch (w/ animations muhaha)
@@ -447,7 +447,7 @@ class Engine(object):
                 newX = 620 - (40 * (len(self.hand) - (num_of_cards - (self.openingIndex + 1))))
                 for h2 in self.hand:
                     h2.resting = False
-                    h2.set_destination(h.posX, h.posY)
+                    h2.set_destination(*h2.defaultPos)
                     h2.defaultPos = (newX, self.openingY)  # 600 = self.openingY
                     h2.update(deltaTime, newX, self.openingY)
                     newX += 80
@@ -887,7 +887,7 @@ class Engine(object):
                             if Type.PERSON in c.type:
                                 boardCard.current_val += 2
                     for bf in self.boardFieldListOpp:
-                        for c in bf.cardlist:
+                        for c in bf.cardList:
                             if Type.PERSON in c.type:
                                 boardCard.current_val += 2
 
@@ -954,7 +954,7 @@ class Engine(object):
                     print(boardCard.name, " effect activated")
                     for c in boardField.cardList:
                         if Type.OBJECT in c.type:
-                            c.current_val += int(c.base_val/2)
+                            c.current_val += (int(c.base_val/2))
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -971,8 +971,8 @@ class Engine(object):
                     if len(enemyBoardfield.cardList) > 0:
                         for c in enemyBoardfield.cardList:
                             if Type.PERSON in c.type:
-                                boardCard += int(c.current_val/4)
-                                c.current_val -= int(c.current_val/4)
+                                boardCard += (int(c.current_val/4))
+                                c.current_val -= (int(c.current_val/4))
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -982,10 +982,10 @@ class Engine(object):
                     print(boardCard.name, " effect activated")
                     for c in self.graveYardList:
                          if Type.PERSON in c.type:
-                             boardCard.current_val += int(c.base_val/2)
+                             boardCard.current_val += (int(c.base_val/2))
                     for c in self.graveYardListOpp:
                          if Type.PERSON in c.type:
-                             boardCard.current_val += int(c.base_val/2)
+                             boardCard.current_val += (int(c.base_val/2))
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -1002,8 +1002,8 @@ class Engine(object):
                     if len(enemyBoardfield.cardList) > 0:
                         for c in enemyBoardfield.cardList:
                             if c.id is 'bagofcash' or c.id is 'bigbagofcash' or c.id is 'dolladollabills':
-                                self.cashPositives.append(int(c.current_val/4))
-                                c.current_val -= int(c.current_val/4)
+                                self.cashPositives.append((int(c.current_val/4)))
+                                c.current_val -= (int(c.current_val/4))
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -1467,10 +1467,10 @@ class Engine(object):
             if len(self.boardField2.cardList) != 0:
                 self.apply_effects(self.boardField2)
             if self.activateLoanSlip:
-                self.cardEffectDraw(2)
+                self.cardEffectDraw(2, currentTime)
                 self.activateLoanSlip = False
             if self.activateInnovate:
-                self.cardEffectDraw(1)
+                self.cardEffectDraw(1, currentTime)
                 self.activateInnovate = False
             # if self.spellPlayed:
             #     if currentTime - self.waitTick >= 1000:         # this does not work; add something where the spell remains on board for 1second, then goes to graveyard, then rearrange board
