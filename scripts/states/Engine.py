@@ -424,6 +424,7 @@ class Engine(object):
         card.set_destination(*card.defaultPos)  # NOTE: added a star to unpack the tuple, so taht set_destination gets the x and y it wanted
 
     def cardEffectDraw(self, amt, currentTime, deltaTime):
+    ############ (backend) transfer card from deck to hand ########################
         num_of_cards = amt
         if not self.done_drawing:
             # please burn cards in future patch (w/ animations muhaha)
@@ -432,8 +433,8 @@ class Engine(object):
             if len(self.hand) > 10:
                 print("Player {0} hand overload!".format(self.player.user.username))
 
-            self.flip_hand_down(self.hand)
             self.done_drawing = True
+    ##################### (frontend) drawing animation ############################
         currentTick = currentTime
         if currentTick - self.waitTick >= self.drawCardWait:
 
