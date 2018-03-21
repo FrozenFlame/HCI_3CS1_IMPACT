@@ -45,27 +45,27 @@ class DeckCatalogue(object):
 
     def get_deck_king(hero_name):
 
-        blackMarket = Card("blackmarket", "Black Market", 15, "Give half of their base value to OBJECT cards on this boardfield", [Type.STRUCTURE, Type.CRIME], hero_name)
-        pickPocket = Card("pickpocket", "Pick Pocket", 1, "Take and Give SELF a quarter of the current value of each PERSON card on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")
-        graveDigger = Card("gravedigger", "Gravedigger", 2, "Give SELF half the base value of each PERSON card in both graveyards", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\gravedigger.png")
-        robinHood = Card("robinhood", "Robin Hood", 10, "Take and Give to PLAYER BANK a quarter of the current value of all -cash- cards on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\robin hood.png")
+        blackMarket = Card("blackmarket", "Black Market", 15, "Give 1/2 their base value to OBJECT cards on this boardfield", [Type.STRUCTURE, Type.CRIME], hero_name)
+        pickPocket = Card("pickpocket", "Pick Pocket", 1, "Transfer to SELF 1/4 current value of each PERSON card on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")
+        graveDigger = Card("gravedigger", "Gravedigger", 2, "Give SELF 1/2 base value of each PERSON card in both graveyards", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\gravedigger.png")
+        robinHood = Card("robinhood", "Robin Hood", 10, "Transfer to PLAYER BANK 1/4 current value of all -cash- cards on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\robin hood.png")
         slums = Card("slums", "Slums", 5, "", [Type.STRUCTURE], hero_name)
         kingpin = Card("kingpin", "Kingpin", 10, "+2C for every CRIME card on this boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\kingpin.png")
-        bodyDouble = Card("bodydouble", "Body Double", 0, "Give SELF the current value of a random PERSON object on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
+        bodyDouble = Card("bodydouble", "Body Double", 0, "Give SELF the current value of a random PERSON card", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
         junker = Card("junker", "Junker", 7, "", [Type.VEHICLE], hero_name)
-        beg = Card("beg", "Beg", 0, "Take and Give 1C to the lowest value PERSON card on your board for every PERSON card on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
-        scam = Card("scam", "Scam", 0, "Take and Give to PLAYER BANK all C from one random non-CRIME PERSON card on both boards", [Type.SPELL], hero_name)
+        beg = Card("beg", "Beg", 0, "Transfer 1C to the lowest value PERSON on your board for every PERSON on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
+        scam = Card("scam", "Scam", 0, "Transfer to PLAYER BANK all C from one random non-CRIME PERSON card", [Type.SPELL], hero_name)
 
-        blackMarket2 = Card("blackmarket", "Black Market", 15, "Give half of their base value to OBJECT cards on this boardfield", [Type.STRUCTURE, Type.CRIME], hero_name)
-        pickPocket2 = Card("pickpocket", "Pick Pocket", 1, "Give SELF a quarter of the current value of each PERSON card on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")
-        graveDigger2 = Card("gravedigger", "Gravedigger", 2, "Give SELF half the base value of each PERSON card in both graveyards", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\gravedigger.png")
-        robinHood2 = Card("robinhood", "Robin Hood", 10, "Take and Give to PLAYER BANK a quarter of the current value of -cash- cards on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\robin hood.png")
+        blackMarket2 = Card("blackmarket", "Black Market", 15, "Give 1/2 their base value to OBJECT cards on this boardfield", [Type.STRUCTURE, Type.CRIME], hero_name)
+        pickPocket2 = Card("pickpocket", "Pick Pocket", 1, "Transfer to SELF 1/4 current value of each PERSON card on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")
+        graveDigger2 = Card("gravedigger", "Gravedigger", 2, "Give SELF 1/2 base value of each PERSON card in both graveyards", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\gravedigger.png")
+        robinHood2 = Card("robinhood", "Robin Hood", 10, "Transfer to PLAYER BANK 1/4 current value of -cash- cards on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\robin hood.png")
         slums2 = Card("slums", "Slums", 5, "", [Type.STRUCTURE], hero_name)
         kingpin2 = Card("kingpin", "Kingpin", 10, "+2C for every CRIME card on this boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\kingpin.png")
-        bodyDouble2 = Card("bodydouble", "Body Double", 0, "Give SELF the current value of a random PERSON object on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
+        bodyDouble2 = Card("bodydouble", "Body Double", 0, "Give SELF the current value of a random PERSON card", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
         junker2 = Card("junker", "Junker", 7, "", [Type.VEHICLE], hero_name)
-        beg2 = Card("beg", "Beg", 0, "Take and Give 1C to the lowest value PERSON card on your board for every PERSON card on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
-        scam2 = Card("scam", "Scam", 0, "Take and Give to PLAYER BANK all C from one random non-CRIME PERSON card on both boards", [Type.SPELL], hero_name)
+        beg2 = Card("beg", "Beg", 0, "Transfer 1C to the lowest value PERSON on your board for every PERSON on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
+        scam2 = Card("scam", "Scam", 0, "Transfer to PLAYER BANK all C from one random non-CRIME PERSON card", [Type.SPELL], hero_name)
 
         deck = [blackMarket, pickPocket, graveDigger, robinHood, slums, kingpin, bodyDouble, junker, beg, scam,
                 blackMarket2, pickPocket2, graveDigger2, robinHood2, slums2, kingpin2, bodyDouble2, junker2, beg2, scam2]
@@ -74,10 +74,10 @@ class DeckCatalogue(object):
     get_deck_king = staticmethod(get_deck_king)
 
     def get_deck_victoria(hero_name):
-        insurance = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
+        insurance = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card on your board to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
         shareHolder = Card("shareholder", "Share Holder", 10, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
         superstar = Card("superstar", "Superstar", 15, "+2C per PERSON card on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\superstar.png")
-        hacker = Card("hacker", "Hacker", 15, "-1C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
+        hacker = Card("hacker", "Hacker", 15, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
         university = Card("university", "University", 15, "", [Type.STRUCTURE], hero_name)
         skyscraper = Card("skyscraper", "Skyscraper", 20, "", [Type.STRUCTURE], hero_name)
         supplyTruck = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
@@ -85,10 +85,10 @@ class DeckCatalogue(object):
         innovate = Card("innovate", "Innovate", 0, "Draw a card", [Type.SPELL], hero_name, "assets\\cards\\card_art\\victoria\\innovation.png")
         solidWorkforce = Card("solidworkforce", "Solid Workforce", 0, "+3C to all non-CRIME PERSON cards on your board", [Type.SPELL], hero_name)
 
-        insurance2 = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
+        insurance2 = Card("insurance", "Insurance", -2, "Restore 1 random undervalued card on your board to its base value", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\victoria\\insurance.png")
         shareHolder2 = Card("shareholder", "Share Holder", 10, "-1C to SELF per STRUCTURE and +2C to each STRUCTURE card on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\business people.png")
         superstar2 = Card("superstar", "Superstar", 15, "+2C per PERSON card on both boards", [Type.PERSON], hero_name, "assets\\cards\\card_art\\victoria\\superstar.png")
-        hacker2 = Card("hacker", "Hacker", 15, "-1C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
+        hacker2 = Card("hacker", "Hacker", 15, "-2C to all non-SPELL cards on enemy board", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\victoria\\hacker.png")
         university2 = Card("university", "University", 15, "", [Type.STRUCTURE], hero_name)
         skyscraper2 = Card("skyscraper", "Skyscraper", 20, "", [Type.STRUCTURE], hero_name)
         supplyTruck2 = Card("supplytruck", "Supply Truck", 8, "", [Type.VEHICLE], hero_name)
