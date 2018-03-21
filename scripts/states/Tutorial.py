@@ -233,10 +233,12 @@ class Tutorial(object):
         # tutorial-specific booleans TODO
         self.tut_wait = True
         self.tut_may_proceed = False
+        self.tut_may_preview = False
         self.may_see_okay_button = False
         self.may_see_arrow = False
         self.may_see_arrowr = False
         self.tut_prep_jebait = True
+        self.tut_may_now_end = False
         self.tut_favordiag_bool = True
         self.tut_welcome_bool = False  # TODO pseudocode for now
         self.tut_passend_bool = True  # this is the pass/end coin
@@ -831,8 +833,9 @@ class Tutorial(object):
         if self.cardMousedOver(pygame.mouse.get_pos()):
             # print("Mousingover")
             if self.clickedCard[0].front:
-                self.board.hasPreviewCard = True
-                self.board.previewCard = self.clickedCard[0]  # this actually must be the card that's being moused over.
+                if self.tut_may_preview:
+                    self.board.hasPreviewCard = True
+                    self.board.previewCard = self.clickedCard[0]  # this actually must be the card that's being moused over.
         elif not self.cardMousedOver(pygame.mouse.get_pos()):
             # print("notmousing")
             self.board.hasPreviewCard = False if not self.holdingCard else True
@@ -908,20 +911,15 @@ class Tutorial(object):
 
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
+                if click[0] == 1 and self.tut_prep_jebait:
+                    self.tut_may_proceed = True
+                    self.tut_prep_jebait = False
                 if click[0] == 0:
 
-                    if self.mouseOnEndTurnButton and self.showEndTurnButton:
-                        self.done_turn = True
-                        self.showEndTurnButton = False
-                    if self.mouseOnPassTurnButton and self.showPassTurnButton:
-                        print("TURN PASSED")
-                        self.done_turn = True
-                        self.showEndTurnButton = False
-                        self.showPassTurnButton = False
-                        self.passed = True
-
-                        if self.player.cash < self.player2.cash:
-                            self.may_end_round = True
+                    if self.mouseOnEndTurnButton and self.showEndTurnButton and self.tut_may_now_end:
+                        self.tut_may_proceed = True
+                    if self.mouseOnPassTurnButton and self.showPassTurnButton and self.tut_may_now_end:
+                        pass
 
                     print("unheld")
                     self.holdingCard = False
@@ -941,6 +939,7 @@ class Tutorial(object):
                         #     self.clickedCard[0].onBoard = True
                         #
 
+
                         for bF in self.boardFieldList:
                             if self.clickedCard[0].collide_rect(*bF.get_dimensions()) and not self.clickedCard[0].onBoard:
                                 bF.take_card(self.clickedCard[0])
@@ -949,8 +948,7 @@ class Tutorial(object):
                                 if Type.SPELL in self.clickedCard[0].type:
                                     self.spellPlayed = True
                                     self.playedSpell = self.clickedCard[0]
-                    elif self.tut_prep_jebait:
-                        self.tut_may_proceed = True
+
                         # TODO erase these boardfield card play below, they are obsolete.
                         # if self.player == self.first_player:
                         #     for bF in self.boardFieldList:
@@ -1240,6 +1238,7 @@ class Tutorial(object):
                     self.tut_general_dialogue = FontObj.factory("Point on a card to see their details to the right!", self.screen_center[0]+450, self.screen_center[1]+100, "big_noodle_titling.ttf", 55, (255, 255, 255))
                     self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]+100)
                     self.may_see_arrow = False
+                    self.tut_may_preview = True
                 elif self.board.hasPreviewCard:
                     self.tut_may_proceed = False
                     self.tut_cards4_bool = False
@@ -1382,35 +1381,145 @@ class Tutorial(object):
             elif self.tut_place7_bool:  # You couldn't place the card down.
                 if currentTime - self.waitTick >= 500 and self.tut_wait:
                     self.tut_wait = False
-                    self.tut_general_dialogue = FontObj.factory("However you've reached the limit of plays (2 max per turn)", self.screen_center[0]+700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
-                    self.tut_general_dialogue.set_destination(*self.screen_center)
+                    self.tut_general_dialogue = FontObj.factory("Hold on, you've reached the limit of plays (2 max per turn)", self.screen_center[0]+700, self.screen_center[1]-10, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]+35, self.screen_center[1]-10)
                     self.may_see_okay_button = True
                 elif self.tut_may_proceed:
                     self.tut_may_proceed = False
                     self.tut_place7_bool = False
 
-                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1]-10)
                     self.may_see_arrow = False
+                    self.may_see_okay_button = False
                     self.waitTick = currentTime
                     self.tut_wait = True
 
             elif self.tut_place8_bool:  # this is because you can only play 2 card per turn
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("However, there may be a way to circumvent this", self.screen_center[0]+700, self.screen_center[1]-10, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1]-10)
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place8_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1] -10)
+                    self.may_see_okay_button = False
+                    self.tut_may_now_end = True
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_place9_bool:  # click the end turn coin at the left to end your turn
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Click the end turn coin at the left to end your turn", self.screen_center[0]+700, self.screen_center[1]-10, "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(*(self.screen_center[0]+90, self.screen_center[1]))
+                    self.may_see_arrow = True
+                    self.tut_arrow.set_destination(self.coin_slot[0] + 130, self.coin_slot[1])
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_place9_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1] -10)
+                    self.may_see_okay_button = False
+                    self.may_see_arrow = False
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             # Don't black out the screen
             elif self.tut_black_bool:  # Now, your opponent will start playing their cards
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Now, it's your opponent's turn.", self.screen_center[0]+700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1])
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_black_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_black2_bool:  # Once a round has been decided after a series of turns
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Once a player passes, and the next ends, the round is judged", self.screen_center[0] + 700, self.screen_center[1], "big_noodle_titling.ttf", 45, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0]+30, self.screen_center[1])
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_black2_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_black3_bool:  # A round winner may be decided, and the loser would lose hitpoints
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("The loser would lose hitpoints (indicated by cracks)", self.screen_center[0] + 700, self.screen_center[1], "big_noodle_titling.ttf", 43, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1])
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_black3_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_black3b_bool:  # Players draw a few cards before starting the next turn
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Players draw a few cards before starting the next turn", self.screen_center[0] + 700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1])
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_black3b_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_black4_bool:  # Each player has 2 lives each. The survivor shall be declared winner
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("Each player has 2 hitpoints. The survivor shall be declared victorious", self.screen_center[0] + 700, self.screen_center[1], "big_noodle_titling.ttf", 50, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1])
+                    self.may_see_okay_button = True
+                elif self.tut_may_proceed:
+                    self.tut_may_proceed = False
+                    self.tut_black4_bool = False
+
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
             elif self.tut_black5_bool:  # How far will you push the greed in order to win
-                pass
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.tut_wait = False
+                    self.tut_general_dialogue = FontObj.factory("How much luck and greed would it take to win?", self.screen_center[0] + 700, self.screen_center[1], "big_noodle_titling.ttf", 55, (255, 255, 255))
+                    self.tut_general_dialogue.set_destination(self.screen_center[0], self.screen_center[1])
+                elif currentTime - self.waitTick >= 2600:
+                    self.tut_may_proceed = False
+                    self.tut_black5_bool = False
+                    self.tut_general_dialogue.set_destination(-700, self.screen_center[1])
+                    self.may_see_okay_button = False
+
+                    self.waitTick = currentTime
+                    self.tut_wait = True
+
+
+            else:
+                if currentTime - self.waitTick >= 500 and self.tut_wait:
+                    self.fadeIn()
+                    self.backToMain()
 
             if not self.done_turn:
                 if self.showEndTurnButton and (self.endTurnImgX + self.endTurnImgDimensionX) > pygame.mouse.get_pos()[0] > self.endTurnImgX and (self.endTurnImgY + self.endTurnImgDimensionY) > \
@@ -1717,6 +1826,9 @@ class Tutorial(object):
         if onTopCard != None:
             onTopCard.draw(screen)
             onTopCard.onTop = False
+        if self.hand != None:
+            for c in self.hand:
+                c.draw(screen)
 
         if self.is_showing_decide:
             self.font_decide_obj.draw(screen)

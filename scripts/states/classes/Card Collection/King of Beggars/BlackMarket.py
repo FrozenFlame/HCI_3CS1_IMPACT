@@ -7,7 +7,7 @@ class BlackMarket(Card):
     base_val = 15
     current_val = 15
 
-    def __init__(self, name="Black Market", base_val=15, effect=None, type=[Type.BLACK, Type.STRUCTURE]):
+    def __init__(self, name="Black Market", base_val=15, effect=None, type=[Type.CRIME, Type.STRUCTURE]):
         super.__init__(name,base_val,effect)
         self.type = type
 

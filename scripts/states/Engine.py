@@ -2150,6 +2150,9 @@ class Engine(object):
         if onTopCard != None:
             onTopCard.draw(screen)
             onTopCard.onTop = False
+        if self.hand != None:
+            for c in self.hand:
+                c.draw(screen)
 
         if self.is_showing_decide:
             self.font_decide_obj.draw(screen)
