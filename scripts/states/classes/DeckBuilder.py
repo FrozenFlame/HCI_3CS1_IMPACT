@@ -55,7 +55,7 @@ class DeckCatalogue(object):
         bodyDouble = Card("bodydouble", "Body Double", 0, "Give SELF the current value of a random PERSON card", [Type.PERSON], hero_name, "assets\\cards\\card_art\\king\\double.png")
         junker = Card("junker", "Junker", 7, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\junker.png")
         beg = Card("beg", "Beg", 0, "Transfer 1C to the lowest value PERSON on your board for every PERSON on enemy board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\beg.png")
-        scam = Card("scam", "Scam", 0, "Transfer to PLAYER BANK all C from one random non-CRIME PERSON card", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\scam.png")
+        scam = Card("scam", "Scam", 0, "Transfer to PLAYER BANK all C from one random non-CRIME PERSON card on both boards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\king\\scam.png")
 
         blackMarket2 = Card("blackmarket", "Black Market", 15, "Give 1/2 their base value to OBJECT cards on this boardfield", [Type.STRUCTURE, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\black market.png")
         pickPocket2 = Card("pickpocket", "Pick Pocket", 1, "Transfer to SELF 1/4 current value of each PERSON card on opposite boardfield", [Type.PERSON, Type.CRIME], hero_name, "assets\\cards\\card_art\\king\\pickpocket.png")

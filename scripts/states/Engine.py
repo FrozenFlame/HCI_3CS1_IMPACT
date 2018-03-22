@@ -950,7 +950,7 @@ class Engine(object):
                     if len(enemyBoardfield.cardList) > 0:
                         for c in enemyBoardfield.cardList:
                             if Type.PERSON in c.type:
-                                boardCard += (int(c.current_val/4))
+                                boardCard.current_val += (int(c.current_val/4))
                                 c.current_val -= (int(c.current_val/4))
 
                     boardCard.effectActivated = True
@@ -1083,14 +1083,24 @@ class Engine(object):
                                     if r is 1:
                                         badluckbrian = c
                                         scammed = True
+                        for bf in self.boardFieldListOpp:
+                            for c in bf.cardList:
+                                if Type.PERSON in c.type and Type.CRIME not in c.type and not scammed:
+                                    r = random.randrange(0, 6)
+                                    if r is 1:
+                                        badluckbrian = c
+                                        scammed = True
                         if not scammed:
+                            for bf in self.boardFieldList:
+                                for c in bf.cardList:
+                                    if Type.PERSON in c.type and Type.CRIME not in c.type and not scammed:
+                                        badluckbrian = c
+                                        scammed = True
                             for bf in self.boardFieldListOpp:
                                 for c in bf.cardList:
                                     if Type.PERSON in c.type and Type.CRIME not in c.type and not scammed:
-                                        r = random.randrange(0, 6)
-                                        if r is 1:
-                                            badluckbrian = c
-                                            scammed = True
+                                        badluckbrian = c
+                                        scammed = True
 
                         self.player.cashPositives.append(badluckbrian.current_val)
                         badluckbrian.current_val = 0
@@ -1686,13 +1696,12 @@ class Engine(object):
 
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
-                    elif self.phase == Phase.ROUND_TWO:
-                        self.player.renew_balances()
-                        self.player2.renew_balances()
-                        self.player.cash = 0
-                        self.player2.cash = 0
-                        self.refresh_cash(self.player)
-                        self.refresh_cash(self.player2)
+                self.player.renew_balances()
+                self.player2.renew_balances()
+                self.player.cash = 0
+                self.player2.cash = 0
+                self.refresh_cash(self.player)
+                self.refresh_cash(self.player2)
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
@@ -1745,14 +1754,13 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
-                    elif self.phase == Phase.ROUND_TWO:
 
-                        self.player.renew_balances()
-                        self.player2.renew_balances()
-                        self.player.cash = 0
-                        self.player2.cash = 0
-                        self.refresh_cash(self.player)
-                        self.refresh_cash(self.player2)
+                self.player.renew_balances()
+                self.player2.renew_balances()
+                self.player.cash = 0
+                self.player2.cash = 0
+                self.refresh_cash(self.player)
+                self.refresh_cash(self.player2)
             # play appropriate animations
             # check if it was the winning blow
                 #2 play animations if a player is found victorious
