@@ -401,18 +401,18 @@ class MainMenu(object):
             for c in self.backCs:
                 c.update(dt)
                 if c.exact_position[1] >= self.y_termination:
-                    scale = random.randrange(100, 170)
-                    cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"), (scale, scale)).convert_alpha()
-                    c.surface = cimg
+                    # scale = random.randrange(100, 170)
+                    # cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - light.png"), (scale, scale)).convert_alpha()
+                    # c.surface = cimg
                     c.set_absolute((random.randrange(-10,1250),-random.randrange(80,500)))
                     c.set_destination(c.exact_position[0], 1200)
 
             for c2 in self.frontCs:
                 c2.update(dt)
                 if c2.exact_position[1] >= self.y_termination:
-                    scale = random.randrange(100, 300)
-                    cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - dark.png"), (scale, scale)).convert_alpha()
-                    c2.surface = cimg
+                    # scale = random.randrange(100, 300)
+                    # cimg = pygame.transform.smoothscale(pygame.image.load("assets\\logo\\Avarice C asset - dark.png"), (scale, scale)).convert_alpha()
+                    # c2.surface = cimg
                     c2.set_absolute((random.randrange(-10,1250),-random.randrange(80,500)))
                     c2.set_destination(c2.exact_position[0], 1200)
 
@@ -607,6 +607,8 @@ class MainMenu(object):
         elif self.phase == Phase.GAME:
             # self.draw(self.screen)
             screen.fill((0,0,0))
+        elif self.phase == Phase.TUTORIAL:
+            screen.fill((0, 0, 0))
     '''
     #    ___           _           _ _                                          _                  _                      _                               _           _                 _        _       _
     #   / __\ __ _ ___(_) ___ __ _| | |_   _   ___  ___  _ __ ___   ___   _ __ | | __ _  ___ ___  | |_ ___    _ __  _   _| |_   _ __ ___ _ __   ___  __ _| |_ ___  __| |   ___ ___   __| | ___  | | ___ | |
@@ -764,7 +766,11 @@ class MainMenu(object):
             self.playerb = None
 
             self.finished = True
-
+        elif Globals.tutorial:
+            print("Globs tuts")
+            Globals.mainmenu = False
+            Globals.gameStart = False
+            Globals.tutorial = True
 
         return self.persist
 
