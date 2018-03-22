@@ -106,7 +106,7 @@ class Tutorial(object):
         self.music_loaded = False
         self.is_showing_decide = False
 
-        # self.noSpells = True
+        self.noSpells = True
 
         # self.opening = True
 
@@ -653,6 +653,30 @@ class Tutorial(object):
             self.recalculate_score(self.player, self.boardFieldList)
             self.recalculate_score(self.player2, self.boardFieldListOpp)
 
+        ############################################## end of effects #################################################
+        if effectActivated:
+            for bf in self.boardFieldList:
+                for a in bf.cardList:
+                    a.rebuildFront()
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] * 0.33), round(a.frontImg.get_rect().size[1] * 0.33)))
+                    # a.draw(self.screen)
+                bf.rearrange()
+
+            for bf in self.boardFieldListOpp:
+                for a in bf.cardList:
+                    a.rebuildFront()
+                    a.img = pygame.transform.smoothscale(a.frontImg, (round(a.frontImg.get_rect().size[0] * 0.33), round(a.frontImg.get_rect().size[1] * 0.33)))
+                    # a.draw(self.screen)
+                bf.rearrange()
+            print("====SELF GRAVEYARD====")
+            for c in self.graveYardList:
+                print(c.name)
+            print("====OPPONENT GRAVEYARD====")
+            for c in self.graveYardListOpp:
+                print(c.name)
+            self.recalculate_score(self.player, self.boardFieldList)
+            self.recalculate_score(self.player2, self.boardFieldListOpp)
+
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  _____ _        _        ______                _   _
     # /  ___| |      | |       |  ___|              | | (_)
@@ -788,11 +812,11 @@ class Tutorial(object):
 
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
-                if click[0] == 1 and self.tut_prep_jebait:
-                    print("Hello dog")
-                    self.tut_may_proceed = True
-                    self.tut_prep_jebait = False
+
                 if click[0] == 0:
+                    if self.tut_prep_jebait:
+                        self.tut_may_proceed = True
+
 
                     if self.mouseOnEndTurnButton and self.showEndTurnButton and self.tut_may_now_end:
                         self.tut_may_proceed = True
@@ -861,9 +885,10 @@ class Tutorial(object):
 
                     for s in self.allCardsList:
                         if s.collidepoint(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]):
-                            # # if Type.SPELL in s.type and self.noSpells:
-                            # #     continue
-                            # else:
+
+                            if Type.SPELL in s.type and self.noSpells:
+                                continue
+                            else:
                                 self.clickedCard.append(s)
                                 s.onTop = True
                                 self.allCardsList.pop(self.allCardsList.index(s))
@@ -872,6 +897,7 @@ class Tutorial(object):
                     if len(self.clickedCard) > 0:
                         if self.clickedCard[0].disabled == False and self.clickedCard[0].onBoard == False and self.clickedCard[0].front and self.may_drag:
                             print("handcard clicked")
+
                             self.clickedCard[0].isHeld = True
                             self.holdingCard = True
                             self.clickedCard[0].resting = False
@@ -1175,7 +1201,7 @@ class Tutorial(object):
                     self.may_see_okay_button = True
                     self.tut_arrow.set_destination(*self.tut_botscore_coord)
 
-                    # self.noSpells = False
+                    self.noSpells = False
                 elif self.tut_may_proceed:
                     self.tut_may_proceed = False
                     self.tut_place2_bool = False
@@ -1296,7 +1322,7 @@ class Tutorial(object):
                 if currentTime - self.waitTick >= 500 and self.tut_wait:
                     self.tut_wait = False
                     self.tut_general_dialogue = FontObj.factory("Click the end turn coin at the left to end your turn", self.screen_center[0]+700, self.screen_center[1]-10, "big_noodle_titling.ttf", 55, (255, 255, 255))
-                    self.tut_general_dialogue.set_destination(*(self.screen_center[0]+90, self.screen_center[1]))
+                    self.tut_general_dialogue.set_destination(*(self.screen_center[0]+110, self.screen_center[1]))
                     self.may_see_arrow = True
                     self.tut_arrow.set_destination(self.coin_slot[0] + 130, self.coin_slot[1])
                 elif self.tut_may_proceed:
@@ -1770,7 +1796,7 @@ class Tutorial(object):
         self.boardFieldList = [self.boardField, self.boardField2]
         self.boardFieldListOpp = [self.boardFieldOpp, self.boardFieldOpp2]
 
-
+        self.first_player_set = False
 
         self.opening = True
         self.done_turn = False

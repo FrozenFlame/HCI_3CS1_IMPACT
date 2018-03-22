@@ -766,7 +766,11 @@ class MainMenu(object):
             self.playerb = None
 
             self.finished = True
-
+        elif Globals.tutorial:
+            print("Globs tuts")
+            Globals.mainmenu = False
+            Globals.gameStart = False
+            Globals.tutorial = True
 
         return self.persist
 

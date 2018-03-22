@@ -52,6 +52,7 @@ class Coordinator(object):
             self.state_dictionary["MAIN_MENU"] = MainMenu()
         elif Globals.tutorial:
             if "TUTORIAL" in self.state_dictionary:
+                print("TUTORIAL LOADED")
                 self.state_dictionary.pop("TUTORIAL")
             self.state_dictionary["TUTORIAL"] = Tutorial()
 
