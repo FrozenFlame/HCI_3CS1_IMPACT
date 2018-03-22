@@ -791,7 +791,7 @@ class Tutorial(object):
                 if click[0] == 1 and self.tut_prep_jebait:
                     print("Hello dog")
                     self.tut_may_proceed = True
-                    # self.tut_prep_jebait = False
+                    self.tut_prep_jebait = False
                 if click[0] == 0:
 
                     if self.mouseOnEndTurnButton and self.showEndTurnButton and self.tut_may_now_end:

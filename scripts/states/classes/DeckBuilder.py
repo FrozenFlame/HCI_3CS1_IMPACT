@@ -34,7 +34,7 @@ class DeckCatalogue(object):
         butler = Card("butler", "Butler", 10, "+5C to card left of the Butler", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\butler.png")
         bagOfCash = Card("bagofcash", "Bag of Cash", 10, "", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\commons\\Money bag.png")
         student = Card("student", "Student", 5, "", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\student.png")
-        car = Card("car", "Car", 15, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
+        car = Card("car", "Car", 10, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
         resurrect = Card("resurrect", "Resurrect", 0, "Restore 1 PERSON card from your graveyard.", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\resurrect.png")
         house = Card("house", "House", 10, "", [Type.STRUCTURE], hero_name)
         saboteur = Card("saboteur", "Saboteur", 0, "Destroy 1 random opponent card", [Type.SPELL], hero_name,"assets\\cards\\card_art\\commons\\saboteur.png")
@@ -105,11 +105,11 @@ class DeckCatalogue(object):
 
 
     def get_deck_billy(hero_name):
-        slaughterHouse = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
+        slaughterHouse = Card("slaughterhouse", "Slaughter House", 10, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
         cropDuster = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this boardfield", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\billy\\cropduster.png")
         farm = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
-        barn = Card("barn", "Barn", 5, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\barn.png")
+        barn = Card("barn", "Barn", 10, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\barn.png")
         cow = Card("cow", "Cow", 7, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\cow.png")
         chicken = Card("chicken", "Chicken", 5, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog = Card("farmdog", "Farm Dog", 3, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\dog.png")
@@ -117,11 +117,11 @@ class DeckCatalogue(object):
         drought = Card("drought", "Drought", 0, "-5C 'Farm', -2C ANIMAL / PERSON, +10C 'Water Purifier' on your board", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\drought.png")
         waterPurifier = Card("waterpurifier", "Water Purifier", 5, "+2C to all ANIMAL or PERSON cards on this boardfield", [Type.OBJECT], hero_name,"assets\\cards\\card_art\\billy\\water purifier.png")
 
-        slaughterHouse2 = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
+        slaughterHouse2 = Card("slaughterhouse", "Slaughter House", 10, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
         cropDuster2 = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this boardfield", [Type.VEHICLE], hero_name,"assets\\cards\\card_art\\billy\\cropduster.png")
         farm2 = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy2 = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
-        barn2 = Card("barn", "Barn", 0, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\billy\\barn.png")
+        barn2 = Card("barn", "Barn", 10, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\billy\\barn.png")
         cow2 = Card("cow", "Cow", 7, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\cow.png")
         chicken2 = Card("chicken", "Chicken", 5, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\chicken.png")
         farmDog2 = Card("farmdog", "Farm Dog", 3, "", [Type.ANIMAL], hero_name, "assets\\cards\\card_art\\billy\\dog.png")
@@ -144,7 +144,7 @@ class DeckCatalogue(object):
         mansion = Card("mansion", "Mansion", 25, "", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\mansion.png")
         house = Card("house", "House", 10, "", [Type.STRUCTURE], hero_name)
         student = Card("student", "Student", 5, "", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\student.png")
-        car = Card("car", "Car", 15, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
+        car = Card("car", "Car", 10, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
 
         bagOfCash2 = Card("bagofcash", "Bag of Cash", 10, "", [Type.OBJECT], hero_name,"assets\\cards\\card_art\\commons\\Money bag.png")
         bigBagOfCash2 = Card("bigbagofcash", "Big Bag of Cash", 20, "", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\commons\\big money bag.png")
@@ -153,7 +153,7 @@ class DeckCatalogue(object):
         mansion2 = Card("mansion", "Mansion", 25, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\commons\\mansion.png")
         house2 = Card("house", "House", 10, "", [Type.STRUCTURE], hero_name)
         student2 = Card("student", "Student", 5, "", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\student.png")
-        car2 = Card("car", "Car", 15, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
+        car2 = Card("car", "Car", 10, "", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\commons\\car.png")
 
         #### COMMON WITH EFFECTS ###
         butler = Card("butler", "Butler", 10, "+5C to card left of the Butler", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\butler.png")
