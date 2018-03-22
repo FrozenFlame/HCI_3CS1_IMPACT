@@ -747,7 +747,7 @@ class Engine(object):
                 if boardCard.id is "slaughterhouse":
                     print(boardCard.name, " effect activated")
                     boardAnimals = 0
-                    for c in boardField:
+                    for c in boardField.cardList:
                         if Type.ANIMAL in c.type:
                             boardAnimals += 1
                     boardCard.current_val += (3*boardAnimals)
@@ -758,8 +758,7 @@ class Engine(object):
 
                 if boardCard.id is "cropduster":
                     print(boardCard.name, " effect activated")
-                    boardFarms = 0
-                    for c in boardField:
+                    for c in boardField.cardList:
                         if c.id is 'farm':
                             c.current_val += 7
 

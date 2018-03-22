@@ -106,7 +106,7 @@ class Tutorial(object):
         self.music_loaded = False
         self.is_showing_decide = False
 
-        self.noSpells = True
+        # self.noSpells = True
 
         # self.opening = True
 
@@ -552,78 +552,18 @@ class Tutorial(object):
 
     def apply_effects(self, boardField):  # f this sh
         vehicleCounter = boardField.count_cardType(Type.VEHICLE)
-        blackCounter = boardField.count_cardType(Type.CRIME)
+        crimeCounter = boardField.count_cardType(Type.CRIME)
         personCounter = boardField.count_cardType(Type.PERSON)
         effectActivated = False
 
         for boardCard in boardField.cardList:
             if not boardCard.effectActivated:
-                if boardCard.id is "parkinglot":
-                    print("Parking Lot Effect")
-                    boardCard.current_val += (3 * vehicleCounter)
-                    boardCard.recalculate()
-                    print("Parking Lot Current Val: ", boardCard.current_val)
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "loanslip":  # cmon bruddah just draw the freakin cards
-                    print("Self hand before Loan:", len(self.hand))
-                    self.done_drawing = False
-                    self.draw_cards(2, self.deck, self.hand)
-                    self.done_drawing = True
-                    self.cashNegatives.append(15)
-                    print("Self hand after Loan:", len(self.hand))
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "lemonadestand":
-                    print("Lemonade Stand Effect")
-                    boardCard.current_val += (3 * personCounter)
-                    boardCard.recalculate()
-                    print("Lemonade Current Val:", boardCard.current_val)
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "creditcard":
-                    print("Credit Card Effect")
-                    for card in boardField.cardList:
-                        if Type.PERSON in card.type:
-                            card.current_val += 2
-                            card.recalculate()
-                        elif Type.OBJECT in card.type:
-                            card.current_val -= 3
-                            card.recalculate()
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
                 if boardCard.id is "butler":
                     print("Butler Effect")
                     if boardField.cardList.index(boardCard) != 0:
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].current_val += 5
                         boardField.cardList[boardField.cardList.index(boardCard) - 1].recalculate()
 
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "arsonist":  # WORKING POGCHAMP
-                    print("Arsonist Effect")
-                    arsonIndex = boardField.cardList.index(boardCard)
-                    if arsonIndex < len(self.boardFieldOpp.cardList) and Type.STRUCTURE in self.boardFieldOpp.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp.cardList[arsonIndex])
-                    if arsonIndex < len(self.boardFieldOpp2.cardList) and Type.STRUCTURE in self.boardFieldOpp2.cardList[arsonIndex].type:
-                        self.sendToGraveyard(self.boardFieldOpp2.cardList[arsonIndex])
-
-                    # for bF in self.boardFieldListOpp:
-                    #     bF.rearrange()
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
@@ -643,73 +583,6 @@ class Tutorial(object):
                                 sent = True
                         if not sent:
                             self.sendToGraveyard(targetList[0])
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "maid":
-                    print("Maid Effect")
-                    for bF in self.boardFieldList:
-                        for a in bF.cardList:
-                            if a.id is "mansion":
-                                a.current_val += 3
-                                a.recalculate()
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "policeofficer":
-                    print("Police Officer Effect")
-                    sent = False
-                    targetList = list()
-                    for bF in self.boardFieldListOpp:
-                        for a in bF.cardList:
-                            if Type.CRIME in a.type and Type.PERSON in a.type:
-                                targetList.append(a)
-
-                    if len(targetList) != 0:
-                        for target in targetList:
-                            r = random.randrange(0, 2)
-                            if r == 1:
-                                self.sendToGraveyard(target)
-                                sent = True
-                        if not sent:
-                            self.sendToGraveyard(targetList[0])
-                    for bF in self.boardFieldListOpp:
-                        bF.rearrange()
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    self.refresh_cash(self.player2)
-                    self.refresh_cash(self.player2)
-                    continue
-
-                if boardCard.id is "impoundlot":
-                    print("Impound Lot Effect")
-                    for bF in self.boardFieldListOpp:
-                        for a in bF.cardList:
-                            if Type.VEHICLE in a.type:
-                                a.current_val -= 2
-                                a.recalculate()
-
-                    boardCard.effectActivated = True
-                    effectActivated = True
-                    continue
-
-                if boardCard.id is "junkyard":
-                    print("Junkyard Effect")
-                    print("Old Junkyard Value: ", boardCard.current_val)
-                    count = 0
-                    for a in self.graveYardList:
-                        if Type.VEHICLE in a.type:
-                            count += 1
-                    for a in self.graveYardListOpp:
-                        if Type.VEHICLE in a.type:
-                            count += 1
-                    boardCard.current_val += (2 * count)
-                    boardCard.recalculate()
-                    print("New Junkyard Value: ", boardCard.current_val)
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -736,27 +609,29 @@ class Tutorial(object):
                     effectActivated = True
                     continue
 
-                if boardCard.id is "rebuild":
-                    print("Rebuild Effect")
-                    graveList = list()
-                    for a in self.graveYardList:
-                        if Type.VEHICLE in a.type or Type.STRUCTURE in a.type:
-                            graveList.append(a)
-                    if len(graveList) > 0:
-                        r = random.randrange(0, len(graveList))
-                        c = graveList[r]
-                        self.boardField.take_card(c)
-                        # self.recalculate_score(self.boardFieldList)
-                        self.graveYardList.pop(self.graveYardList.index(c))
-                        c.flip()
-                        c.disabled = False
-                        c.resting = False
-                        c.set_destination(*c.defaultPos)
+                if boardCard.id is "reap":
+                    print(boardCard.name, " effect activated")
+                    for bf in self.boardFieldList:
+                        for c in bf.cardList:
+                            if c.id is 'farm':
+                                self.player.cashPositives.append(c.current_val)
+                                self.send_to_grave_fromboard(c, bf)
 
                     boardCard.effectActivated = True
                     effectActivated = True
                     continue
 
+                if boardCard.id is "farmboy":
+                    print(boardCard.name, " effect activated")
+                    for c in boardField.cardList:
+                        if c.id is 'farm':
+                            c.current_val += 3
+                        if Type.ANIMAL in c.type:
+                            c.current_val += 1
+
+                    boardCard.effectActivated = True
+                    effectActivated = True
+                    continue
         if effectActivated:
             for bf in self.boardFieldList:
                 for a in bf.cardList:
@@ -915,7 +790,7 @@ class Tutorial(object):
                 click = pygame.mouse.get_pressed()
                 if click[0] == 1 and self.tut_prep_jebait:
                     self.tut_may_proceed = True
-                    self.tut_prep_jebait = False
+                    # self.tut_prep_jebait = False
                 if click[0] == 0:
 
                     if self.mouseOnEndTurnButton and self.showEndTurnButton and self.tut_may_now_end:
@@ -1904,7 +1779,7 @@ class Tutorial(object):
 
         self.usera = User("Player 1", 99, 0)
         self.heroa = Hero("Billy", pygame.image.load("assets\\heroes\\hero_billy.png").convert_alpha())
-        self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck("Billy"))  # NOTE set hero name deck here
+        self.playera = Player(self.usera, self.heroa, DeckBuilder.build_deck("Tutorial"))  # NOTE set hero name deck here
 
         self.userb = User("Player 2", 99, 0)
         self.herob = Hero("King", pygame.image.load("assets\\heroes\\hero_king.png").convert_alpha())

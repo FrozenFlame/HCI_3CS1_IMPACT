@@ -42,12 +42,14 @@ class Card(object):
         self.fontDictionary = {"King": 'POORICH.TTF',
                           "Billy": 'GARA.TTF',
                           "Victoria": 'big_noodle_titling_oblique.ttf',
-                          "Generic": 'OLDENGL.TTF'}
+                          "Generic": 'OLDENGL.TTF',
+                               "Tutorial": 'GARA.TTF'}
 
         self.fontSizeDictionary = {"King": 17,
                                "Billy": 18,
                                "Victoria": 20,
-                               "Generic": 20}
+                               "Generic": 20,
+                                   "Tutorial": 18}
         self.fontChoice = self.fontDictionary[self.owner]
         self.fontSizeChoice = self.fontSizeDictionary[self.owner]
 

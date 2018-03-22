@@ -29,7 +29,7 @@ class DeckCatalogue(object):
 
     def get_deck_tutorial(hero_name):
         reap = Card("reap", "Reap", 0, "Gain all the values of your 'Farm' cards on board, then send them to graveyard", [Type.SPELL], hero_name, "assets\\cards\\card_art\\billy\\reap.png")
-        farm = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name)
+        farm = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
         butler = Card("butler", "Butler", 10, "+5C to card left of the Butler", [Type.PERSON], hero_name,"assets\\cards\\card_art\\commons\\butler.png")
         bagOfCash = Card("bagofcash", "Bag of Cash", 10, "", [Type.OBJECT], hero_name, "assets\\cards\\card_art\\commons\\Money bag.png")
@@ -106,7 +106,7 @@ class DeckCatalogue(object):
 
     def get_deck_billy(hero_name):
         slaughterHouse = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
-        cropDuster = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this board", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\billy\\cropduster.png")
+        cropDuster = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this boardfield", [Type.VEHICLE], hero_name, "assets\\cards\\card_art\\billy\\cropduster.png")
         farm = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
         barn = Card("barn", "Barn", 5, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\barn.png")
@@ -118,7 +118,7 @@ class DeckCatalogue(object):
         waterPurifier = Card("waterpurifier", "Water Purifier", 5, "+2C to all ANIMAL or PERSON cards on this boardfield", [Type.OBJECT], hero_name,"assets\\cards\\card_art\\billy\\water purifier.png")
 
         slaughterHouse2 = Card("slaughterhouse", "Slaughter House", 5, "+3C for every ANIMAL card on this boardfield", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\slaughterhouse.png")
-        cropDuster2 = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this board", [Type.VEHICLE], hero_name,"assets\\cards\\card_art\\billy\\cropduster.png")
+        cropDuster2 = Card("cropduster", "Crop Duster", 10, "+7C to all 'Farm' card on this boardfield", [Type.VEHICLE], hero_name,"assets\\cards\\card_art\\billy\\cropduster.png")
         farm2 = Card("farm", "Farm", 15, "", [Type.STRUCTURE], hero_name, "assets\\cards\\card_art\\billy\\farm.png")
         farmBoy2 = Card("farmboy", "Farm Boy", 5, "+3C to 'Farm' cards, +1C to ANIMAL cards on this boardfield", [Type.PERSON], hero_name, "assets\\cards\\card_art\\billy\\farmboy.png")
         barn2 = Card("barn", "Barn", 0, "+3C to ANIMAL cards on this boardfield", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\billy\\barn.png")
@@ -162,7 +162,7 @@ class DeckCatalogue(object):
         gangsters = Card("gangsters", "Gangsters", 5, "", [Type.PERSON, Type.CRIME], hero_name,"assets\\cards\\card_art\\commons\\gangsters.png")
         arsonist = Card("arsonist", "Arsonist", 3, "Destroy Opposing Column's STRUCTURE cards", [Type.PERSON, Type.CRIME], hero_name,"assets\\cards\\card_art\\commons\\arsonist.png")
         lemonadeStand = Card("lemonadestand", "Lemonade Stand", 5, "+3C to SELF per PERSON card on this boardfield", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\lemonade stand.png" )
-        parkingLot = Card("parkinglot", "Parking Lot", 10, "+3C to SELF per VEHICLE card on this boardfield.", [Type.STRUCTURE], hero_name)
+        parkingLot = Card("parkinglot", "Parking Lot", 10, "+3C to SELF per VEHICLE card on this boardfield.", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\parking lot.png")
         impoundLot = Card("impoundlot", "Impound Lot", 5, "-2C to VEHICLE cards on enemy board", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\impound lot.png")
         junkyard = Card("junkyard", "Junkyard", 5, "+2C to SELF per VEHICLE card on both graveyards.", [Type.STRUCTURE], hero_name,"assets\\cards\\card_art\\commons\\junkyard.png")
         loanSlip = Card("loanslip", "Loan Slip", 0, "-20C to PLAYER BANK; Draw 3 cards", [Type.SPELL], hero_name, "assets\\cards\\card_art\\commons\\loan slip.png")
