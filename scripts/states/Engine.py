@@ -638,8 +638,14 @@ class Engine(object):
                                     sent = True
                                     bF.rearrange()
                     if not sent:
-                        self.send_to_grave_fromboard(self.boardFieldListOpp[0].cardList[0], self.boardFieldListOpp[0])
-                        self.boardFieldListOpp[0].rearrange()
+                        for bF in self.boardFieldListOpp:
+                            for target in bF.cardList:
+                                if Type.PERSON in target.type and Type.CRIME in target.type:
+                                    if not sent:
+                                        self.send_to_grave_fromboard(target, bF)
+                                    print(target.name, " sent to graveyard")
+                                    sent = True
+                                    bF.rearrange()
 
                     boardCard.effectActivated = True
                     effectActivated = True
@@ -1680,12 +1686,13 @@ class Engine(object):
 
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X *0.5, Globals.RESOLUTION_Y * 0.5 + 200))
-                self.player.renew_balances()
-                self.player2.renew_balances()
-                self.player.cash = 0
-                self.player2.cash = 0
-                self.refresh_cash(self.player)
-                self.refresh_cash(self.player2)
+                    elif self.phase == Phase.ROUND_TWO:
+                        self.player.renew_balances()
+                        self.player2.renew_balances()
+                        self.player.cash = 0
+                        self.player2.cash = 0
+                        self.refresh_cash(self.player)
+                        self.refresh_cash(self.player2)
             elif self.player.cash == self.player2.cash:
                 print("Both players have equal amount of cash!")
                 self.font_decide_obj = FontObj.factory("round draw", Globals.RESOLUTION_X * 0.5, -200, "cash currency.ttf", 40, (255, 255, 255))
@@ -1738,13 +1745,14 @@ class Engine(object):
                         self.font_turn_obj.set_absolute((Globals.RESOLUTION_X * 0.5 + 1200, Globals.RESOLUTION_Y * 0.5 + 200))
                         self.hero_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5))
                         self.font_turn_obj.set_destination(*(Globals.RESOLUTION_X * 0.5 , Globals.RESOLUTION_Y * 0.5 + 200))
+                    elif self.phase == Phase.ROUND_TWO:
 
-                self.player.renew_balances()
-                self.player2.renew_balances()
-                self.player.cash = 0
-                self.player2.cash = 0
-                self.refresh_cash(self.player)
-                self.refresh_cash(self.player2)
+                        self.player.renew_balances()
+                        self.player2.renew_balances()
+                        self.player.cash = 0
+                        self.player2.cash = 0
+                        self.refresh_cash(self.player)
+                        self.refresh_cash(self.player2)
             # play appropriate animations
             # check if it was the winning blow
                 #2 play animations if a player is found victorious
