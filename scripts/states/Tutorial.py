@@ -223,7 +223,7 @@ class Tutorial(object):
         self.playedSpell = None
 
         self.cashNegatives = list()
-        self.startup(pygame.time.get_ticks(),{})
+        # self.startup(pygame.time.get_ticks(),{})
 
         #  _____       _             _       _   _   _     _
         # /__   \_   _| |_ ___  _ __(_) __ _| | | |_| |__ (_)_ __   __ _ ___
@@ -789,6 +789,7 @@ class Tutorial(object):
             if event.type == pygame.MOUSEBUTTONUP:
                 click = pygame.mouse.get_pressed()
                 if click[0] == 1 and self.tut_prep_jebait:
+                    print("Hello dog")
                     self.tut_may_proceed = True
                     # self.tut_prep_jebait = False
                 if click[0] == 0:
